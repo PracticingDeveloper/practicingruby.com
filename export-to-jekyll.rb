@@ -10,7 +10,7 @@ def yaml_frontmatter(article)
   front_matter = {
     'layout'     => 'post',
     'title'      => article[:title],
-    'date'       => article[:published].strftime("%F %R %z"),
+    'date'       => article[:published].strftime("%F"),
     'categories' => 'articles',
     'author'     => author(article),
     'permalink'  => "articles/#{article[:slug]}"
@@ -30,4 +30,4 @@ def write_to_file(article)
   File.write("_posts/#{filename}", output)
 end
 
-write_to_file(articles[0])
+articles.each { |article| write_to_file(article) }
