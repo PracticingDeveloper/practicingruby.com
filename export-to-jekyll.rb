@@ -12,10 +12,14 @@ def yaml_frontmatter(article)
     'title'      => article[:title],
     'date'       => article[:published].strftime("%F %R %z"),
     'categories' => 'articles',
-    'author'     => 'Practicing Ruby',
+    'author'     => author(article),
     'permalink'  => "articles/#{article[:slug]}"
   }.to_yaml
   front_matter << "---\n\n"
+end
+
+def author(article)
+  article[:summary][/\(w\. (.*)\)/, 1] || 'Gregory Brown'
 end
 
 def write_to_file(article)
