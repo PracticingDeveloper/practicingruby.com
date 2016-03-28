@@ -1,8 +1,9 @@
 ---
 layout: page
 title: About
-permalink: /about/
+permalink: /about
 ---
 Welcome to practicingruby.com!
 
-(add more here later)
+We're currently in the process of rebuilding this website. For any questions
+or to report problems, contact gregory@practicingdeveloper.com.
