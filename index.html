@@ -9,7 +9,7 @@ layout: default
         <div class="post-link">
           <a href="{{ post.url | prepend: site.github.url }}">{{ post.title }}</a>
         </div>
-        <h4 style="padding-top: 5px;">{{ post.summary }}<br/><span class="post-meta">Issue {{ post.issue_number }} — {{ post.date | date: "%b %-d, %Y" }}</span></h4>
+        <div class="post-summary">{{ post.summary }}<br/><span class="post-meta">Issue {{ post.issue_number }} &mdash; {{ post.date | date: "%B %-d, %Y" }}</span></div>
       </li>
     {% endfor %}
   </ul>
