@@ -21,11 +21,9 @@ end
 def write_to_file(article)
   date = article[:published].strftime("%F")
   filename = "#{date}-#{article[:slug]}.md"
-  File.open("_posts/#{filename}", 'w') do |file|
-    file.puts yaml_frontmatter(article)
-    file.puts article[:body]
-    file.close
-  end
+
+  output = yaml_frontmatter(article) + article[:body]
+  File.write("_posts/#{filename}", output)
 end
 
 write_to_file(articles[0])
