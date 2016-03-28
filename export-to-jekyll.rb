@@ -19,7 +19,6 @@ def create_yaml_frontmatter(article)
 end
 
 def write_body(article)
-  puts "> #{article[:summary]}\n\n"
   puts article[:body]
 end
 
