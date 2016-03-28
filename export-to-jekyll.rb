@@ -13,7 +13,8 @@ def yaml_frontmatter(article)
     'date'       => article[:published].strftime("%F"),
     'categories' => 'articles',
     'author'     => author(article),
-    'permalink'  => "articles/#{article[:slug]}"
+    'permalink'  => "articles/#{article[:slug]}",
+    'summary'    => article[:summary]
   }.to_yaml
   front_matter << "---\n\n"
 end
