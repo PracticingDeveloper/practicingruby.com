@@ -9,7 +9,7 @@ layout: default
   <ul class="post-list">
     {% for post in site.posts %}
       <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+        <span class="post-meta">Issue {{ post.issue_number }}, {{ post.date | date: "%b %-d, %Y" }}</span>
 
         <div class="post-link">
           <a href="{{ post.url | prepend: site.github.url }}">{{ post.title }}</a>
