@@ -14,9 +14,9 @@ def create_yaml_frontmatter(article)
     'categories' => 'articles',
     'author'     => 'Practicing Ruby',
     'permalink'  => "articles/#{article[:slug]}"
-  }.to_yaml
+  }
   
-  puts front_matter, "---\n\n"
+  puts front_matter.to_yaml, "---\n\n"
 end
 
 def write_body(article)
