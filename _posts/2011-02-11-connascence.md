@@ -5,6 +5,9 @@ date: '2011-02-11'
 categories: articles
 author: Gregory Brown
 permalink: articles/connascence
+summary: Work through code samples inspired by Jim Weirich's "Building Blocks of Modularity"
+  presentation.
+issue_number: '1.24'
 ---
 
 My article on the [SOLID design

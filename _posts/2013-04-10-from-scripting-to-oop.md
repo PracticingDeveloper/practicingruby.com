@@ -5,6 +5,9 @@ date: '2013-04-10'
 categories: articles
 author: Gregory Brown
 permalink: articles/from-scripting-to-oop
+summary: Gradually convert a  "throwaway" procedural program into a well-defined domain
+  model.
+issue_number: '6.8'
 ---
 
 > **NOTE:** This issue of Practicing Ruby was one of several content experiments 

@@ -5,6 +5,9 @@ date: '2012-02-28'
 categories: articles
 author: Gregory Brown
 permalink: articles/using-games-to-practice-domain-modeling
+summary: Learn about modeling non-trivial business logic by implementing Minecraft's
+  crafting table.
+issue_number: '3.9'
 ---
 
 As programmers, it is literally our job to make [domain models](http://en.wikipedia.org/wiki/Domain_model) understandable to computers. While this can be some of the most creative work we do, it also tends to be the most challenging. The inherent difficulty of designing and implementing conceptual models leads many to develop their problem solving skills through a painful process of trial and error rather than some form of deliberate practice. However, that is a path paved with sorrows, and we can do better.

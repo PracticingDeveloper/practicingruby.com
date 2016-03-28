@@ -5,6 +5,9 @@ date: '2013-01-25'
 categories: articles
 author: Alberto F. Capel
 permalink: articles/gentle-intro-to-actor-based-concurrency
+summary: Solve "Dining Philosophers" using mutex locks, then do it again using actors.
+  (w. Alberto F. Capel)
+issue_number: '6.3'
 ---
 
 > This issue was a collaboration with [Alberto Fernández Capel][afcapel], a Ruby developer

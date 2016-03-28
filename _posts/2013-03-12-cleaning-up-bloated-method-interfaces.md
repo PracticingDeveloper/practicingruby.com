@@ -5,6 +5,8 @@ date: '2013-03-12'
 categories: articles
 author: Gregory Brown
 permalink: articles/cleaning-up-bloated-method-interfaces
+summary: Tame a complex method interface using keyword arguments and parameter objects.
+issue_number: '6.6'
 ---
 
 > **NOTE:** This issue of Practicing Ruby was one of several content experiments 

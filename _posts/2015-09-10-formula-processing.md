@@ -5,6 +5,9 @@ date: '2015-09-10'
 categories: articles
 author: Solomon White
 permalink: articles/formula-processing
+summary: Learn how to use the Dentaku formula parser/evaluator to run Excel-like formulas
+  in Ruby programs (w. Solomon White)
+issue_number: '8.2'
 ---
 
 > This article was written in collaboration with Solomon White ([@rubysolo](http://twitter.com/rubysolo)). Solomon is a software developer from Denver, where he builds web applications with Ruby and ENV.JAVASCRIPT_FRAMEWORK.  He likes code, caffeine, and capsaicin.

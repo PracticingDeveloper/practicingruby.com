@@ -5,6 +5,8 @@ date: '2010-12-08'
 categories: articles
 author: Gregory Brown
 permalink: articles/uses-for-modules-1
+summary: Use modules as namespaces for your libraries and applications.
+issue_number: '1.8'
 ---
 
 > Note: This article series on modules is also available as a [PDF download]. The

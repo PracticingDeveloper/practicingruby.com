@@ -5,6 +5,9 @@ date: '2010-11-11'
 categories: articles
 author: Gregory Brown
 permalink: articles/method-lookup-2
+summary: Use your knowledge of Ruby's lookup path to determine where to add methods
+  in a program.
+issue_number: '1.2'
 ---
 
 In [Issue #1](http://practicingruby.com/articles/29) we discussed Ruby's lookup

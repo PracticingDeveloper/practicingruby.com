@@ -5,6 +5,9 @@ date: '2012-01-25'
 categories: articles
 author: Gregory Brown
 permalink: articles/spiral-staircase-of-refactoring
+summary: In this issue, we improve the design of the Brainf*ck interpreter that was
+  introduced in Issue 3.3
+issue_number: '3.4'
 ---
 
 In [Issue 3.3](http://practicingruby.com/articles/shared/bwgflabwncjv), I presented a proof-of-concept Ruby implementation of the [Brainfuck programming language](http://en.wikipedia.org/wiki/Brainfuck) and challenged Practicing Ruby readers to improve upon it. After receiving several patches that helped move things along, I sat down once again to clean up the code even further. What I came to realize as I worked on my revisions is that the refactoring process is very similar to climbing a spiral staircase. Each structural change to the code simultaneously left the project back where it started along one vector while moving it forward along another.

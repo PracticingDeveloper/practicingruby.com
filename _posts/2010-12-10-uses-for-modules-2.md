@@ -5,6 +5,8 @@ date: '2010-12-10'
 categories: articles
 author: Gregory Brown
 permalink: articles/uses-for-modules-2
+summary: Use mixins as an alternative to multiple inheritance to augment class definitions.
+issue_number: '1.9'
 ---
 
 > Note: This article series on modules is also available as a [PDF download]. The

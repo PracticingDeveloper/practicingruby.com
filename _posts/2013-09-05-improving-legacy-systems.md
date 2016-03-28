@@ -5,6 +5,9 @@ date: '2013-09-05'
 categories: articles
 author: Jordan Byron
 permalink: articles/improving-legacy-systems
+summary: Experience the challenge of overhauling one of Practicing Ruby's oldest features.
+  (w. Jordan Byron)
+issue_number: '7.4'
 ---
 
 When you look at this photograph of highway construction, what do you see?

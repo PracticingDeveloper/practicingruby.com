@@ -5,6 +5,9 @@ date: '2011-01-26'
 categories: articles
 author: Gregory Brown
 permalink: articles/how-to-practice-1
+summary: Discover a new way to practice your coding skills by asking yourself the
+  right questions.
+issue_number: '1.21'
 ---
 
 When I was 17 years old, I was asked by an Air Force military training

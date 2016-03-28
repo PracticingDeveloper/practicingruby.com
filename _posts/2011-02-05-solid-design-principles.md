@@ -5,6 +5,9 @@ date: '2011-02-05'
 categories: articles
 author: Gregory Brown
 permalink: articles/solid-design-principles
+summary: Work through code samples inspired by Sandi Metz's "SOLID Object-oriented
+  Design" presentation.
+issue_number: '1.23'
 ---
 
 SOLID is a collection of five object oriented design principles that go nicely

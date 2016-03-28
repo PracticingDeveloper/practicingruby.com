@@ -5,6 +5,9 @@ date: '2012-05-10'
 categories: articles
 author: Gregory Brown
 permalink: articles/tricks-for-working-with-text-and-files
+summary: Tear apart a minimal clone of the Jekyll blog engine in search of helpful
+  Ruby idioms.
+issue_number: '4.4'
 ---
 
 While it may not seem like it at first, you can learn a great deal about Ruby by building something as simple as a static website generator. Although the task itself may seem a bit dull, it provides an opportunity to practice a wide range of Ruby idioms that can be applied elsewhere whenever you need to manipulate text-based data or muck around with the filesystem. Because text and files are everywhere, this kind of practice can have a profound impact on your ability to write elegant Ruby code.

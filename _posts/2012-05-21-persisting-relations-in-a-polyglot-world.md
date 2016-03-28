@@ -5,6 +5,9 @@ date: '2012-05-21'
 categories: articles
 author: Piotr Szotkowski
 permalink: articles/persisting-relations-in-a-polyglot-world
+summary: Explore some non-traditional persistence mechanisms and their uses.  (w.
+  Piotr Szotkowski)
+issue_number: '4.6'
 ---
 
 *This article is written by Piotr Szotkowski. Greg invited Piotr to contribute

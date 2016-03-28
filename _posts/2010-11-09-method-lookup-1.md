@@ -5,6 +5,9 @@ date: '2010-11-09'
 categories: articles
 author: Gregory Brown
 permalink: articles/method-lookup-1
+summary: Discover the complicated, multi-step dance that is the Ruby method lookup
+  path.
+issue_number: '1.1'
 ---
 
 I decided to start off this newsletter with one of the most basic but essential pieces of knowledge you can have about Ruby's object model: the way it looks up methods. Let's do a little exploration by working through a few examples.

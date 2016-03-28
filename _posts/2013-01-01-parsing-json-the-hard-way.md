@@ -5,6 +5,9 @@ date: '2013-01-01'
 categories: articles
 author: Aaron Patterson
 permalink: articles/parsing-json-the-hard-way
+summary: Learn about low-level parser and compiler tools by implementing a JSON parser.
+  (w. Aaron Patterson)
+issue_number: '6.1'
 ---
 
 *This article was written by Aaron Patterson, a Ruby

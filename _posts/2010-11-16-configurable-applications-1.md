@@ -5,6 +5,9 @@ date: '2010-11-16'
 categories: articles
 author: Gregory Brown
 permalink: articles/configurable-applications-1
+summary: Learn what not to do when configuring applications, then explore a simple
+  YAML-based configuration.
+issue_number: '1.3'
 ---
 
 Ruby developers tend to prefer convention over configuration, but that doesn't mean our applications are configuration-free.  If you're doing serious software development, it's likely that at least some of your projects depend on some sort of configuration data. Whether you simply need to store database credentials, an API key, or something much more complicated, it's important to know how to do so in a way that is flexible without introducing too much administrative overhead.

@@ -5,6 +5,9 @@ date: '2012-12-11'
 categories: articles
 author: Avdi Grimm
 permalink: articles/adventure-in-prototypes
+summary: Build a text adventure game and a prototype-based object model, at the same
+  time! (w. Avdi Grimm)
+issue_number: '5.10'
 ---
 
 *This article was written by Avdi Grimm. Avdi is a [Ruby Rogue][rogue], a

@@ -5,6 +5,8 @@ date: '2012-03-13'
 categories: articles
 author: Gregory Brown
 permalink: articles/coding-in-the-danger-zone
+summary: Establish a few survival skills for working in hostile programming environments.
+issue_number: '3.10'
 ---
 
 Writing robust code is always challenging, even when dealing with extremely well controlled environments. But when you enter the danger zone where software failures can result in data loss or extended service interruptions, coding for robustness becomes essential even if it is inconvenient to do so. 

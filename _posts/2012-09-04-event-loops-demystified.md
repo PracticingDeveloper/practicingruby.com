@@ -5,6 +5,9 @@ date: '2012-09-04'
 categories: articles
 author: Magnus Holm
 permalink: articles/event-loops-demystified
+summary: Build a Node.js/EventMachine-style event loop in roughly 150 lines of Ruby
+  code. (w. Magnus Holm)
+issue_number: '5.3'
 ---
 
 *This issue of Practicing Ruby was contributed by Magnus Holm ([@judofyr][judofyr]), 

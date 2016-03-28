@@ -5,6 +5,9 @@ date: '2012-05-15'
 categories: articles
 author: James Edward Gray II
 permalink: articles/solving-the-scoring-predictions-kata
+summary: Work through a coding puzzle and learn some fun tricks along the way. (w.
+  James Edward Gray II)
+issue_number: '4.5'
 ---
 
 *This article is written by James Edward Gray II.  James is an old friend of

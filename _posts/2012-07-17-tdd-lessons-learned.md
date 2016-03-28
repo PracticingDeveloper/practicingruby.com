@@ -5,6 +5,8 @@ date: '2012-07-17'
 categories: articles
 author: Gregory Brown
 permalink: articles/tdd-lessons-learned
+summary: Revisit the reasons for Gregory's 90-day self-study on TDD, and see the results.
+issue_number: '4.12'
 ---
 
 Test-driven development (TDD) is a topic that never gets old among programmers, 

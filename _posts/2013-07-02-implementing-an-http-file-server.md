@@ -5,6 +5,9 @@ date: '2013-07-02'
 categories: articles
 author: Luke Francl
 permalink: articles/implementing-an-http-file-server
+summary: Build just enough HTTP functionality from scratch to serve up static files.
+  (w. Luke Francl)
+issue_number: '7.2'
 ---
 
 *This article was written by Luke Francl, a Ruby developer living in

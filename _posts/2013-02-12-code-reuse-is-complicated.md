@@ -5,6 +5,8 @@ date: '2013-02-12'
 categories: articles
 author: Gregory Brown
 permalink: articles/code-reuse-is-complicated
+summary: "Learn the costs and benefits of the many ways that Ruby lets you reuse code.\r\n\r\n"
+issue_number: '6.4'
 ---
 
 > NOTE: This article was one of many content experiments published in Volume 6, which aimed to try out different formats and styles to see what readers thought of them.

@@ -5,6 +5,9 @@ date: '2012-07-18'
 categories: articles
 author: Gregory Brown
 permalink: articles/end-to-end-testing-is-essential
+summary: Build acceptance tests that reflect application behavior, rather than implementation
+  details.
+issue_number: 4.12.1
 ---
 
 > **NOTE:** This is one of [four lessons

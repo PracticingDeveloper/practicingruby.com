@@ -5,6 +5,9 @@ date: '2013-06-04'
 categories: articles
 author: Gregory Brown
 permalink: articles/simulating-tiny-worlds
+summary: Practice exploratory programming by modeling forest fires, rabbit populations,
+  and diseases.
+issue_number: '7.1'
 ---
 
 As programmers we are very comfortable with the idea of using

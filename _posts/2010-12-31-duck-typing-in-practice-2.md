@@ -5,6 +5,9 @@ date: '2010-12-31'
 categories: articles
 author: Gregory Brown
 permalink: articles/duck-typing-in-practice-2
+summary: Examine real uses of Ruby's duck-typing capabilities in various open source
+  projects and Ruby itself.
+issue_number: '1.15'
 ---
 
 Today, I've got a handful of neat examples to share, each which demonstrates an interesting use of duck typing. We'll start by looking a feature built into Ruby's core, and then look at a few examples from other open source Ruby projects.

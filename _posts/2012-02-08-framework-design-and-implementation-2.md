@@ -5,6 +5,8 @@ date: '2012-02-08'
 categories: articles
 author: Gregory Brown
 permalink: articles/framework-design-and-implementation-2
+summary: Explore some lessons learned the hard way in developing the Newman mail framework.
+issue_number: '3.6'
 ---
 
 In [Issue 3.5](http://practicingruby.com/articles/22), I  challenged Practicing Ruby subscribers to read through and play with the uncommented source code of [Newman 0.1.1](https://github.com/mendicant-original/newman/tree/v0.1.1), the first release of my micro-framework for building email-centric applications. My hope was that by looking through the implementation of a framework in its very early stages of development, readers would be able to familiarize themselves with the kinds of challenges involved in building this sort of project.

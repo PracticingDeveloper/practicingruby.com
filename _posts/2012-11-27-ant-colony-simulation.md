@@ -5,6 +5,9 @@ date: '2012-11-27'
 categories: articles
 author: Gregory Brown
 permalink: articles/ant-colony-simulation
+summary: Explore how simple rules for individuals can yield complex group behavior
+  by simulating an ant colony.
+issue_number: '5.9'
 ---
 
 *This article is based on a [heavily modified Ruby port][rubyantsim] 

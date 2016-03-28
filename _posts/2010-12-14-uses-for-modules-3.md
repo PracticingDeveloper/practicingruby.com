@@ -5,6 +5,9 @@ date: '2010-12-14'
 categories: articles
 author: Gregory Brown
 permalink: articles/uses-for-modules-3
+summary: See how modules can be used as namespaced function bags, and as singleton
+  objects.
+issue_number: '1.10'
 ---
 
 > Note: This article series on modules is also available as a [PDF download]. The

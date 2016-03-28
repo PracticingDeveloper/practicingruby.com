@@ -5,6 +5,9 @@ date: '2014-03-31'
 categories: articles
 author: Gregory Brown
 permalink: articles/study-guide-1
+summary: Explore UNIX-style stream processing, binary file formats, the Racc parser
+  generator, and socket programming.
+issue_number: '7.9'
 ---
 
 This self-guided course will help you learn how to work with the low level 

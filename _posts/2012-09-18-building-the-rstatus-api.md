@@ -5,6 +5,9 @@ date: '2012-09-18'
 categories: articles
 author: Carol Nichols
 permalink: articles/building-the-rstatus-api
+summary: Consider the design tradeoffs between the JSON API and hypermedia API styles.
+  (w. Carol Nichols)
+issue_number: '5.4'
 ---
 
 *This article was contributed by Carol Nichols

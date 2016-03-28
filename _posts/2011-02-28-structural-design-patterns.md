@@ -5,6 +5,9 @@ date: '2011-02-28'
 categories: articles
 author: Gregory Brown
 permalink: articles/structural-design-patterns
+summary: Examine a use case for each of the classic structural design patterns laid
+  out by the Gang of Four.
+issue_number: '1.26'
 ---
 
 In this two part series, I've been looking at the classical design patterns laid out by the Gang of Four and exploring their relevance to modern day Ruby programming. Rather than teaching the design patterns themselves, my goal is to give practical examples using real code so that you can consider what the strengths and weaknesses of these techniques are.

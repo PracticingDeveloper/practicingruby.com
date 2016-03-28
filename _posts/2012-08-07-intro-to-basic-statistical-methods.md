@@ -5,6 +5,9 @@ date: '2012-08-07'
 categories: articles
 author: Jia Wu
 permalink: articles/intro-to-basic-statistical-methods
+summary: Crunch some numbers to see how Olympic medal wins relate to GDP and population.
+  (w. Jia Wu)
+issue_number: '5.1'
 ---
 
 > This issue was a collaboration with my wife, Jia Wu. Jia is an associate

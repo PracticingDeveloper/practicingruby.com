@@ -5,6 +5,8 @@ date: '2012-01-10'
 categories: articles
 author: Gregory Brown
 permalink: articles/patterns-for-building-excellent-examples
+summary: Learn how to write code samples that clearly communicate ideas to other programmers.
+issue_number: '3.2'
 ---
 
 Good code examples are the secret sauce that makes Practicing Ruby a high-quality learning resource. That said, the art of building excellent examples is one that I think all programmers should practice, not just those folks out there trying to teach for a living. The ability to express ideas clearly through well-focused snippets of code is key to writing good tests, documentation, bug reports, code reviews, demonstrations, and a whole lot of other stuff, too.

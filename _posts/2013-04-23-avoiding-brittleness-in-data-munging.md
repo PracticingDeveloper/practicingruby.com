@@ -5,6 +5,9 @@ date: '2013-04-23'
 categories: articles
 author: Gregory Brown
 permalink: articles/avoiding-brittleness-in-data-munging
+summary: Process data and generate reports without writing unmaintainable spaghetti
+  code.
+issue_number: '6.9'
 ---
 
 > **NOTE:** This issue of Practicing Ruby was one of several content experiments 

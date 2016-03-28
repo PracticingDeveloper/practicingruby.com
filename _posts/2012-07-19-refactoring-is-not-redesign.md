@@ -5,6 +5,9 @@ date: '2012-07-19'
 categories: articles
 author: Gregory Brown
 permalink: articles/refactoring-is-not-redesign
+summary: 'Discover how the differences between refactoring and redesign affect testing
+  strategies. '
+issue_number: 4.12.2
 ---
 
 > **NOTE**: This is one of [four lessons learned](http://practicingruby.com/articles/65) 

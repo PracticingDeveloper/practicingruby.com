@@ -5,6 +5,9 @@ date: '2010-12-03'
 categories: articles
 author: Gregory Brown
 permalink: articles/meditations-on-bad-and-good-code-2
+summary: Read through a cleaned up version of the ugly "Tic Tac Toe" game created
+  in Issue 1.5
+issue_number: '1.7'
 ---
 
 In Issue #6, you got to see my intentionally bad implementation of Tic Tac Toe. For today, I have promised to show you some better code and the steps I took to get there. But before we move forward, let's take a quick look back at where we started.

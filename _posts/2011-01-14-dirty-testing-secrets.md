@@ -5,6 +5,8 @@ date: '2011-01-14'
 categories: articles
 author: Gregory Brown
 permalink: articles/dirty-testing-secrets
+summary: Take a look at some dark corners of the traditional testing dogma.
+issue_number: '1.18'
 ---
 
 Today I have a small rant about the test obsessed culture of Ruby. This area in particular is one in which the incredible enthusiasm surrounding the methodology seems to have outpaced the individual practitioner's ability to evaluate its utility. I'm not just talking about beginners here, but seasoned professionals as well. The sheer volume of rapidly changing testing tools and techniques is an indicator that we're nowhere near convergence, but that doesn't stop many from describing automated testing, particularly in the _Behavior Driven Development_ style, as if it were some sort of magic bullet. It isn't.

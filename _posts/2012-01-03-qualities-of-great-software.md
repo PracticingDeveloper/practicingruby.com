@@ -5,6 +5,9 @@ date: '2012-01-03'
 categories: articles
 author: Gregory Brown
 permalink: articles/qualities-of-great-software
+summary: See what ISO/IEC 9126 has to say about software quality, and how its metrics
+  apply to Ruby code.
+issue_number: '3.1'
 ---
 
 I ended the second volume of Practicing Ruby by launching an exploration into the uncomfortable question of what it means to write good code. To investigate the topic, I began to compile a wiki full of small case studies for each of the different properties outlined by [ISO/IEC 9126](http://en.wikipedia.org/wiki/ISO/IEC_9126) -- an international standard for evaluating software quality. While I made good headway on this project before taking a break for the holidays, I left some of it unfinished and promised to kick off this new volume by presenting my completed work.

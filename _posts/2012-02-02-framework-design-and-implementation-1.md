@@ -5,6 +5,9 @@ date: '2012-02-02'
 categories: articles
 author: Gregory Brown
 permalink: articles/framework-design-and-implementation-1
+summary: Dig through the Newman mail framework's source code in search of useful patterns
+  and practices.
+issue_number: '3.5'
 ---
 
 Ruby is a great language for building application frameworks, particularly micro-frameworks. The sad thing is that by the time most frameworks become popular, they end up quite complicated. To discover the joy of building reusable scaffolding for others, it's necessary to take a look at where the need for that scaffolding comes from in the first place.

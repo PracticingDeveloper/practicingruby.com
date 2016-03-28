@@ -5,6 +5,8 @@ date: '2011-01-03'
 categories: articles
 author: Gregory Brown
 permalink: articles/ruby-hackers
+summary: Find out which Ruby hackers consistently write great code worth reading.
+issue_number: '1.16'
 ---
 
 In this article, I've listed five people worth knowing about if you're involved in Ruby. If you're reading this in July 2011, please note that I wrote this article over 7 months ago, and so the descriptions you see below are slightly outdated. That having been said, I still think these five people are on the top of my list when it comes to interesting folks in our community.

@@ -5,6 +5,8 @@ date: '2011-01-22'
 categories: articles
 author: Gregory Brown
 permalink: articles/thoughts-on-mocking-2
+summary: Explore a few good uses of mock objects from a non-mockist's perspective.
+issue_number: '1.20'
 ---
 
 In the [last issue](http://practicingruby.com/articles/48), I encouraged everyone to read Martin Fowler's classic article [Mocks Aren't Stubs](http://martinfowler.com/articles/mocksArentStubs.html). Since this article is a bit dated and leans heavily towards Java style development practices, I also offered my own commentary to hopefully bridge the gap between Fowler's insights and the modern Ruby world. Now that we have the theories behind us, today we can focus on putting these ideas into practice.

@@ -5,6 +5,9 @@ date: '2012-07-24'
 categories: articles
 author: Gregory Brown
 permalink: articles/mock-objects-deeply-influence-design
+summary: Learn the rules that you need to follow in order to use mock objects as an
+  effective design tool.
+issue_number: 4.12.3
 ---
 
 > **NOTE:** This is one of [four lessons

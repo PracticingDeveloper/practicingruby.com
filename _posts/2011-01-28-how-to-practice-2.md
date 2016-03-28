@@ -5,6 +5,9 @@ date: '2011-01-28'
 categories: articles
 author: Gregory Brown
 permalink: articles/how-to-practice-2
+summary: 'See an example of how the practice methods outlined in Issue 1.21 can be
+  applied to a real project. '
+issue_number: '1.22'
 ---
 
 > **NOTE:** I generally remove temporal references in Practicing Ruby 

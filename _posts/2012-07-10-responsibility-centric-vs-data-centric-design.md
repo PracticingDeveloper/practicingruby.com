@@ -5,6 +5,9 @@ date: '2012-07-10'
 categories: articles
 author: Greg Moeck
 permalink: articles/responsibility-centric-vs-data-centric-design
+summary: Work through two approaches to object modeling and examine their tradeoffs.
+  (w. Greg Moeck)
+issue_number: '4.11'
 ---
 
 _This article was contributed by Greg Moeck. Greg is a software 

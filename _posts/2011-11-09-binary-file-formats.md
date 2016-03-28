@@ -5,6 +5,8 @@ date: '2011-11-09'
 categories: articles
 author: Gregory Brown
 permalink: articles/binary-file-formats
+summary: Read and write bitmap files using only a few dozen lines of Ruby code.
+issue_number: '2.12'
 ---
 
 Even if we rarely give them much thought, binary file formats are everywhere.

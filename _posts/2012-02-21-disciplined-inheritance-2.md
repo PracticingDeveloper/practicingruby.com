@@ -5,6 +5,9 @@ date: '2012-02-21'
 categories: articles
 author: Gregory Brown
 permalink: articles/disciplined-inheritance-2
+summary: Discover how Barbara Liskov's concept of "behavioral subtypes" apply to object
+  modeling in Ruby.
+issue_number: '3.8'
 ---
 
 In [Issue 3.7](http://practicingruby.com/articles/24), I started to explore the criteria laid out by Sakkinen's

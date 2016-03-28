@@ -5,6 +5,9 @@ date: '2011-11-02'
 categories: articles
 author: Gregory Brown
 permalink: articles/domain-specific-apis
+summary: Master classic Ruby DSL design patterns by ripping off well-known libraries
+  and tools.
+issue_number: '2.11'
 ---
 
 Many people are attracted to Ruby because of its flexible syntax. Through various tricks and techniques, it is possible for Ruby APIs to blend seamlessly into a wide range of domains. 

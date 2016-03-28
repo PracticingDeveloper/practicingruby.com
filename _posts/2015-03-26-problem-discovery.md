@@ -5,6 +5,9 @@ date: '2015-03-26'
 categories: articles
 author: Gregory Brown
 permalink: articles/problem-discovery
+summary: A brief story about why you should play around with problems before trying
+  to solve them.
+issue_number: '8.1'
 ---
 
 Imagine you're a programmer for a dental clinic, and they need your help to build a vacation scheduling system for their staff. Among other things, this system will display a calendar to staff members that summarizes all of the currently approved and pending vacation requests for the clinic, grouped by role.

@@ -5,6 +5,9 @@ date: '2011-09-06'
 categories: articles
 author: Gregory Brown
 permalink: articles/closures-are-complicated
+summary: Discover why the closure property can sometimes lead to hard-to-spot memory
+  leaks.
+issue_number: '2.3'
 ---
 
 Every `Proc` object is a closure, which means that each code block you write captures references to data from its surrounding scope for later use. Although that sounds highly academic, it has some very practical benefits that you're probably already aware of, as well as some drawbacks that you may or may not know about.

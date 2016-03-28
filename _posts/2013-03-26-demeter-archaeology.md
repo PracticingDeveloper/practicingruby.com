@@ -5,6 +5,9 @@ date: '2013-03-26'
 categories: articles
 author: David A. Black
 permalink: articles/demeter-archaeology
+summary: Explore the history of a classic design principle and how it relates to Ruby.
+  (w. David A. Black)
+issue_number: '6.7'
 ---
 
 *This article was contributed by [David A. Black](https://twitter.com/david_a_black), Lead Developer at Cyrus Innovation. David is a long-time Ruby developer, author, trainer, 

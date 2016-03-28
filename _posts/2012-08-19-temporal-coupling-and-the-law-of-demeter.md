@@ -5,6 +5,9 @@ date: '2012-08-19'
 categories: articles
 author: Gregory Brown
 permalink: articles/temporal-coupling-and-the-law-of-demeter
+summary: See how NASA JPL's take on the Law of Demeter simplifies building robust
+  asynchronous code.
+issue_number: '5.2'
 ---
 
 The [Law of Demeter](http://www.ccs.neu.edu/home/lieber/LoD.html) is a well-known 

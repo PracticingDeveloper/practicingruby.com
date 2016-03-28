@@ -5,6 +5,9 @@ date: '2012-06-19'
 categories: articles
 author: Gregory Brown
 permalink: articles/hidden-costs-of-inheritance
+summary: Think through some problems with inheritance-based modeling and then try
+  a few related exercises.
+issue_number: '4.9'
 ---
 
 As a Ruby programmer, you almost certainly make use of inheritance-based object

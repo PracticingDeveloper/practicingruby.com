@@ -5,6 +5,9 @@ date: '2011-10-04'
 categories: articles
 author: Gregory Brown
 permalink: articles/unobtrusive-ruby-in-practice
+summary: Explore ideas from Mike Burns's "Unobtrusive Ruby" blog post via practical
+  code samples.
+issue_number: '2.7'
 ---
 
 When Mike Burns outlined his vision of [Unobtrusive Ruby](http://robots.thoughtbot.com/post/10125070413/unobtrusive-ruby), I initially thought it was going to be a hit with the community. However, a lack of specific examples led to a backlash of criticism and caused the post to generate more heat than light. This is unfortunate, because the ideas he outlined are quite valuable and shouldn't be overlooked.

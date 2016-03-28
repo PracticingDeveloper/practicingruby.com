@@ -5,6 +5,9 @@ date: '2012-10-02'
 categories: articles
 author: Jesse Storimer
 permalink: articles/process-spawning-patterns
+summary: Implement Ruby's system and backticks methods using the fork/exec pattern.
+  (w. Jesse Storimer)
+issue_number: '5.5'
 ---
 
 *This article was contributed by [Jesse Storimer](http://jstorimer.com). He is

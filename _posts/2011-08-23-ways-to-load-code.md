@@ -5,6 +5,9 @@ date: '2011-08-23'
 categories: articles
 author: Gregory Brown
 permalink: articles/ways-to-load-code
+summary: Explore the strengths and weaknesses of the many code loading mechanisms
+  in Ruby.
+issue_number: '2.1'
 ---
 
 There are many ways to load Ruby code, and that has lead to confusion over the years. In this article, I will give you the backstory behind several conventions seen in the wild and share some stories about how I use those conventions in my own code.

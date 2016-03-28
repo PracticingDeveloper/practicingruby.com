@@ -5,6 +5,9 @@ date: '2012-06-05'
 categories: articles
 author: Avdi Grimm
 permalink: articles/confident-ruby
+summary: Develop intention-revealing code that is confident about its responsibilities.
+  (w. Avdi Grimm)
+issue_number: '4.7'
 ---
 
 *This article was contributed by [Avdi Grimm](http://avdi.org). Avdi has been wrangling Ruby code for over a

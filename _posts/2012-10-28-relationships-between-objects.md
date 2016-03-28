@@ -5,6 +5,9 @@ date: '2012-10-28'
 categories: articles
 author: Gregory Brown
 permalink: articles/relationships-between-objects
+summary: Learn how to model dependencies, notifications, adjustments, and internal
+  object relationships.
+issue_number: '5.7'
 ---
 
 > **CREDIT:** Although this article is my own work, it is based on ideas I got from

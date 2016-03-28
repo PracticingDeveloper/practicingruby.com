@@ -5,6 +5,9 @@ date: '2011-02-22'
 categories: articles
 author: Gregory Brown
 permalink: articles/creational-design-patterns
+summary: Examine a use case for each of the classic creational design patterns laid
+  out by the Gang of Four.
+issue_number: '1.25'
 ---
 
 In this issue and the next one, I look at several design patterns laid out by

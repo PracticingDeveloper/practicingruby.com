@@ -5,6 +5,9 @@ date: '2011-09-20'
 categories: articles
 author: Gregory Brown
 permalink: articles/regession-testing
+summary: Benefit from two lessons about regression testing that were learned the hard
+  way.
+issue_number: '2.5'
 ---
 
 The most simple and unambiguous benefit that automated testing provides is that it can be used to minimize the impact of regressions. If each bug fix is accompanied by a corresponding test, it makes it very likely that known defects will be noticed immediately whenever they resurface. Over the lifetime of a project, regression tests end up forming a safety net that makes refactoring easier and maintenance work less scary.

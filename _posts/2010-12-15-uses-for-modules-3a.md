@@ -5,6 +5,9 @@ date: '2010-12-15'
 categories: articles
 author: Gregory Brown
 permalink: articles/uses-for-modules-3a
+summary: Learn the subtle differences between "extend self", "def self.method", and
+  "module_function".
+issue_number: 1.10.a
 ---
 
 > Note: This article series on modules is also available as a [PDF download]. The

@@ -5,6 +5,9 @@ date: '2012-07-26'
 categories: articles
 author: Gregory Brown
 permalink: articles/spiking-is-not-cowboy-coding
+summary: Search for the boundary lines between organized chaos and wild, unstructured
+  hacking.
+issue_number: 4.12.4
 ---
 
 > **NOTE:** This is one of [four lessons

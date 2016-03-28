@@ -5,6 +5,9 @@ date: '2012-10-16'
 categories: articles
 author: Jordan Byron
 permalink: articles/growing-a-stable-codebase
+summary: Discover the process we use for continuously improving practicingruby.com.
+  (w. Jordan Byron)
+issue_number: '5.6'
 ---
 
 Software projects need to evolve over time, but they also need to avoid

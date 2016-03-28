@@ -5,6 +5,9 @@ date: '2011-10-18'
 categories: articles
 author: Gregory Brown
 permalink: articles/building-unix-style-command-line-applications
+summary: Build a basic clone of the 'cat' utility while learning some Ruby idioms
+  for command line applications.
+issue_number: '2.9'
 ---
 
 Ruby is best known as a web development language, but in its early days it was

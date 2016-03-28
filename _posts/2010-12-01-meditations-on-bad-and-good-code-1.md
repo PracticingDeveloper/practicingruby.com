@@ -5,6 +5,9 @@ date: '2010-12-01'
 categories: articles
 author: Gregory Brown
 permalink: articles/meditations-on-bad-and-good-code-1
+summary: Build an ugly tic-tac-toe game by writing the entire implementation as a
+  single procedural script.
+issue_number: '1.6'
 ---
 
 In this issue and the next one, I'd like to demonstrate one of my favorite learning exercises while inviting you to follow along at home. It's something I usually do while teaching in a one-on-one setting, but I think we can adapt it for a broader audience and still get a lot out of it.

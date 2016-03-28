@@ -5,6 +5,9 @@ date: '2013-11-12'
 categories: articles
 author: Mathias Lafeldt
 permalink: articles/infrastructure-automation
+summary: Discover why infrastructure automation matters by exploring real Chef recipes.
+  (w. Mathias Lafeldt)
+issue_number: '7.6'
 ---
 
 > This issue of Practicing Ruby was a collaboration with Mathias Lafeldt

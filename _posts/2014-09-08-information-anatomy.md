@@ -5,6 +5,9 @@ date: '2014-09-08'
 categories: articles
 author: Gregory Brown
 permalink: articles/information-anatomy
+summary: Explore the tradeoffs involved in designing message formats, and the messy
+  boundary between humans and computers.
+issue_number: '7.10'
 ---
 
 Suppose that you want catch up with your friends 

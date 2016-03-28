@@ -5,6 +5,9 @@ date: '2013-08-06'
 categories: articles
 author: Jia Wu
 permalink: articles/exploratory-data-analysis
+summary: Aggregate and analyze 500+ data points from a SMS-based mood study using
+  R and Ruby. (w. Jia Wu)
+issue_number: '7.3'
 ---
 
 > This issue was a collaboration with my wife, Jia Wu. Jia is an associate scientist at the Yale Child Study Center, where she spends a good portion of her time analyzing brainwave data from various EEG experiments. Although this article focuses on very basic concepts, her background in statistical programming was very helpful whenever I got stuck on something. That said, if you find any mistakes in this article, you can blame me, not her.

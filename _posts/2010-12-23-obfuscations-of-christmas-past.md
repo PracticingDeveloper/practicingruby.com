@@ -5,6 +5,9 @@ date: '2010-12-23'
 categories: articles
 author: Gregory Brown
 permalink: articles/obfuscations-of-christmas-past
+summary: Tear apart an obfuscated Ruby program from Christian Neukirchen to learn
+  some neat tricks.
+issue_number: '1.13'
 ---
 
 Rather than always focusing on SERIOUS BUSINESS, I'd like share something a little more light hearted today. Whether you celebrate Christmas or not, I think you'll find this little holiday themed hack a great deal of fun to play with.

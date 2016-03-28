@@ -5,6 +5,9 @@ date: '2010-12-28'
 categories: articles
 author: Gregory Brown
 permalink: articles/duck-typing-in-practice-1
+summary: Investigate the three main ways of doing type checking in Ruby, then work
+  on some related exercises.
+issue_number: '1.14'
 ---
 
 Type systems are a fundamental part of every programming language. In fact, the way a language designer approaches typing goes a long way towards outlining the way that thoughts are expressed in that language.

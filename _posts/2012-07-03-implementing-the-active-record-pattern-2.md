@@ -5,6 +5,9 @@ date: '2012-07-03'
 categories: articles
 author: Gregory Brown
 permalink: articles/implementing-the-active-record-pattern-2
+summary: Consider using "object-oriented mixins" to reduce inheritance-related problems
+  in ActiveRecord.
+issue_number: '4.10'
 ---
 
 > This two part article explores the challenges involved in

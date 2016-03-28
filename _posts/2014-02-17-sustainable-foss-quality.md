@@ -5,6 +5,9 @@ date: '2014-02-17'
 categories: articles
 author: Eric Hodel
 permalink: articles/sustainable-foss-quality
+summary: Learn three useful practices for maintaining high quality open source projects
+  (w. Eric Hodel)
+issue_number: '7.8'
 ---
 
 > This article was written in collaboration with Eric Hodel

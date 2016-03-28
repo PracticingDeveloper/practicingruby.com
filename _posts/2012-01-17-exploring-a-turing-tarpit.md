@@ -5,6 +5,9 @@ date: '2012-01-17'
 categories: articles
 author: Gregory Brown
 permalink: articles/exploring-a-turing-tarpit
+summary: Read the code for a simple Brainf*ck interpreter and think about how it might
+  be improved.
+issue_number: '3.3'
 ---
 
 > NOTE: This article describes an interactive challenge that was done in

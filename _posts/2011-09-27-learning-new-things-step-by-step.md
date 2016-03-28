@@ -5,6 +5,8 @@ date: '2011-09-27'
 categories: articles
 author: Gregory Brown
 permalink: articles/learning-new-things-step-by-step
+summary: Build a simple arcade game in 13 tiny steps.
+issue_number: '2.6'
 ---
 
 One of the lessons I always try to teach programmers of various skill levels is that it is very important to work in small steps. This approach is especially important when you're learning a new tool or technique, due to all the unexpected issues that can crop up in uncharted territory. Most folks seem to conceptually understand the value of working in small iterations, yet still bite off more than they can chew on a consistent basis because the question of "how small is small enough?" is a hard one to answer.

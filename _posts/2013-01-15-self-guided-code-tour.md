@@ -5,6 +5,9 @@ date: '2013-01-15'
 categories: articles
 author: Gregory Brown
 permalink: articles/self-guided-code-tour
+summary: Practice your code reading skills by walking through a small GUI client to
+  the GNU Go game engine.
+issue_number: '6.2'
 ---
 
 > **NOTE:** This issue of Practicing Ruby is one of several content experiments that was published in Volume 6. It intentionally breaks away from the traditional article format that we have developed over the years in the hopes of finding new and interesting ways for you to level up your programming skills.

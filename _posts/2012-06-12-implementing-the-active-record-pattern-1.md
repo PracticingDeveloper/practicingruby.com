@@ -5,6 +5,9 @@ date: '2012-06-12'
 categories: articles
 author: Gregory Brown
 permalink: articles/implementing-the-active-record-pattern-1
+summary: Build a basic foundation to serve as the groundwork for implementing an ActiveRecord-style
+  ORM.
+issue_number: '4.8'
 ---
 
 > (ORM) is one of the most complex things you could ever touch, and we choose it

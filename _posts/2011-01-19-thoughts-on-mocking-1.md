@@ -5,6 +5,9 @@ date: '2011-01-19'
 categories: articles
 author: Gregory Brown
 permalink: articles/thoughts-on-mocking-1
+summary: Consider how the ideas from Martin Fowler's "Mocks aren't Stubs" can be applied
+  to Ruby.
+issue_number: '1.19'
 ---
 
 When I originally published my [small rant on testing](http://practicingruby.com/articles/47), it generated a spirited discussion about a number of different topics. It even lead [Bryan Liles](http://twitter.com/bryanl) to post a great set of [testing guidelines](https://gist.github.com/785610) to balance out my unfocused rant. But the topic that overshadowed almost everything else was that of best practices regarding mock objects. In this two part article, we'll try to shine some light on that topic, because it is clearly still a point of confusion and occasionally even controversy within our community.

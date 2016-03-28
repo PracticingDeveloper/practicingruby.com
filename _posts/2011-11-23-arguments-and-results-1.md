@@ -5,6 +5,9 @@ date: '2011-11-23'
 categories: articles
 author: Gregory Brown
 permalink: articles/arguments-and-results-1
+summary: Work through argument objects inspired by James Noble's classic "Arguments
+  and Results" paper.
+issue_number: '2.14'
 ---
 
 Back in 1997, James Noble published a paper called [Arguments and Results](http://www.laputan.org/pub/patterns/noble/noble.pdf) which outlined several useful patterns for designing better object protocols. Despite the fact that this paper was written nearly 15 years ago, it addresses design problems that programmers still struggle with today. In this two part article, I show how the patterns James came up with can be applied to modern Ruby programs.

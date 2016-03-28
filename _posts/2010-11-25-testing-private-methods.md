@@ -5,6 +5,8 @@ date: '2010-11-25'
 categories: articles
 author: Gregory Brown
 permalink: articles/testing-private-methods
+summary: Understand why testing private methods can be a code smell.
+issue_number: '1.5'
 ---
 
 If you are using `send` to test private methods in your tests, you are almost certainly doing it wrong. Most private methods tend to fall into one of the following categories, none of which require `send` to test:

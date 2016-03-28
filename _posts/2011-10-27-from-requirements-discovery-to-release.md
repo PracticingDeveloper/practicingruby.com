@@ -5,6 +5,9 @@ date: '2011-10-27'
 categories: articles
 author: Gregory Brown
 permalink: articles/from-requirements-discovery-to-release
+summary: Watch a small game project develop from the brainstorming phase to its first
+  public release.
+issue_number: '2.10'
 ---
 
 Every time we start a greenfield software project, we are faced with the overwhelming responsibility of creating something from nothing. Because the path from the requirements discovery phase to the first release of a product has so many unexpected twists and turns, the whole process can feel a bit unforgiving and magical. This feeling is a big part of what makes programming hard, even for experienced developers.

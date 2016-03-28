@@ -5,6 +5,8 @@ date: '2010-12-21'
 categories: articles
 author: Gregory Brown
 permalink: articles/rapid-prototyping
+summary: Build a tiny prototype of a tetris game on the command line.
+issue_number: '1.12'
 ---
 
 Ruby makes it easy to quickly put together a proof-of-concept for almost any kind of project, as long as you have some experience in rapid application development. In this article, I will go over how I build prototypes, sharing the tricks that have worked well for me.

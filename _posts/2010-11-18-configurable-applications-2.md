@@ -5,6 +5,8 @@ date: '2010-11-18'
 categories: articles
 author: Gregory Brown
 permalink: articles/configurable-applications-2
+summary: Build dynamic Ruby-based configuration objects.
+issue_number: '1.4'
 ---
 
 In [Issue #3](http://practicingruby.com/articles/31), we looked at the downsides

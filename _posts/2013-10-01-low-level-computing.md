@@ -5,6 +5,9 @@ date: '2013-10-01'
 categories: articles
 author: Gregory Brown
 permalink: articles/low-level-computing
+summary: Implement a minimal simulator of the classic 6502 processor using nothing
+  but JRuby.
+issue_number: '7.5'
 ---
 
 > This issue of Practicing Ruby was directly inspired by Nick Morgan's

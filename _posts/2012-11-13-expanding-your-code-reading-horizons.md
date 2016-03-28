@@ -5,6 +5,9 @@ date: '2012-11-13'
 categories: articles
 author: Gregory Brown
 permalink: articles/expanding-your-code-reading-horizons
+summary: See how much even a few dozen lines of code can tell you about a programming
+  language.
+issue_number: '5.8'
 ---
 
 An interesting thing about learning new programming languages is that it takes

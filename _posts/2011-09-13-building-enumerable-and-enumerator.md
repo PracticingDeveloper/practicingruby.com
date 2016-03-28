@@ -5,6 +5,9 @@ date: '2011-09-13'
 categories: articles
 author: Gregory Brown
 permalink: articles/building-enumerable-and-enumerator
+summary: Learn about Ruby's powerful iteration tools by implementing some of its functionality
+  yourself.
+issue_number: '2.4'
 ---
 
 When I first came to Ruby, one of the things that impressed me the most was the killer features provided by the `Enumerable` module. I eventually also came to love `Enumerator`, even though it took me a long time to figure out what it was and what one might use it for.

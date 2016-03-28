@@ -5,6 +5,8 @@ date: '2013-05-07'
 categories: articles
 author: Gregory Brown
 permalink: articles/low-cost-approach-to-side-projects
+summary: Save time by building a standalone feature before designing a complete product.
+issue_number: '6.10'
 ---
 
 > **NOTE:** This issue of Practicing Ruby was one of several content experiments 

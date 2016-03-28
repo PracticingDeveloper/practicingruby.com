@@ -5,6 +5,9 @@ date: '2011-08-30'
 categories: articles
 author: Gregory Brown
 permalink: articles/attacking-sticky-problems
+summary: Work through a few lessons that will help you find a starting point whenever
+  you feel stuck.
+issue_number: '2.2'
 ---
 
 One project that I've always wanted to work on is the creation of a generic table datastructure for Ruby. I've partially solved this problem in a dozen contexts before, but I've never come up with something I've been happy enough with to extract into its own gem. 

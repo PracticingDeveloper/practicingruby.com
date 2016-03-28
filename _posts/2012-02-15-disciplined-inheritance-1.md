@@ -5,6 +5,9 @@ date: '2012-02-15'
 categories: articles
 author: Gregory Brown
 permalink: articles/disciplined-inheritance-1
+summary: See how M. Sakkinen's notion of "Disciplined Inheritance" in 1989 still applies
+  to modern Ruby code.
+issue_number: '3.7'
 ---
 
 Inheritance is a key concept in most object-oriented languages, but applying it skillfully can be challenging in practice. Back in 1989, [M. Sakkinen](http://users.jyu.fi/~sakkinen/) wrote a paper called [Disciplined inheritance](http://scholar.google.com/scholar?cluster=5893037045851782349&hl=en&as_sdt=0,7&sciodt=0,7) that addresses these problems and offers some useful criteria for working around them. Despite being more than two decades old, this paper is extremely relevant to the modern Ruby programmer. 

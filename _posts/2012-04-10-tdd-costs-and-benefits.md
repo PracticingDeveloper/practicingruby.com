@@ -5,6 +5,9 @@ date: '2012-04-10'
 categories: articles
 author: Gregory Brown
 permalink: articles/tdd-costs-and-benefits
+summary: Think through how to evaluate the impact of test-driven development on your
+  work.
+issue_number: '4.1'
 ---
 
 Over the last several years, Ruby programmers have gained a reputation of being

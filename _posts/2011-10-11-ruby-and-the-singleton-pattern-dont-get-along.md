@@ -5,6 +5,9 @@ date: '2011-10-11'
 categories: articles
 author: Gregory Brown
 permalink: articles/ruby-and-the-singleton-pattern-dont-get-along
+summary: Model the singleton pattern in seven different ways, without discovering
+  an elegant solution.
+issue_number: '2.8'
 ---
 
 Many design patterns that originated in other object-oriented languages have elegant Ruby translations. However, the [Singleton](http://en.wikipedia.org/wiki/Singleton_pattern) stands out as a construct that seems to have no good way to implement in Ruby. In this article, I will walk through the different options and explain why they all have something wrong with them. But first, we need a working definition of the singleton pattern to make sure we're on the same page.

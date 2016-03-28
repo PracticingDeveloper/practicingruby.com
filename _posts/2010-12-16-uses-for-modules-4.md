@@ -5,6 +5,8 @@ date: '2010-12-16'
 categories: articles
 author: Gregory Brown
 permalink: articles/uses-for-modules-4
+summary: Explore the use of mixins for customizing individual objects.
+issue_number: '1.11'
 ---
 
 > Note: This article series on modules is also available as a [PDF download]. The
