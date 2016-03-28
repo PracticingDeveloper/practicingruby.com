@@ -3,7 +3,7 @@ layout: post
 title: 'Sustainable maintenance: Focus on quality first '
 date: '2014-02-17'
 categories: articles
-author: Eric Hodel
+author: Eric Hodel and Gregory Brown
 permalink: articles/sustainable-foss-quality
 summary: Learn three useful practices for maintaining high quality open source projects
   (w. Eric Hodel)

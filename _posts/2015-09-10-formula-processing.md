@@ -3,7 +3,7 @@ layout: post
 title: 'Safely evaluating user-defined formulas and calculations '
 date: '2015-09-10'
 categories: articles
-author: Solomon White
+author: Solomon White and Gregory Brown
 permalink: articles/formula-processing
 summary: Learn how to use the Dentaku formula parser/evaluator to run Excel-like formulas
   in Ruby programs (w. Solomon White)

@@ -3,7 +3,7 @@ layout: post
 title: Making incremental improvements to legacy systems
 date: '2013-09-05'
 categories: articles
-author: Jordan Byron
+author: Jordan Byron and Gregory Brown
 permalink: articles/improving-legacy-systems
 summary: Experience the challenge of overhauling one of Practicing Ruby's oldest features.
   (w. Jordan Byron)

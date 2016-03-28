@@ -3,7 +3,7 @@ layout: post
 title: Using data to explore questions about our lives
 date: '2013-08-06'
 categories: articles
-author: Jia Wu
+author: Jia Wu and Gregory Brown
 permalink: articles/exploratory-data-analysis
 summary: Aggregate and analyze 500+ data points from a SMS-based mood study using
   R and Ruby. (w. Jia Wu)

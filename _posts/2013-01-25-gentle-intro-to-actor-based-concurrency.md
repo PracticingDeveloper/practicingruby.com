@@ -3,7 +3,7 @@ layout: post
 title: A gentle introduction to actor-based concurrency
 date: '2013-01-25'
 categories: articles
-author: Alberto F. Capel
+author: Alberto F. Capel and Gregory Brown
 permalink: articles/gentle-intro-to-actor-based-concurrency
 summary: Solve "Dining Philosophers" using mutex locks, then do it again using actors.
   (w. Alberto F. Capel)
