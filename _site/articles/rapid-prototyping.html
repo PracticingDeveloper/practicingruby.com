@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Rapid Prototyping</title>
+  <meta name="description" content="Ruby makes it easy to quickly put together a proof-of-concept for almost any kind of project, as long as you have some experience in rapid application develo...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/rapid-prototyping">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Rapid Prototyping</h1>
+    <p class="post-meta"><time datetime="2010-12-21T00:00:00-05:00" itemprop="datePublished">Dec 21, 2010</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Ruby makes it easy to quickly put together a proof-of-concept for almost any kind of project, as long as you have some experience in rapid application development. In this article, I will go over how I build prototypes, sharing the tricks that have worked well for me.</p>
+
+<p>Today we’ll be walking through a bit of code that implements a small chunk of a falling blocks game that is similar to Tetris. If you’re not familiar with Tetris, head over to <a href="http://freetetris.org">freetetris.org</a> and play it a bit before reading this article.</p>
+
+<p>Assuming you’re now familiar with the general idea behind the game, I’ll walk you through the thought process that I went through from the initial idea of working on a falling blocks game to the small bit of code I have written for this issue.</p>
+
+<h3 id="the-planning-phase">The Planning Phase</h3>
+
+<p>After running through a few ideas, I settled on a falling blocks game as a good example of a problem that’s too big to be tackled in a single sitting, but easy enough to make some quick progress on.</p>
+
+<p>The next step for me was to come up with a target set of requirements for my
+prototype. To prevent the possibilities from seeming endless, I had to set a
+time limit up front to make this decision making process easier. Because 
+very small  chunks of focused effort can get you far in Ruby, I settled on
+coming up with something I felt I could build within an hour or two.</p>
+
+<p>I knew right away this meant that I wasn’t going to make an interactive demo. Synchronizing user input and screen output is something that may be easy for folks who do it regularly, but my concurrency knowledge is very limited, and I’d risk spending several hours on that side of things and coming up empty if I went down that path. Fortunately, even without an event loop, there are still a lot of options for building a convincing demo.</p>
+
+<p>In my initial optimism, I thought what I’d like to be able to do is place a piece on the screen, and then let gravity take over, eliminating any completed lines as it fell into place. But this would require me to implement collision detection, something I didn’t want to tackle right away.</p>
+
+<p>Eventually, I came up with the idea of just implementing the action that happens when a piece collides with the junk on the grid. This process involved turning the active piece into inactive junk, and then removing any completed rows from the grid. This is something that I felt fit within the range of what I could do within an hour or two, so I decided to sleep on it and see if any unknowns bubbled up to the surface.</p>
+
+<p>I could have just started hacking right away, but ironically that’s a practice I typically avoid when putting together rapid prototypes. If this were a commercial project and I quoted the customer 2-4 hours, I’d want to use their money in the best possible way, and picking the wrong scope for my project would be a surefire way to either blow the budget or fail to produce something interesting. I find a few hours of passive noodling helps me see unexpected issues before they bite me.</p>
+
+<p>Fortunately, this idea managed to pass the test of time, and I set out to begin coding by turning the idea into a set of requirements.</p>
+
+<h3 id="the-requirements-phase">The Requirements Phase</h3>
+
+<p>A good prototype does not come from a top-down or bottom-up design, but instead comes from starting in the middle and building outwards. By taking a small vertical slice of the problem at hand, you are forced to think about many aspects of the system, but not in a way that requires you consider the whole problem all at once. This allows most of your knowledge and often a good chunk of your code to be re-used when you approach the full project.</p>
+
+<p>The key is to start with a behavior the user can actually observe. This means that you should be thinking in terms of features rather than functions and objects. Some folks use story frameworks such as Cucumber to help them formalize this sort of inside-out thinking, but personally, I prefer just to come up with a good, clear example and not worry about shoehorning it into a formal setting.</p>
+
+<p>To do this, I created a simple text file filled with ascii art that codified two cases: One in which a line was cleared, and where no lines were cleared. Both cases are shown below.</p>
+
+<h3 id="case-1-removing-completed-lines">CASE 1: REMOVING COMPLETED LINES</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>==========
+           
+           
+           
+           
+           
+           
+   #       
+   #|    | 
+  |#||  ||
+|||#||||||
+==========
+</code></pre>
+</div>
+
+<p>BECOMES:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>==========
+           
+           
+           
+           
+           
+
+
+   |       
+   ||    | 
+  ||||  ||
+==========
+</code></pre>
+</div>
+
+<h3 id="case-2-collision-without-any-completed-lines">CASE 2: COLLISION WITHOUT ANY COMPLETED LINES</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>==========
+           
+           
+           
+           
+           
+          
+  #       
+  ##|    |
+  |#||  ||
+||| ||||||
+==========
+</code></pre>
+</div>
+
+<p>BECOMES:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>==========
+           
+           
+           
+           
+           
+          
+  |       
+  |||    | 
+  ||||  ||
+||| ||||||
+==========
+</code></pre>
+</div>
+
+<hr />
+
+<p>With the goals for the prototype clearly outlined, I set out to write a simple program that would perform the necessary transformations.</p>
+
+<h3 id="the-coding-phase">The Coding Phase</h3>
+
+<p>One thing I’ll openly admit is that when prototyping something that will take me less than a half day from end to end, I tend to relax my standards on both testing and writing clean code. The reason for this is that when I’m trying to take a nose-dive into a new problem domain, I find my best practices actually get in the way until I have at least a basic understanding of the project.</p>
+
+<p>What I’ll typically do instead is write a single file that implements both the objects I need and an example that gets me closer to my goal. For this project, I started with a canvas object for rendering output similar to what I outlined in my requirements.</p>
+
+<p>Imagining this canvas object already existed, I wrote some code for generating the very first bit out output we see in the requirements.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">canvas</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Canvas</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="mi">2</span><span class="p">).</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span>
+  <span class="n">canvas</span><span class="p">.</span><span class="nf">paint</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"|"</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">canvas</span><span class="p">.</span><span class="nf">paint</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="s2">"|"</span><span class="p">)</span>
+
+<span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="mi">3</span><span class="p">).</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">y</span><span class="o">|</span>
+  <span class="n">canvas</span><span class="p">.</span><span class="nf">paint</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="n">y</span><span class="p">],</span> <span class="s2">"#"</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="p">(</span><span class="mi">4</span><span class="p">.</span><span class="nf">.</span><span class="mi">9</span><span class="p">).</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span>
+  <span class="n">canvas</span><span class="p">.</span><span class="nf">paint</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"|"</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">].</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span>
+  <span class="n">canvas</span><span class="p">.</span><span class="nf">paint</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="s2">"|"</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">canvas</span><span class="p">.</span><span class="nf">paint</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="s2">"|"</span><span class="p">)</span>
+<span class="n">canvas</span><span class="p">.</span><span class="nf">paint</span><span class="p">([</span><span class="mi">9</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="s2">"|"</span><span class="p">)</span>
+
+<span class="nb">puts</span> <span class="n">canvas</span> 
+</code></pre>
+</div>
+
+<p>While I use a few loops for convenience, it’s easy to see that this code does little more than put symbols on a text grid at the specified (x,y) coordinates. Once <code class="highlighter-rouge">FallingBlocks::Canvas</code> is implemented, we’d expect the following output from this example:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>==========
+           
+           
+           
+           
+           
+           
+   #       
+   #|    | 
+  |#||  ||
+|||#||||||
+==========
+</code></pre>
+</div>
+
+<p>What we have done is narrowed the problem down to a much simpler task, making it easier to get started. The following implementation is sufficient to get the example working, and is simple enough that we probably don’t need to discuss it further.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FallingBlocks</span>
+  <span class="k">class</span> <span class="nc">Canvas</span>
+    <span class="nc">SIZE</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span>
+      <span class="vi">@data</span> <span class="o">=</span> <span class="no">SIZE</span><span class="p">.</span><span class="nf">times</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="no">Array</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">SIZE</span><span class="p">)</span> <span class="p">}</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">paint</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">marker</span><span class="p">)</span>
+      <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">point</span>
+      <span class="vi">@data</span><span class="p">[</span><span class="no">SIZE</span><span class="o">-</span><span class="n">y</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">marker</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">to_s</span>
+      <span class="p">[</span><span class="n">separator</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">separator</span><span class="p">].</span><span class="nf">join</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">separator</span>
+      <span class="s2">"="</span><span class="o">*</span><span class="no">SIZE</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">body</span>
+      <span class="vi">@data</span><span class="p">.</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">row</span><span class="o">|</span>
+        <span class="n">row</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span> <span class="o">||</span> <span class="s2">" "</span> <span class="p">}.</span><span class="nf">join</span>
+      <span class="k">end</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>However, things get a little more hairy once we’ve plucked this low hanging fruit. So far, we’ve built a tool for painting the picture of what’s going on, but that doesn’t tell us anything about the underlying structure. This is a good time to start thinking about what Tetris pieces are.</p>
+
+<p>While a full implementation of the game would require implementing rotations and movement, our prototype looks at pieces frozen in time. This means that a piece is really just represented by a collection of points. If we define each piece based on an origin of [0,0], we end up with something like this for a vertical line:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">line</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
+</code></pre>
+</div>
+
+<p>Similarly, a bent S-shaped piece would be defined like this:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">bent</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+</code></pre>
+</div>
+
+<p>In order to position these pieces on a grid, what we’d need as an anchor point that could be used to translate the positions occupied by the pieces into another coordinate space.</p>
+
+<p>We could use the origin at [0,0], but for aesthetic reason, I didn’t like the mental model of grasping a piece by a position that could potentially be unoccupied. Instead, I decided to define the anchor as the top-left position occupied by the piece, which could later be translated to a different position on the canvas. This gives us an anchor of [0,3] for the line, and an anchor of [0,2] for the bent shape. I wrote the following example to outline how the API should work.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">line</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
+<span class="nb">p</span> <span class="n">line</span><span class="p">.</span><span class="nf">anchor</span> <span class="c1">#=&gt; [0,3]</span>
+
+<span class="n">bent</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="nb">p</span> <span class="n">bent</span><span class="p">.</span><span class="nf">anchor</span> <span class="c1">#=&gt; [0,2]</span>
+</code></pre>
+</div>
+
+<p>Once again, a simple example gives me enough constraints to make it easy to write an object that implements the desired behavior.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Piece</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+    <span class="vi">@points</span> <span class="o">=</span> <span class="n">points</span>
+    <span class="n">establish_anchor</span>
+  <span class="k">end</span>
+
+  <span class="kp">attr_reader</span> <span class="ss">:points</span><span class="p">,</span> <span class="ss">:anchor</span>
+
+  <span class="c1"># Gets the top-left most point</span>
+  <span class="k">def</span> <span class="nf">establish_anchor</span>
+    <span class="vi">@anchor</span> <span class="o">=</span> <span class="vi">@points</span><span class="p">.</span><span class="nf">max_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="p">[</span><span class="n">y</span><span class="p">,</span><span class="o">-</span><span class="n">x</span><span class="p">]</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>As I was writing this code, I stopped for a moment and considered that this logic, as well as the logic written earlier that manipulates (x,y) coordinates to fit inside a row-major data structure are the sort of things I really like to write unit tests for. There is nothing particularly tricky about this code, but the lack of tests makes it harder to see what’s going on at a glance. Still, this sort of tension is normal when prototyping, and at this point I wasn’t even 30 minutes into working on the problem, so I let the feeling pass.</p>
+
+<p>The next step was to paint these pieces onto the canvas, and I decided to start
+with their absolute coordinates to verify my shape definitions. The following example 
+outlines the behavior I had expected.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">canvas</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Canvas</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="n">bent_shape</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">bent_shape</span><span class="p">.</span><span class="nf">paint</span><span class="p">(</span><span class="n">canvas</span><span class="p">)</span>
+
+<span class="nb">puts</span> <span class="n">canvas</span>
+</code></pre>
+</div>
+
+<p>OUTPUTS:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>==========
+          
+          
+          
+          
+          
+          
+          
+#         
+##        
+ #        
+==========
+</code></pre>
+</div>
+
+<p>Getting this far was easy, the following definition of <code class="highlighter-rouge">Piece</code> does the trick:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Piece</span>
+   <span class="nc">SYMBOL</span> <span class="o">=</span> <span class="s2">"#"</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+    <span class="vi">@points</span> <span class="o">=</span> <span class="n">points</span>
+    <span class="n">establish_anchor</span>
+  <span class="k">end</span>
+
+  <span class="kp">attr_reader</span> <span class="ss">:points</span><span class="p">,</span> <span class="ss">:anchor</span>
+
+  <span class="c1"># Gets the top-left most point</span>
+  <span class="k">def</span> <span class="nf">establish_anchor</span>
+    <span class="vi">@anchor</span> <span class="o">=</span> <span class="vi">@points</span><span class="p">.</span><span class="nf">min_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="p">[</span><span class="n">y</span><span class="p">,</span><span class="o">-</span><span class="n">x</span><span class="p">]</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">paint</span><span class="p">(</span><span class="n">canvas</span><span class="p">)</span>
+    <span class="n">points</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">point</span><span class="o">|</span>
+      <span class="n">canvas</span><span class="p">.</span><span class="nf">paint</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="no">SYMBOL</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This demonstrates to me that the concept of considering pieces as a collection of points can work, and that my basic coordinates for a bent piece are right. But since I need a way to translate these coordinates to arbitrary positions of the grid for this code to be useful, this iteration was only a stepping stone. A new example pushes us forward.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">canvas</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Canvas</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="n">bent_shape</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+
+<span class="n">canvas</span><span class="p">.</span><span class="nf">paint_shape</span><span class="p">(</span><span class="n">bent_shape</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="nb">puts</span> <span class="n">canvas</span>
+</code></pre>
+</div>
+
+<p>OUTPUTS</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>==========
+          
+          
+          
+          
+          
+          
+  #       
+  ##      
+   #      
+          
+==========
+</code></pre>
+</div>
+
+<p>As you can see in the code above, I decided that my <code class="highlighter-rouge">Piece#paint</code> method was probably better off as <code class="highlighter-rouge">Canvas#paint_shape</code>, just to collect the presentation logic in one place. Here’s what the updated code ended up looking like.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Canvas</span>
+ <span class="c1"># ...</span>
+
+ <span class="k">def</span> <span class="nf">paint_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
+   <span class="n">shape</span><span class="p">.</span><span class="nf">translated_points</span><span class="p">(</span><span class="n">position</span><span class="p">).</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">point</span><span class="o">|</span>
+     <span class="n">paint</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="no">Piece</span><span class="o">::</span><span class="no">SYMBOL</span><span class="p">)</span>
+   <span class="k">end</span>
+ <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This new code does not rely directly on the <code class="highlighter-rouge">Piece#points</code> method anymore, but instead, passes a position to the newly created <code class="highlighter-rouge">Piece#translated_points</code> to get a set of coordinates anchored by the specified position.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Piece</span>
+  <span class="c1">#...</span>
+  
+  <span class="k">def</span> <span class="nf">translated_points</span><span class="p">(</span><span class="n">new_anchor</span><span class="p">)</span>
+    <span class="n">new_x</span><span class="p">,</span> <span class="n">new_y</span> <span class="o">=</span> <span class="n">new_anchor</span>
+    <span class="n">old_x</span><span class="p">,</span> <span class="n">old_y</span> <span class="o">=</span> <span class="n">anchor</span>
+
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">new_x</span> <span class="o">-</span> <span class="n">old_x</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">new_y</span> <span class="o">-</span> <span class="n">old_y</span>
+    
+    <span class="n">points</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="p">[</span><span class="n">x</span><span class="o">+</span><span class="n">dx</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">dy</span><span class="p">]</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>While this mapping isn’t very complex, it’s yet another point where I was
+thinking ‘gee, I should be writing tests’, and a couple subtle bugs that
+cropped up while implementing it confirmed my gut feeling. But with the light
+visible at the end of the tunnel, I wrote an example to unify piece objects 
+with the junk left on the grid from previous moves.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">game</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Game</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">bent_shape</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">game</span><span class="p">.</span><span class="nf">piece</span> <span class="o">=</span> <span class="n">bent_shape</span>
+<span class="n">game</span><span class="p">.</span><span class="nf">piece_position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">game</span><span class="p">.</span><span class="nf">junk</span> <span class="o">+=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">2</span><span class="p">]]</span>
+
+<span class="nb">puts</span> <span class="n">game</span>
+</code></pre>
+</div>
+
+<p>OUTPUTS:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>==========
+
+
+
+
+
+
+  #
+  ##|    |
+  |#||  ||
+||| ||||||
+==========
+</code></pre>
+</div>
+
+<p>The key component that tied this all together is the <code class="highlighter-rouge">Game</code> object, which essentially is just a container that knows how to use a <code class="highlighter-rouge">Canvas</code> object to render itself.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Game</span>
+  <span class="k">def</span> <span class="nf">initialize</span>
+    <span class="vi">@junk</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="vi">@piece</span> <span class="o">=</span> <span class="kp">nil</span>
+    <span class="vi">@piece_position</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">end</span>
+
+  <span class="kp">attr_accessor</span> <span class="ss">:junk</span><span class="p">,</span> <span class="ss">:piece</span><span class="p">,</span> <span class="ss">:piece_position</span>
+
+  <span class="k">def</span> <span class="nf">to_s</span>
+    <span class="n">canvas</span> <span class="o">=</span> <span class="no">Canvas</span><span class="p">.</span><span class="nf">new</span>
+
+    <span class="n">junk</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">pos</span><span class="o">|</span>
+      <span class="n">canvas</span><span class="p">.</span><span class="nf">paint</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="s2">"|"</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">canvas</span><span class="p">.</span><span class="nf">paint_shape</span><span class="p">(</span><span class="n">piece</span><span class="p">,</span> <span class="n">piece_position</span><span class="p">,</span> <span class="s2">"#"</span><span class="p">)</span>
+
+    <span class="n">canvas</span><span class="p">.</span><span class="nf">to_s</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>I made a small change to <code class="highlighter-rouge">Canvas#paint_shape</code> so that the symbol used to display pieces on the grid was parameterized rather than stored in <code class="highlighter-rouge">Piece::SYMBOL</code>. This isn’t a major change and was just another attempt at moving display code away from the data models.</p>
+
+<p>After all this work, we’ve made it back to the output we were getting out of our first example, but without the smoke and mirrors. Still, the model is not as solid as I’d hoped for, and some last minute changes were needed to bridge the gap before this code was ready to implement the two use cases I was targeting.</p>
+
+<p>Since the last iteration would be a bit cumbersome to describe in newsletter form, please just “check out my final commit”:http://is.gd/jbvdB for this project on github. With this new code, it’s possible to get output identical to our target story through the following two examples.</p>
+
+<h3 id="case-1-lineshapedemorb">CASE 1: line_shape_demo.rb</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s2">"falling_blocks"</span>
+
+<span class="n">game</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Game</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">line_shape</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
+<span class="n">game</span><span class="p">.</span><span class="nf">piece</span> <span class="o">=</span> <span class="n">line_shape</span>
+<span class="n">game</span><span class="p">.</span><span class="nf">piece_position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">game</span><span class="p">.</span><span class="nf">add_junk</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+
+<span class="nb">puts</span> <span class="n">game</span>
+
+<span class="nb">puts</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">BECOMES:</span><span class="se">\n\n</span><span class="s2">"</span>
+
+<span class="n">game</span><span class="p">.</span><span class="nf">update_junk</span>
+<span class="nb">puts</span> <span class="n">game</span>
+</code></pre>
+</div>
+
+<h3 id="case-2-bendedshapedemorb">CASE 2: bended_shape_demo.rb</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s2">"falling_blocks"</span>
+
+<span class="n">game</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Game</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">bent_shape</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">game</span><span class="p">.</span><span class="nf">piece</span> <span class="o">=</span> <span class="n">bent_shape</span>
+<span class="n">game</span><span class="p">.</span><span class="nf">piece_position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">game</span><span class="p">.</span><span class="nf">add_junk</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+
+<span class="nb">puts</span> <span class="n">game</span>
+
+<span class="nb">puts</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">BECOMES:</span><span class="se">\n\n</span><span class="s2">"</span>
+
+<span class="n">game</span><span class="p">.</span><span class="nf">update_junk</span>
+<span class="nb">puts</span> <span class="n">game</span>
+</code></pre>
+</div>
+
+<h3 id="reflections">Reflections</h3>
+
+<p>Once I outlined the story by drawing some ascii art, it took me just over 1.5 hours to produce working code that performs the transformations described. Overall, I’d call that a success.</p>
+
+<p>That having been said, working on this problem was not without hurdles. While it turns out that removing completed lines and turning pieces into junk upon collision is surprisingly simple, I am still uneasy about my final design. It seems that there is considerable duplication between the grid maintained by <code class="highlighter-rouge">Game</code> and the <code class="highlighter-rouge">Canvas</code> object. But a refactoring here would be non-trivial, and I wouldn’t want to attempt it without laying down some tests to minimize the amount of time hunting down subtle bugs.</p>
+
+<p>For me, this is about as far as I can write code organically in a single sitting without either writing tests, or doing some proper design in front of whiteboard, or a combination of the two. I think it’s important to recognize this limit, and also note that it varies from person to person and project to project. The key to writing a good prototype is getting as close to that line as you can without flying off the edge of a cliff.</p>
+
+<p>In the end though, what I like about this prototype is that it isn’t just an illusion. With a little work, it’d be easy enough to scale up to my initial ambition of demonstrating a free falling piece. By adding some tests and doing some refactoring, it’d be possible to evolve this code into something that could be used in production rather than just treating it as throwaway demo-ware.</p>
+
+<p>Hopefully, seeing how I decomposed the problem, and having a bit of insight into what my though process was like as I worked on this project has helped you understand what goes into making proof-of-concept code in Ruby. I’ve not actually taught extensively about this process before, so describing it is a bit of an experiment for me. Let me know what you think!</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> This article has also been published on the Ruby Best Practices blog. There <a href="http://blog.rubybestpractices.com/posts/gregory/044-issue-12-rapid-prototyping.html#disqus_thread">may be additional commentary</a> 
+over there worth taking a look at.</p>
+</blockquote>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

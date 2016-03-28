@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Temporal coupling and the Law of Demeter</title>
+  <meta name="description" content="The Law of Demeter is a well-known software design principle for reducing coupling between collaborating objects. However, because the law exists in many for...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/temporal-coupling-and-the-law-of-demeter">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Temporal coupling and the Law of Demeter</h1>
+    <p class="post-meta"><time datetime="2012-08-19T00:00:00-04:00" itemprop="datePublished">Aug 19, 2012</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>The <a href="http://www.ccs.neu.edu/home/lieber/LoD.html">Law of Demeter</a> is a well-known 
+software design principle for reducing coupling between collaborating objects. 
+However, because the law exists in many forms, it often means different things 
+to different people. As far as laws go, Demeter has been flexible in practice, 
+which has lead to some interesting evolutions in its application over time. 
+In this article, I will discuss an interpretation of the law that is quite 
+literally out of this world.</p>
+
+<h3 id="an-introduction-to-smyths-law-of-demeter">An introduction to Smyth’s Law of Demeter</h3>
+
+<p><a href="http://mars.jpl.nasa.gov/zipcodemars/bio-contribution.cfm?bid=1018&amp;cid=393&amp;pid=377&amp;country_id=0">David Smyth</a>, 
+a scientist who worked on various Mars missions for NASA’s Jet 
+Propulsion Laboratory, came up with this seemingly innocuous definition
+of the Law of Demeter:</p>
+
+<blockquote>
+  <p>A method can act only upon the message arguments and the state of the receiving object.</p>
+</blockquote>
+
+<p>On the surface, this formulation is essentially <a href="http://www.ccs.neu.edu/research/demeter/demeter-method/LawOfDemeter/object-formulation.html">the object form of the Law
+of Demeter</a>
+stated in much less formal terms. However, Smyth’s law is different in the way in which
+he interprets it: he assumes that the Law of Demeter implies that 
+methods should not have return values. This small twist causes 
+the law to have a much deeper effect than its originators had 
+anticipated.</p>
+
+<p>Before we discuss the implications of building systems entirely out of methods
+without return values, it is important to understand why Smyth assumed
+that value-returning methods were forbidden in the first place. To explore
+that point, consider the following trivial example:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">in_postal_area</span><span class="p">(</span><span class="n">zipcode</span><span class="p">)</span>
+    <span class="n">where</span><span class="p">(</span><span class="ss">:zipcode</span> <span class="o">=&gt;</span> <span class="n">zipcode</span><span class="p">)</span>  
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The <code class="highlighter-rouge">Person.in_postal_area</code> method does not violate the 
+Law of Demeter itself, as it is nothing more than a simple delegation
+mechanism that passes the <code class="highlighter-rouge">zipcode</code> parameter to a 
+lower-level function on the same object. But because it
+returns a value, this function makes it easy for its callers
+to violate the Law of Demeter, as shown here:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">UnsolicitedMailer</span> <span class="o">&lt;</span> <span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span>
+  <span class="k">def</span> <span class="nf">spam_postal_area</span><span class="p">(</span><span class="n">zipcode</span><span class="p">)</span>
+    <span class="n">people</span> <span class="o">=</span> <span class="no">Person</span><span class="p">.</span><span class="nf">in_postal_area</span><span class="p">(</span><span class="n">zipcode</span><span class="p">)</span>
+
+    <span class="n">emails</span> <span class="o">=</span> <span class="n">people</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">email</span> <span class="p">}</span>
+
+    <span class="n">mail</span><span class="p">(</span><span class="ss">:to</span> <span class="o">=&gt;</span> <span class="n">emails</span><span class="p">,</span> <span class="ss">:subject</span> <span class="o">=&gt;</span> <span class="s2">"Offer for you!"</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Because the value returned by <code class="highlighter-rouge">Person.in_postal_area</code> is neither 
+a direct part of the <code class="highlighter-rouge">UnsolicitedMailer</code> object nor a parameter
+of the <code class="highlighter-rouge">spam_postal_area</code> method, sending messages
+to it results in a Demeter violation. Depending on the project’s 
+requirements, breaking the law in this fashion could be 
+reasonable, but it is a code smell to watch out for.</p>
+
+<p>In the context of the typical Ruby project, methods that 
+return values are common because the convenience of implementing
+things this way often outweighs the cost of doing so. However,
+whenever you take this approach, you make two fundamental 
+assumptions that those who write code for Mars rovers 
+cannot: that your value-returning methods will respond
+in a reasonable amount of time, and that they will not fail 
+in all sorts of complicated ways.</p>
+
+<p>Although these basic assumptions often apply to the bulk of what we do,
+even those of us who aren’t rocket scientists occasionally
+need to work on projects for which temporal coupling is considered
+harmful and robust failure handling is essential. In such
+scenarios, it is worth considering what Smyth’s interpretation
+of the Law of Demeter (LoD) has to offer.</p>
+
+<h3 id="the-implications-of-smyths-law-of-demeter">The implications of Smyth’s Law of Demeter</h3>
+
+<p>Smyth’s unique interpretation of how to apply LoD eventually 
+caught the eye of Karl Lieberherr, a member of the
+Demeter project who published some of the earliest papers
+on the topic. Lieberherr took an interest in Smyth’s approach 
+because it was clearly different than what the Demeter 
+researchers had intended—yet potentially useful. 
+A correspondence between the two led Smyth to share his 
+thoughts about what his definition of LoD brings to 
+the table. His six key points from the <a href="http://www.ccs.neu.edu/research/demeter/demeter-method/LawOfDemeter/Smyth/LoD-revisited2">original discussion</a> 
+are listed in an abridged form here:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>There are actually several wonderful properties that fall out 
+from this definition of LoD:
+
+     A method can act only upon the message arguments and the
+     existing state of the receiving object.
+
+1. Method bodies tend to be very close to straight-line code. Very
+   simple logic, very low complexity.
+
+2. There must be no return values; if there are, the sender of the message
+   is not obeying the law.
+
+3. There cannot be tight synchronization, as the sender cannot tell whether
+   the message is acted on or not within any "small" period of time
+   (perhaps the objects collaborate with a two-way protocol and the
+   sender can eventually detect a timeout).
+
+4. Because there are no return values, the objects need to be
+   "responsible" objects: they need to handle both nominal and
+   foreseeable off-nominal cases. This requirement has the wonderful effect of
+   localizing failure handling within the object that has the
+   best visibility and understanding of whatever went wrong.
+   It also dramatically reduces the complexity of protocols and
+   clients.
+
+   ...
+
+5. The law requires an object to subscribe to information so that it has
+   what it needs whenever it gets a message. Thus lazy
+   evaluation can't be used. Although this requirement may seem like an 
+   inefficiency, it becomes one in practice only if the objects don't have 
+   concise responsibilities. In such a case, efficiency of communication
+   bandwidth isn't the real problem.
+
+   ...
+
+6. Because tight synchronization is out of the picture, the responsible
+   objects should be goal oriented. A goal is different from a method
+   in that a goal is pursued over some expanse of time and does not
+   seem instantaneous. By thinking of goals rather than discrete
+   actions, people can derive solutions that don't require tight
+   temporal coupling. This sounds like hand waving, and it is—but
+   seven years of doing it shows that it really does work.
+</code></pre>
+</div>
+
+<p>These are deep claims, but the remainder of the discussion between Smyth
+and Lieberherr did not elaborate much further on them. However, it is 
+fascinating to imagine the kind of programming style that Smyth
+is advocating here: it boils down to a highly robust form of
+<a href="http://practicingruby.com/articles/64">responsibility-driven development</a> with 
+concurrent (and potentially distributed) objects that communicate almost 
+exclusively via callback mechanisms. If Smyth were not an established
+scientist working on some of the world’s most challenging problems,
+it would almost seem as if he were playing object-oriented buzzword bingo.</p>
+
+<p>Although I don’t know nearly enough about any of these ideas to speak 
+authoritatively on them, I think that they form a great starting point 
+for a very interesting conversation. However, if you’re like me, you
+would benefit from having these ideas brought back down to earth
+a bit. With that in mind, I’ve put together a little example 
+program that will hopefully help you do exactly that.</p>
+
+<h3 id="smyths-law-of-demeter-in-practice">Smyth’s Law of Demeter in practice</h3>
+
+<p>Software design principles can be interesting to study in the abstract, but
+there is no substitute for trying them out in concrete applications. If you 
+can find a project that is a natural fit for the technique you are 
+trying to investigate, even the most simple toy application will teach you
+more than pure thought experiments ever could.</p>
+
+<p>Smyth’s approach to the Law of Demeter originated from his work on software for
+Mars rovers, an environment where tight temporal coupling and a lack of 
+robust interactions between distributed systems can cause serious problems.
+Because it takes about 14 minutes for light to travel between Earth and Mars, 
+even the most trivial system interactions require careful design consideration. 
+With so much room for things to go wrong, a programming style that claims to 
+make it easier to manage these kinds of problems definitely sounds promising.</p>
+
+<p>Of course, you don’t need to land robots on Mars to encounter these kind of
+challenges. I can easily imagine things such as payment processing systems 
+and remote system administration toolchains having a good
+degree of overlap with the issues that Smyth’s LoD is meant to
+address. Still, those problems are not nearly as exciting as driving a
+remote control car around on a different planet. Knowing that, I decided
+to test Smyth’s ideas by building a very unrealistic Mars rover 
+simulation. The video below shows me interacting with it over IRC:</p>
+
+<div align="center">
+<iframe width="800" height="600" src="//www.youtube.com/embed/Yqofx6MbYFU?vq=480&amp;rel=0" frameborder="0" allowfullscreen=""></iframe>
+</div>
+
+<p>In the video, the communications delay is set at only a couple of seconds, but it
+can be set arbitrarily high, which makes it possible to simulate the full 14-
+minute-plus delay between Earth and Mars. No matter what the delay is set at, the
+rover queues up commands as they come in and sends its responses one 
+at a time as its tasks are completed. The entire simulator is only a couple of
+pages of code. It consists of the following objects and responsibilities:</p>
+
+<ul>
+  <li><a href="https://github.com/elm-city-craftworks/space_explorer/blob/pr-5.2/lib/space_explorer/radio.rb">SpaceExplorer::Radio</a> relays messages on a time delay.</li>
+  <li><a href="https://github.com/elm-city-craftworks/space_explorer/blob/pr-5.2/lib/space_explorer/mission_control.rb">SpaceExplorer::MissionControl</a> communicates with the rover.</li>
+  <li><a href="https://github.com/elm-city-craftworks/space_explorer/blob/pr-5.2/lib/space_explorer/rover.rb">SpaceExplorer::Rover</a> communicates with mission control and updates the map.</li>
+  <li><a href="https://github.com/elm-city-craftworks/space_explorer/blob/pr-5.2/lib/space_explorer/world.rb">SpaceExplorer::World</a> implements the simulated world map.</li>
+</ul>
+
+<p>As I implemented this system, I took care to abide by Smyth’s recommendation
+that methods not return meaningful values. Although I wasn’t so pedantic as
+to explicitly return <code class="highlighter-rouge">nil</code> from each function, I treated them as void functions
+internally, so none of the simulator’s features depend on the return value 
+of the methods I implemented. To see the effect this approach had on
+overall system design, we can trace a command’s execution from end to end while
+paying attention to what is going on under the hood.</p>
+
+<p>I’d like to walk you through how <code class="highlighter-rouge">SNAPSHOT</code> works, simply because it has the
+largest number of moving parts to it. As you saw in the video, 
+<code class="highlighter-rouge">SNAPSHOT</code> is used to get back a 5x5 ASCII “picture” of the area around the 
+rover, which can be used to aid navigation. In the following example, 
+<code class="highlighter-rouge">@</code> is the rover, <code class="highlighter-rouge">-</code> represents empty spaces, and <code class="highlighter-rouge">X</code> represents boulders:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>20:35|  seacreature| !SNAPSHOT
+20:35|  roboseacreature| X - - X -
+20:35|  roboseacreature| X X - X X
+20:35|  roboseacreature| - X @ X X
+20:35|  roboseacreature| - - X X -
+20:35|  roboseacreature| - - - - -
+</code></pre>
+</div>
+
+<p>As you may have already guessed, the user interface for this project is
+IRC-based, which is a convenient (if ugly) medium for experimenting with
+asynchronous communications. A bot that is responsible for running
+the simulation monitors the channel for commands, which can be any
+message that starts with an exclamation point. When these messages are
+detected, they are passed on a <code class="highlighter-rouge">MissionControl</code> object for processing. The
+callback that monitors the channel and passes messages along to that 
+object is shown here:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">bot</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="ss">:message</span><span class="p">,</span> <span class="sr">/\A!(.*)/</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">m</span><span class="p">,</span> <span class="n">command</span><span class="o">|</span>
+  <span class="n">mission_control</span><span class="p">.</span><span class="nf">send_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The <code class="highlighter-rouge">MissionControl</code> object is nothing more than a bridge between the UI 
+and a <code class="highlighter-rouge">Radio</code> object, so the <code class="highlighter-rouge">send_command</code> method passes the 
+command along without modification:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SpaceExplorer</span>
+  <span class="k">class</span> <span class="nc">MissionControl</span>
+    <span class="k">def</span> <span class="nf">send_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+      <span class="vi">@radio_link</span><span class="p">.</span><span class="nf">transmit</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The <code class="highlighter-rouge">Radio</code> instance that <code class="highlighter-rouge">@radio_link</code> points to holds a
+reference to a <code class="highlighter-rouge">Rover</code> object, which is where the <code class="highlighter-rouge">SNAPSHOT</code> command will be
+processed. Before it gets there, <code class="highlighter-rouge">Radio#transmit</code> enforces a
+transmission delay through the use of a very coarse-grained timer mechanism:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SpaceExplorer</span>
+  <span class="k">class</span> <span class="nc">Radio</span>
+    <span class="k">def</span> <span class="nf">transmit</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+      <span class="k">raise</span> <span class="s2">"Target not defined"</span> <span class="k">unless</span> <span class="n">defined?</span><span class="p">(</span><span class="vi">@target</span><span class="p">)</span>
+
+      <span class="no">Thread</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="no">Time</span><span class="p">.</span><span class="nf">now</span>
+
+        <span class="nb">sleep</span> <span class="mi">1</span> <span class="k">while</span> <span class="no">Time</span><span class="p">.</span><span class="nf">now</span> <span class="o">-</span> <span class="n">start_time</span> <span class="o">&lt;</span> <span class="vi">@delay</span>
+
+        <span class="vi">@target</span><span class="p">.</span><span class="nf">receive_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span> 
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>It’s important to point out here that <code class="highlighter-rouge">Radio#transmit</code> is designed to work with
+an arbitrary delay, so it isn’t practical for it to block execution and
+return a value. Instead, it spins off a background thread that will eventually
+call the <code class="highlighter-rouge">receive_command</code> callback method on its <code class="highlighter-rouge">@target</code> object, which in this case is a
+<code class="highlighter-rouge">Rover</code> instance.</p>
+
+<p>The implementation of the <code class="highlighter-rouge">Rover</code> object is more interesting than the
+objects we’ve looked at so far because it implements the
+<a href="http://en.wikipedia.org/wiki/Actor_model">Actor model</a>. 
+Whenever <code class="highlighter-rouge">Rover#receive_command</code> is called, commands are not
+processed directly but are instead placed on a threadsafe queue that then gets
+acted upon in a first-come, first-serve basis. This approach allows the <code class="highlighter-rouge">Rover</code> to do 
+its tasks sequentially while continuing to accept requests as they come in. To
+understand how that works, think about how <code class="highlighter-rouge">SNAPSHOT</code> gets handled by the 
+following code:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"thread"</span>
+
+<span class="k">module</span> <span class="nn">SpaceExplorer</span>
+  <span class="k">class</span> <span class="nc">Rover</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">radio_link</span><span class="p">)</span>
+      <span class="vi">@world</span>      <span class="o">=</span> <span class="n">world</span>
+      <span class="vi">@radio_link</span> <span class="o">=</span> <span class="n">radio_link</span>
+
+      <span class="vi">@queue</span> <span class="o">=</span> <span class="no">Queue</span><span class="p">.</span><span class="nf">new</span>
+
+      <span class="no">Thread</span><span class="p">.</span><span class="nf">new</span> <span class="p">{</span> <span class="kp">loop</span> <span class="p">{</span> <span class="n">process_command</span><span class="p">(</span><span class="vi">@queue</span><span class="p">.</span><span class="nf">pop</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">receive_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+      <span class="vi">@queue</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">process_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+      <span class="k">case</span> <span class="n">command</span>
+      <span class="k">when</span> <span class="s2">"PING"</span>
+        <span class="vi">@radio_link</span><span class="p">.</span><span class="nf">transmit</span><span class="p">(</span><span class="s2">"PONG"</span><span class="p">)</span>
+      <span class="k">when</span> <span class="s2">"NORTH"</span><span class="p">,</span> <span class="s2">"SOUTH"</span><span class="p">,</span> <span class="s2">"EAST"</span><span class="p">,</span> <span class="s2">"WEST"</span>      
+        <span class="vi">@world</span><span class="p">.</span><span class="nf">move</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+      <span class="k">when</span> <span class="s2">"SNAPSHOT"</span>
+        <span class="vi">@world</span><span class="p">.</span><span class="nf">snapshot</span> <span class="p">{</span> <span class="o">|</span><span class="n">text</span><span class="o">|</span> <span class="vi">@radio_link</span><span class="p">.</span><span class="nf">transmit</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="si">#{</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="p">}</span>
+      <span class="k">else</span>
+        <span class="c1"># do nothing</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>When the <code class="highlighter-rouge">receive_command</code> callback is triggered by the <code class="highlighter-rouge">Radio</code> object,
+the method pushes that command onto a queue, which should happen nearly
+instantaneously in practice. At this point, the command has finished its
+outbound trip and is ready to be processed.</p>
+
+<p>After the <code class="highlighter-rouge">Rover</code> object handles any tasks that were already queued up,
+<code class="highlighter-rouge">SNAPSHOT</code> is passed to the <code class="highlighter-rouge">process_command</code> method, where the 
+following line gets executed:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="vi">@world</span><span class="p">.</span><span class="nf">snapshot</span> <span class="p">{</span> <span class="o">|</span><span class="n">text</span><span class="o">|</span> <span class="vi">@radio_link</span><span class="p">.</span><span class="nf">transmit</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="si">#{</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>This code looks a little weird because it isn’t immediately obvious why a block
+is being used here. Instead, we might expect the following code under 
+ordinary circumstances:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="vi">@radio_link</span><span class="p">.</span><span class="nf">transmit</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="si">#{</span><span class="vi">@world</span><span class="p">.</span><span class="nf">snapshot</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> 
+</code></pre>
+</div>
+
+<p>However, taking this approach would be a subtle violation of Smyth’s LoD,
+because it would require <code class="highlighter-rouge">World#snapshot</code> to have a meaningful return value,
+introducing additional coupling. In this case, the coupling is
+temporal rather than structural, which makes it harder to spot.</p>
+
+<p>The main difference between the two examples is that the latter has a strong
+connascence of timing and the former does not. In the value-returning example,
+if <code class="highlighter-rouge">@world.snapshot</code> were not simply generating a trivial ASCII diagram but
+actually controlling hardware on a Mars rover to take an image, we might expect
+it to take some amount of time to respond. If it were a large enough amount of
+time, it wouldn’t be practical to block while waiting for a response, so the
+call to <code class="highlighter-rouge">RadioLink#transmit</code> would need to be backgrounded. This would also be
+true for any caller that made use of <code class="highlighter-rouge">World#snapshot</code>.</p>
+
+<p>By using a code block (which is really just a lightweight, anonymous callback
+mechanism), we can push the responsibility of whether to run the
+computations in a background thread into the <code class="highlighter-rouge">World</code> object, making that
+decision completely invisible to its callers. As an added bonus, <code class="highlighter-rouge">World</code> can
+also be more responsible about failure handling as well, because it decides 
+if and when to execute the callback and how to handle unexpected situations.</p>
+
+<p>In practical scenarios, the advantages and disadvantages of whether 
+violate Smyth’s law would need to be weighed out, but in this case I’ve
+intentionally tried to apply it first and then attempt to justify it. For this
+particular example, I can see the approach as being worthwhile even if it 
+makes for slightly more ugly code.</p>
+
+<p>Of course, no attempt at purity is ultimately successful, and if you take a look
+at <code class="highlighter-rouge">World#snapshot</code>, you will see that this is where I finally throw Smyth’s LoD
+out the window for the sake of practicality. Feel free to focus on the structure
+of the code rather than the algorithm used to process the map, as that is what 
+matters most in this article:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SpaceExplorer</span>
+  <span class="k">class</span> <span class="nc">World</span>
+    <span class="nc">DELTAS</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">.</span><span class="nf">.</span><span class="mi">2</span><span class="p">).</span><span class="nf">to_a</span><span class="p">.</span><span class="nf">product</span><span class="p">((</span><span class="o">-</span><span class="mi">2</span><span class="p">.</span><span class="nf">.</span><span class="mi">2</span><span class="p">).</span><span class="nf">to_a</span><span class="p">)</span>
+
+    <span class="c1"># ...</span>
+
+    <span class="k">def</span> <span class="nf">snapshot</span>
+      <span class="n">snapshot</span> <span class="o">=</span> <span class="no">DELTAS</span><span class="p">.</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">rowD</span><span class="p">,</span> <span class="n">colD</span><span class="o">|</span>
+        <span class="k">if</span> <span class="n">colD</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">rowD</span> <span class="o">==</span> <span class="mi">0</span>
+          <span class="s2">"@"</span>
+        <span class="k">else</span>
+          <span class="vi">@data</span><span class="p">[</span><span class="vi">@row</span> <span class="o">+</span> <span class="n">rowD</span><span class="p">][</span><span class="vi">@col</span> <span class="o">+</span> <span class="n">colD</span><span class="p">]</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="n">text</span> <span class="o">=</span> <span class="n">snapshot</span><span class="p">.</span><span class="nf">each_slice</span><span class="p">(</span><span class="mi">5</span><span class="p">).</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s2">" "</span><span class="p">)</span> <span class="p">}.</span><span class="nf">join</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+      <span class="k">yield</span> <span class="n">text</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Among other things, we see here the familiar chain of <code class="highlighter-rouge">Enumerable</code> methods 
+slammed together, all of which return values that are not immediate parts of
+the <code class="highlighter-rouge">World</code> object:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">text</span> <span class="o">=</span> <span class="n">snapshot</span><span class="p">.</span><span class="nf">each_slice</span><span class="p">(</span><span class="mi">5</span><span class="p">).</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s2">" "</span><span class="p">)</span> <span class="p">}.</span><span class="nf">join</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Although I could probably have written some cumbersome adapters to make this
+code conform to Smyth’s LoD, I think that would be a wasteful attempt to follow
+the letter of the law rather than its spirit. This is especially true when you
+consider that Smyth and many other early adopters of the classical Law of
+Demeter were working in languages that had a clear separation between objects
+and data structures, so they would not necessarily have considered core
+structures to be “objects” in the proper sense. In Ruby, our core structures are
+full-blown objects, but that does not mean they need to follow the same rules 
+as our domain objects.</p>
+
+<p>I would love it if you’d share a comment with your own thoughts about 
+the philosophical divide between data structures and domain objects, and
+also encourage you to read <a href="https://sites.google.com/site/unclebobconsultingllc/active-record-vs-objects">this post from Bob Martin</a> 
+on the topic, but I won’t dwell on the point for now. We still have
+work to do!</p>
+
+<p>With the output in hand, all that remains to be done is to ferry it back to the
+IRC channel that requested it. Looking back at the relevant portion of <code class="highlighter-rouge">Rover#process_command</code>, 
+you can see that the yielded text from <code class="highlighter-rouge">World#snapshot</code> is passed on to 
+another <code class="highlighter-rouge">Radio</code> object:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="vi">@world</span><span class="p">.</span><span class="nf">snapshot</span> <span class="p">{</span> <span class="o">|</span><span class="n">text</span><span class="o">|</span> <span class="vi">@radio_link</span><span class="p">.</span><span class="nf">transmit</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="si">#{</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>This <code class="highlighter-rouge">Radio</code> object holds a reference to the <code class="highlighter-rouge">MissionControl</code> object that sent
+the original <code class="highlighter-rouge">SNAPSHOT</code> command, and the path back to it is identical to the
+path the command took to get to the <code class="highlighter-rouge">Rover</code> object, just in reverse. I won’t
+explain that process again in detail, as all that really matters is that
+<code class="highlighter-rouge">MissionControl#receive_command</code> eventually gets run. This method is just as
+boring as the <code class="highlighter-rouge">send_command</code> method we looked at earlier, serving as a direct
+bridge to the UI. I’ve used a Cinch-based IRC bot in this example, but anything
+with a <code class="highlighter-rouge">msg()</code> method will do:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SpaceExplorer</span>
+  <span class="k">class</span> <span class="nc">MissionControl</span>
+    <span class="c1"># ...</span>
+
+    <span class="k">def</span> <span class="nf">receive_command</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+      <span class="vi">@narrator</span><span class="p">.</span><span class="nf">msg</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>At this point, a message is sent to the IRC channel and the out-and-back trip is
+completed. Despite being a fairly complicated feature, Smyth’s LoD was mostly
+followed throughout, and things got weird in only a few places. That said,
+if you have a devious mind, you are likely to have already realized that the
+relative simplicity of this code is deceptive, because there are
+so many places things can go wrong. Let’s talk a little more about 
+that now.</p>
+
+<h3 id="group-project-exploring-our-options-for-failure-handling">GROUP PROJECT: Exploring our options for failure handling</h3>
+
+<p>Smyth’s Law of Demeter promises three main consequences: less complex method
+definitions, a decrease in temporal coupling, and a robust way of handling
+failures. Although the example I’ve been using provides some evidence for the
+first two claims, I intentionally avoided working on error handling to leave
+something for us to think through together.</p>
+
+<p>Your challenge, if you choose to accept it, is to think about what can go wrong
+in this simulation and to come up with ways to handle those problems without
+violating Smyth’s LoD. Off the top of my head, I can think of several trivial
+problems that exist in this code, but I’m sure there are many other things that I
+haven’t considered.</p>
+
+<p>If you want to start with some low-hanging fruit, think about what happens when
+an invalid command is sent, or what happens when the rover moves off the edge of
+the fixed-size map it is currently using. If you want to get fancy, think about
+whether the rover ought to have some safety mechanism that will prevent it from
+driving into boulders, which it is currently perfectly happy to do. Or, if you
+want to get creative, find your own way of breaking things, and feel free to ask
+me clarifying questions as you go.</p>
+
+<p>Any level of participation is welcome, ranging from asking a “What if?”
+question after reading through the code a bit to grand-scale patches that make
+our clunky little rover bulletproof. As I said at the beginning of this
+article, my purpose in introducing Smyth’s LoD to you was to start a
+conversation, and I think this is a fun way to do exactly that.</p>
+
+<p>The <a href="https://github.com/elm-city-craftworks/space_explorer">full source for the simulator</a> 
+is ready for you to tinker with, so go forth and break stuff!</p>
+
+<h3 id="reflections">Reflections</h3>
+
+<p>Although I am fairly happy with how the simulator experiment turned out, it is 
+hard to draw very many conclusions from it. In very small greenfield 
+projects, it is hard  to see how any design principle will ultimately 
+influence the full software development lifecycle. That having been said,
+it did serve as a great testbed for exploring these ideas and can be a 
+stepping stone toward trying these techniques in more practical settings.</p>
+
+<p>I tend to think of software principles as being descriptive rather than
+prescriptive; they provide us with convenient labels for particular approaches
+to problems that already exist in the wild. If you’ve seen or worked on some
+code that reminds you of the ideas that Smyth’s Law of Demeter attempts to
+capture, I’d love to hear about it.</p>
+
+<p>I’d also love to hear about whatever doubts have been nagging you as
+you worked your way through this article. Every software design strategy has its
+strengths and weaknesses, and sometimes we make the mistake of emphasizing the
+good parts while downplaying the bad parts, especially when we study new things.
+With that in mind, your curmudgeonly comments are most welcome, as they tend to 
+bring some balance along with them.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> I owe a huge hat-tip to <a href="http://twitter.com/david_a_black">David
+Black</a>, as he was the inspiration for
+this article. He and I were collaborating on a more traditional
+treatment of the Law of Demeter; we each found our own divergent ideas to
+investigate, but I definitely would not have written this article if he hadn’t
+shared his thoughtful explorations with me.</p>
+</blockquote>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

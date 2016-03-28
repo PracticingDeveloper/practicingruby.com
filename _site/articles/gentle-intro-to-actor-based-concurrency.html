@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>A gentle introduction to actor-based concurrency</title>
+  <meta name="description" content="  This issue was a collaboration with Alberto Fernández Capel, a Ruby developerfrom Spain. Although it has been through many revisions sincewe started, Alber...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/gentle-intro-to-actor-based-concurrency">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">A gentle introduction to actor-based concurrency</h1>
+    <p class="post-meta"><time datetime="2013-01-25T00:00:00-05:00" itemprop="datePublished">Jan 25, 2013</time> • Alberto F. Capel</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <blockquote>
+  <p>This issue was a collaboration with <a href="https://github.com/afcapel">Alberto Fernández Capel</a>, a Ruby developer
+from Spain. Although it has been through many revisions since
+we started, Alberto’s ideas, code, and explanations provided
+an excellent starting point that lead us to publish this article.</p>
+</blockquote>
+
+<p>Conventional wisdom says that concurrent programming is hard, especially in 
+Ruby. This basic assumption is what lead many Rubyists to take an interest
+in languages like Erlang and Scala – their baked in support for 
+the <a href="http://en.wikipedia.org/wiki/Actor_model">actor model</a> is meant to make concurrent systems 
+much easier for everyday programmers to implement and understand.</p>
+
+<p>But do you really need to look outside of Ruby to find concurrency primitives
+that can make your work easier? The answer to that question probably 
+depends on the levels of concurrency and availability that you require, but
+things have definitely been shaping up in recent years. In particular, 
+the <a href="http://celluloid.io/">Celluloid</a> framework has brought us a convenient and clean way to implement
+actor-based concurrent systems in Ruby.</p>
+
+<p>In order to appreciate what Celluloid can do for you, you first need to
+understand what the actor model is, and what benefits it offers over the
+traditional approach of directly using threads and locks for concurrent 
+programming. In this article, we’ll try to shed some light on those points by
+solving a classic concurrency puzzle in three ways: Using Ruby’s built-in
+primitives (threads and mutex locks), using the Celluloid framework, and using a
+minimal implementation of the actor model that we’ll build from scratch.</p>
+
+<p>By the end of this article, you certainly won’t be a concurrency expert
+if you aren’t already, but you’ll have a nice head start on some
+basic concepts that will help you decide how to tackle concurrent programming
+within your own projects. Let’s begin!</p>
+
+<h2 id="the-dining-philosophers-problem">The Dining Philosophers Problem</h2>
+
+<p>The <a href="http://en.wikipedia.org/wiki/Dining_philosophers">Dining Philosophers</a> problem was formulated by Edsger Djisktra in 1965 to
+illustrate the kind of issues we can find when multiple processes compete to
+gain access to exclusive resources.</p>
+
+<p>In this problem, five philosophers meet to have dinner. They sit at a round
+table and each one has a bowl of rice in front of them. There are also five
+chopsticks, one between each philosopher. The philosophers spent their time
+thinking about <em>The Meaning of Life</em>. Whenever they get
+hungry, they try to eat. But a philosopher needs a chopstick in each
+hand in order to grab the rice. If any other
+philosopher has already taken one of those chopsticks, the hungry
+philosopher will wait until that chopstick is available.</p>
+
+<p>This problem is interesting because if it is not properly solved it can easily
+lead to deadlock issues. We’ll take a look at those issues soon, but first let’s
+convert this problem domain into a few basic Ruby objects.</p>
+
+<h3 id="modeling-the-table-and-its-chopsticks">Modeling the table and its chopsticks</h3>
+
+<p>All three of the solutions we’ll discuss in this article rely on a <code class="highlighter-rouge">Chopstick</code>
+class and a <code class="highlighter-rouge">Table</code> class. The definitions of both classes are shown below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Chopstick</span>
+  <span class="k">def</span> <span class="nf">initialize</span>
+    <span class="vi">@mutex</span> <span class="o">=</span> <span class="no">Mutex</span><span class="p">.</span><span class="nf">new</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">take</span>
+    <span class="vi">@mutex</span><span class="p">.</span><span class="nf">lock</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">drop</span>
+    <span class="vi">@mutex</span><span class="p">.</span><span class="nf">unlock</span>
+
+  <span class="k">rescue</span> <span class="no">ThreadError</span>
+    <span class="nb">puts</span> <span class="s2">"Trying to drop a chopstick not acquired"</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">in_use?</span>
+    <span class="vi">@mutex</span><span class="p">.</span><span class="nf">locked?</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Table</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">num_seats</span><span class="p">)</span>
+    <span class="vi">@chopsticks</span>  <span class="o">=</span> <span class="n">num_seats</span><span class="p">.</span><span class="nf">times</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="no">Chopstick</span><span class="p">.</span><span class="nf">new</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">left_chopstick_at</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">position</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="vi">@chopsticks</span><span class="p">.</span><span class="nf">size</span>
+    <span class="vi">@chopsticks</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">right_chopstick_at</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">position</span> <span class="o">%</span> <span class="vi">@chopsticks</span><span class="p">.</span><span class="nf">size</span>
+    <span class="vi">@chopsticks</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">chopsticks_in_use</span>
+    <span class="vi">@chopsticks</span><span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span><span class="p">.</span><span class="nf">in_use?</span> <span class="p">}.</span><span class="nf">size</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The <code class="highlighter-rouge">Chopstick</code> class is just a thin wrapper around a regular Ruby mutex 
+that will ensure that two philosophers can not grab the same chopstick 
+at the same time. The <code class="highlighter-rouge">Table</code> class deals with the geometry of the problem; 
+it knows where each seat is at the table, which chopstick is to the left 
+or to the right of that seat, and how many chopsticks are currently in use.</p>
+
+<p>Now that you’ve seen the basic domain objects that model this problem, we’ll
+look at different ways of implementing the behavior of the philosophers. 
+We’ll start with what <em>doesn’t</em> work.</p>
+
+<h2 id="a-solution-that-leads-to-deadlocks">A solution that leads to deadlocks</h2>
+
+<p>The <code class="highlighter-rouge">Philosopher</code> class shown below would seem to be the most straightforward
+solution to this problem, but has a fatal flaw that prevents it from being
+thread safe. Can you spot it?</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Philosopher</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+    <span class="vi">@name</span> <span class="o">=</span> <span class="nb">name</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">dine</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
+    <span class="vi">@left_chopstick</span>  <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="nf">left_chopstick_at</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+    <span class="vi">@right_chopstick</span> <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="nf">right_chopstick_at</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+
+    <span class="kp">loop</span> <span class="k">do</span>
+      <span class="n">think</span>
+      <span class="n">eat</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">think</span>
+    <span class="nb">puts</span> <span class="s2">"</span><span class="si">#{</span><span class="vi">@name</span><span class="si">}</span><span class="s2"> is thinking"</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">eat</span>
+    <span class="n">take_chopsticks</span>
+
+    <span class="nb">puts</span> <span class="s2">"</span><span class="si">#{</span><span class="vi">@name</span><span class="si">}</span><span class="s2"> is eating."</span>
+
+    <span class="n">drop_chopsticks</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">take_chopsticks</span>
+    <span class="vi">@left_chopstick</span><span class="p">.</span><span class="nf">take</span>
+    <span class="vi">@right_chopstick</span><span class="p">.</span><span class="nf">take</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">drop_chopsticks</span>
+    <span class="vi">@left_chopstick</span><span class="p">.</span><span class="nf">drop</span>
+    <span class="vi">@right_chopstick</span><span class="p">.</span><span class="nf">drop</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>If you’re still scratching your head, consider what happens when each
+philosopher object is given its own thread, and all the philosophers attempt to
+eat at the same time.</p>
+
+<p>In this naive implementation, it is
+possible to reach a state in which every philosopher picks up their left-hand
+chopstick, leaving no chopsticks on the table. In that scenario, every
+philosopher would simply wait forever for their right-hand chopstick to 
+become available – resulting in a deadlock. You can reproduce the problem
+by running the following code:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">names</span> <span class="o">=</span> <span class="sx">%w{Heraclitus Aristotle Epictetus Schopenhauer Popper}</span>
+
+<span class="n">philosophers</span> <span class="o">=</span> <span class="n">names</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span> <span class="no">Philosopher</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span> <span class="p">}</span>
+<span class="n">table</span>        <span class="o">=</span> <span class="no">Table</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">philosophers</span><span class="p">.</span><span class="nf">size</span><span class="p">)</span>
+
+<span class="n">threads</span> <span class="o">=</span> <span class="n">philosophers</span><span class="p">.</span><span class="nf">map</span><span class="p">.</span><span class="nf">with_index</span> <span class="k">do</span> <span class="o">|</span><span class="n">philosopher</span><span class="p">,</span> <span class="n">i</span><span class="o">|</span>
+  <span class="no">Thread</span><span class="p">.</span><span class="nf">new</span> <span class="p">{</span> <span class="n">philosopher</span><span class="p">.</span><span class="nf">dine</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="n">threads</span><span class="p">.</span><span class="nf">each</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:join</span><span class="p">)</span>
+<span class="nb">sleep</span>
+</code></pre>
+</div>
+
+<p>Ruby is smart enough to inform you of what went wrong, so you should end up
+seeing a backtrace that looks something like this:</p>
+
+<pre><code class="language-console">Aristotle is thinking
+Popper is eating.
+Popper is thinking
+Epictetus is eating.
+Epictetus is thinking
+Heraclitus is eating.
+Heraclitus is thinking
+Schopenhauer is eating.
+Schopenhauer is thinking
+
+dining_philosophers_uncoordinated.rb:79:in `join': deadlock detected (fatal)
+  from dining_philosophers_uncoordinated.rb:79:in `each'
+  from dining_philosophers_uncoordinated.rb:79:in `&lt;main&gt;
+</code></pre>
+
+<p>In many situations, the most simple solution tends to be the best one, but this
+is obviously not one of those cases. Since we’ve learned the hard way that the
+philosophers cannot be safely left to their own devices, we’ll need to do more
+to make sure their behaviors remain coordinated.</p>
+
+<h3 id="a-coordinated-mutex-based-solution">A coordinated mutex-based solution</h3>
+
+<p>One easy solution to this issue is introduce a <code class="highlighter-rouge">Waiter</code> object into the mix. In this
+model, the philosopher must ask the waiter before eating. If the number of chopsticks
+in use is four or more, the waiter will make the philosopher wait until someone
+finishes eating. This will ensure that at least one philosopher will be able to eat 
+at any time, avoiding the deadlock condition.</p>
+
+<p>There’s still a catch, though. From the moment the waiter checks the number of chopstick
+in use until the next philosopher starts to eat we have a critical region in our
+program: If we let two concurrent threads execute that code at the same time there
+is still a chance of a deadlock. For example, suppose the waiter checks the number of
+chopsticks used and see it is 3. At that moment, the scheduler yields control to
+another philosopher who is just picking the chopstick. When the execution flow
+comes back to the original thread, it will allow the original philosopher to
+eat, even if there may be more than four chopsticks already in use.</p>
+
+<p>To avoid this situation we need to protect the critical region with a mutex, as
+shown below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Waiter</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">capacity</span><span class="p">)</span>
+    <span class="vi">@capacity</span> <span class="o">=</span> <span class="n">capacity</span>
+    <span class="vi">@mutex</span>    <span class="o">=</span> <span class="no">Mutex</span><span class="p">.</span><span class="nf">new</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">serve</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">philosopher</span><span class="p">)</span>
+    <span class="vi">@mutex</span><span class="p">.</span><span class="nf">synchronize</span> <span class="k">do</span>
+      <span class="nb">sleep</span><span class="p">(</span><span class="nb">rand</span><span class="p">)</span> <span class="k">while</span> <span class="n">table</span><span class="p">.</span><span class="nf">chopsticks_in_use</span> <span class="o">&gt;=</span> <span class="vi">@capacity</span> 
+      <span class="n">philosopher</span><span class="p">.</span><span class="nf">take_chopsticks</span>
+    <span class="k">end</span>
+
+    <span class="n">philosopher</span><span class="p">.</span><span class="nf">eat</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Introducing the <code class="highlighter-rouge">Waiter</code> object requires us to make some minor changes to our
+<code class="highlighter-rouge">Philosopher</code> object, but they are fairly straightforward:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Philosopher</span>
+
+  <span class="c1"># ... all omitted code same as before</span>
+
+  <span class="k">def</span> <span class="nf">dine</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">waiter</span><span class="p">)</span>
+    <span class="vi">@left_chopstick</span>  <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="nf">left_chopstick_at</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+    <span class="vi">@right_chopstick</span> <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="nf">right_chopstick_at</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+
+    <span class="kp">loop</span> <span class="k">do</span>
+      <span class="n">think</span>
+
+      <span class="c1"># instead of calling eat() directly, make a request to the waiter </span>
+      <span class="n">waiter</span><span class="p">.</span><span class="nf">serve</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="nb">self</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">eat</span>
+    <span class="c1"># removed take_chopsticks call, as that's now handled by the waiter</span>
+
+    <span class="nb">puts</span> <span class="s2">"</span><span class="si">#{</span><span class="vi">@name</span><span class="si">}</span><span class="s2"> is eating."</span>
+
+    <span class="n">drop_chopsticks</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The runner code also needs minor tweaks, but is mostly similar to what
+you saw earlier:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">names</span> <span class="o">=</span> <span class="sx">%w{Heraclitus Aristotle Epictetus Schopenhauer Popper}</span>
+
+<span class="n">philosophers</span> <span class="o">=</span> <span class="n">names</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span> <span class="no">Philosopher</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="n">table</span>  <span class="o">=</span> <span class="no">Table</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">philosophers</span><span class="p">.</span><span class="nf">size</span><span class="p">)</span>
+<span class="n">waiter</span> <span class="o">=</span> <span class="no">Waiter</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">philosophers</span><span class="p">.</span><span class="nf">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">threads</span> <span class="o">=</span> <span class="n">philosophers</span><span class="p">.</span><span class="nf">map</span><span class="p">.</span><span class="nf">with_index</span> <span class="k">do</span> <span class="o">|</span><span class="n">philosopher</span><span class="p">,</span> <span class="n">i</span><span class="o">|</span>
+  <span class="no">Thread</span><span class="p">.</span><span class="nf">new</span> <span class="p">{</span> <span class="n">philosopher</span><span class="p">.</span><span class="nf">dine</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">waiter</span><span class="p">)</span> <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="n">threads</span><span class="p">.</span><span class="nf">each</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:join</span><span class="p">)</span>
+<span class="nb">sleep</span>
+</code></pre>
+</div>
+
+<p>This approach is reasonable and solves the deadlock issue, but using mutexes 
+to synchronize code requires some low level thinking. Even in this simple 
+problem, there were several gotchas to consider. As programs get more
+complicated, it becomes really difficult to keep track of critical regions 
+while ensuring that the code behaves properly when accessing them.</p>
+
+<p>The actor model is meant to provide a more systematic and natural way of 
+sharing data between threads. We’ll now take a look at an actor-based 
+solution to this problem so that we can see how it compares to this 
+mutex-based approach.</p>
+
+<h2 id="an-actor-based-solution-using-celluloid">An actor-based solution using Celluloid</h2>
+
+<p>We’ll now rework our <code class="highlighter-rouge">Philosopher</code> and <code class="highlighter-rouge">Waiter</code> classes to make use of 
+Celluloid. Much of the code will remain the same, but some important
+details will change. The full class definitions are shown below to preserve
+context, but the changed portions are marked with comments.</p>
+
+<p>We’ll spend the rest of the article explaining the inner workings 
+of this code, so don’t worry about understanding every last detail. Instead,
+just try to get a basic idea of what’s going on here:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Philosopher</span>
+  <span class="kp">include</span> <span class="no">Celluloid</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+    <span class="vi">@name</span> <span class="o">=</span> <span class="nb">name</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Switching to the actor model requires us get rid of our</span>
+  <span class="c1"># more procedural event loop in favor of a message-oriented</span>
+  <span class="c1"># approach using recursion. The call to think() eventually</span>
+  <span class="c1"># leads to a call to eat(), which in turn calls back to think(),</span>
+  <span class="c1"># completing the loop.</span>
+
+  <span class="k">def</span> <span class="nf">dine</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">waiter</span><span class="p">)</span>
+    <span class="vi">@waiter</span> <span class="o">=</span> <span class="n">waiter</span>
+
+    <span class="vi">@left_chopstick</span>  <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="nf">left_chopstick_at</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+    <span class="vi">@right_chopstick</span> <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="nf">right_chopstick_at</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+
+    <span class="n">think</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">think</span>
+    <span class="nb">puts</span> <span class="s2">"</span><span class="si">#{</span><span class="vi">@name</span><span class="si">}</span><span class="s2"> is thinking."</span>
+    <span class="nb">sleep</span><span class="p">(</span><span class="nb">rand</span><span class="p">)</span>
+
+    <span class="c1"># Asynchronously notifies the waiter object that</span>
+    <span class="c1"># the philosophor is ready to eat</span>
+
+    <span class="vi">@waiter</span><span class="p">.</span><span class="nf">async</span><span class="p">.</span><span class="nf">request_to_eat</span><span class="p">(</span><span class="no">Actor</span><span class="p">.</span><span class="nf">current</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">eat</span>
+    <span class="n">take_chopsticks</span>
+
+    <span class="nb">puts</span> <span class="s2">"</span><span class="si">#{</span><span class="vi">@name</span><span class="si">}</span><span class="s2"> is eating."</span>
+    <span class="nb">sleep</span><span class="p">(</span><span class="nb">rand</span><span class="p">)</span>
+
+    <span class="n">drop_chopsticks</span>
+
+    <span class="c1"># Asynchronously notifies the waiter</span>
+    <span class="c1"># that the philosopher has finished eating</span>
+
+    <span class="vi">@waiter</span><span class="p">.</span><span class="nf">async</span><span class="p">.</span><span class="nf">done_eating</span><span class="p">(</span><span class="no">Actor</span><span class="p">.</span><span class="nf">current</span><span class="p">)</span>
+
+    <span class="n">think</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">take_chopsticks</span>
+    <span class="vi">@left_chopstick</span><span class="p">.</span><span class="nf">take</span>
+    <span class="vi">@right_chopstick</span><span class="p">.</span><span class="nf">take</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">drop_chopsticks</span>
+    <span class="vi">@left_chopstick</span><span class="p">.</span><span class="nf">drop</span>
+    <span class="vi">@right_chopstick</span><span class="p">.</span><span class="nf">drop</span>
+  <span class="k">end</span>
+
+  <span class="c1"># This code is necessary in order for Celluloid to shut down cleanly</span>
+  <span class="k">def</span> <span class="nf">finalize</span>
+    <span class="n">drop_chopsticks</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+
+<span class="k">class</span> <span class="nc">Waiter</span>
+  <span class="kp">include</span> <span class="no">Celluloid</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span>
+    <span class="vi">@eating</span>   <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">end</span>
+
+  <span class="c1"># because synchronized data access is ensured</span>
+  <span class="c1"># by the actor model, this code is much more</span>
+  <span class="c1"># simple than its mutex-based counterpart. However,</span>
+  <span class="c1"># this approach requires two methods</span>
+  <span class="c1"># (one to start and one to stop the eating process),</span>
+  <span class="c1"># where the previous approach used a single serve() method.</span>
+
+  <span class="k">def</span> <span class="nf">request_to_eat</span><span class="p">(</span><span class="n">philosopher</span><span class="p">)</span>
+    <span class="k">return</span> <span class="k">if</span> <span class="vi">@eating</span><span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="n">philosopher</span><span class="p">)</span>
+
+    <span class="vi">@eating</span> <span class="o">&lt;&lt;</span> <span class="n">philosopher</span>
+    <span class="n">philosopher</span><span class="p">.</span><span class="nf">async</span><span class="p">.</span><span class="nf">eat</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">done_eating</span><span class="p">(</span><span class="n">philosopher</span><span class="p">)</span>
+    <span class="vi">@eating</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="n">philosopher</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The runner code is similar to before, with only some very minor changes:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">names</span> <span class="o">=</span> <span class="sx">%w{Heraclitus Aristotle Epictetus Schopenhauer Popper}</span>
+
+<span class="n">philosophers</span> <span class="o">=</span> <span class="n">names</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span> <span class="no">Philosopher</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="n">waiter</span> <span class="o">=</span> <span class="no">Waiter</span><span class="p">.</span><span class="nf">new</span> <span class="c1"># no longer needs a "capacity" argument</span>
+<span class="n">table</span> <span class="o">=</span> <span class="no">Table</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">philosophers</span><span class="p">.</span><span class="nf">size</span><span class="p">)</span>
+
+<span class="n">philosophers</span><span class="p">.</span><span class="nf">each_with_index</span> <span class="k">do</span> <span class="o">|</span><span class="n">philosopher</span><span class="p">,</span> <span class="n">i</span><span class="o">|</span> 
+  <span class="c1"># No longer manually create a thread, rely on async() to do that for us.</span>
+  <span class="n">philosopher</span><span class="p">.</span><span class="nf">async</span><span class="p">.</span><span class="nf">dine</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">waiter</span><span class="p">)</span> 
+<span class="k">end</span>
+
+<span class="nb">sleep</span>
+</code></pre>
+</div>
+
+<p>The runtime behavior of this solution is similar to that of our mutex-based
+solution. However, the following differences in implementation are worth noting:</p>
+
+<ul>
+  <li>
+    <p>Each class that mixes in <code class="highlighter-rouge">Celluloid</code> becomes an actor with its own thread of execution.</p>
+  </li>
+  <li>
+    <p>The Celluloid library intercepts any method call run through the <code class="highlighter-rouge">async</code> proxy
+object and stores it in the actor’s mailbox. The actor’s thread will sequentially 
+execute those stored methods, one after another.</p>
+  </li>
+  <li>
+    <p>This behavior makes it so that we don’t need to manage threads and mutex
+synchronization explicitly. The Celluloid library handles that under 
+the hood in an object-oriented manner.</p>
+  </li>
+  <li>
+    <p>If we encapsulate all data inside actor objects, only the actor’s
+thread will be able to access and modify its own data. That prevents the
+possibility of two threads writing to a critical region at the same time,
+which eliminates the risk of deadlocks and data corruption.</p>
+  </li>
+</ul>
+
+<p>These features are very useful for simplifying the way we think about
+concurrent programming, but you’re probably wondering how much magic is involved
+in implementing them. Let’s build our own minimal drop-in replacement for
+Celluloid to find out!</p>
+
+<h2 id="rolling-our-own-actor-model">Rolling our own actor model</h2>
+
+<p>Celluloid provides much more functionality than what we can discuss
+in this article, but building a barebones implementation of the actor
+model is within our reach. In fact, the following 80 lines of code are
+enough to serve as a replacement for our use of Celluloid in the 
+previous example:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'thread'</span>
+
+<span class="k">module</span> <span class="nn">Actor</span>  <span class="c1"># To use this, you'd include Actor instead of Celluloid</span>
+  <span class="k">module</span> <span class="nn">ClassMethods</span>
+    <span class="k">def</span> <span class="nf">new</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+      <span class="no">Proxy</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="k">super</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+    <span class="k">def</span> <span class="nf">included</span><span class="p">(</span><span class="n">klass</span><span class="p">)</span>
+      <span class="n">klass</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">ClassMethods</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">current</span>
+      <span class="no">Thread</span><span class="p">.</span><span class="nf">current</span><span class="p">[</span><span class="ss">:actor</span><span class="p">]</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">class</span> <span class="nc">Proxy</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+      <span class="vi">@target</span>  <span class="o">=</span> <span class="n">target</span>
+      <span class="vi">@mailbox</span> <span class="o">=</span> <span class="no">Queue</span><span class="p">.</span><span class="nf">new</span>
+      <span class="vi">@mutex</span>   <span class="o">=</span> <span class="no">Mutex</span><span class="p">.</span><span class="nf">new</span>
+      <span class="vi">@running</span> <span class="o">=</span> <span class="kp">true</span>
+
+      <span class="vi">@async_proxy</span> <span class="o">=</span> <span class="no">AsyncProxy</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+
+      <span class="vi">@thread</span> <span class="o">=</span> <span class="no">Thread</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span>
+        <span class="no">Thread</span><span class="p">.</span><span class="nf">current</span><span class="p">[</span><span class="ss">:actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">self</span>
+        <span class="n">process_inbox</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">async</span>
+      <span class="vi">@async_proxy</span>
+    <span class="k">end</span>
+      
+    <span class="k">def</span> <span class="nf">send_later</span><span class="p">(</span><span class="n">meth</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+      <span class="vi">@mailbox</span> <span class="o">&lt;&lt;</span> <span class="p">[</span><span class="n">meth</span><span class="p">,</span> <span class="n">args</span><span class="p">]</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">terminate</span>
+      <span class="vi">@running</span> <span class="o">=</span> <span class="kp">false</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="n">meth</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+      <span class="n">process_message</span><span class="p">(</span><span class="n">meth</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="kp">private</span>
+
+    <span class="k">def</span> <span class="nf">process_inbox</span>
+      <span class="k">while</span> <span class="vi">@running</span>
+        <span class="n">meth</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="vi">@mailbox</span><span class="p">.</span><span class="nf">pop</span>
+        <span class="n">process_message</span><span class="p">(</span><span class="n">meth</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+      <span class="k">end</span>
+
+    <span class="k">rescue</span> <span class="no">Exception</span> <span class="o">=&gt;</span> <span class="n">ex</span>
+      <span class="nb">puts</span> <span class="s2">"Error while running actor: </span><span class="si">#{</span><span class="n">ex</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="n">meth</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+      <span class="vi">@mutex</span><span class="p">.</span><span class="nf">synchronize</span> <span class="k">do</span>
+        <span class="vi">@target</span><span class="p">.</span><span class="nf">public_send</span><span class="p">(</span><span class="n">meth</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">class</span> <span class="nc">AsyncProxy</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span>
+      <span class="vi">@actor</span> <span class="o">=</span> <span class="n">actor</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="n">meth</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+      <span class="vi">@actor</span><span class="p">.</span><span class="nf">send_later</span><span class="p">(</span><span class="n">meth</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This code mostly builds upon concepts that have already been covered in this 
+article, so it shouldn’t be too hard to follow with a bit of effort. That
+said, combining meta-programming techniques and concurrency can
+lead to code that makes your eyes glaze over, so we should also make
+an attempt to discuss how this module works at the high level. Let’s do that
+now!</p>
+
+<p>Any class that includes the <code class="highlighter-rouge">Actor</code> module will be converted into an actor and will be 
+able to receive asynchronous calls. We accomplish this by overriding the constructor
+of the target class so that we can return a proxy object every time an object of 
+that class is instantiated. We also store the proxy object in a
+thread level variable. This is necessary because when sending messages between actors, 
+if we refer to self in method calls we will exposed the inner target object, 
+instead of the proxy. This same <a href="https://github.com/celluloid/celluloid/wiki/Gotchas">gotcha is also present in Celluloid</a>.</p>
+
+<p>Using this mixin, whenever we attempt to create an instance of a <code class="highlighter-rouge">Philosopher</code>
+object, we will actually receive an instance of <code class="highlighter-rouge">Actor::Proxy</code>. The <code class="highlighter-rouge">Philosopher</code> 
+class is left mostly untouched, and so the actor-like behavior is handled
+entirely by the proxy object. Upon instantiation, that proxy creates
+a mailbox to store the incoming asynchronous messages and a thread to process those 
+messages. The inbox is a thread-safe queue that ensures that incoming message
+are processed sequentially even if they arrive at the same time. Whenever the inbox
+is empty, the actor’s thread will be blocked until a new message needs to
+be processed.</p>
+
+<p>This is roughly how things work in Celluloid as well, although its
+implementation is much more complex due to the many additional features it
+offers. Still, if you understand this code, you’re well on your way to having a
+working knowledge of what the actor model is all about.</p>
+
+<h3 id="actors-are-helpful-but-are-not-a-golden-hammer">Actors are helpful, but are not a golden hammer</h3>
+
+<p>Even this minimal implementation of the actor model gets the low-level
+concurrency primitives out of our ordinary class definitions, and into a
+centralized place where it can be handled in a consistent and reliable way.
+Celluloid goes a lot farther than we did here by providing excellent fault
+tolerance mechanisms, the ability to recover from failures, and lots of other
+interesting stuff. However, these benefits do come with their own share of
+costs and potential pitfalls.</p>
+
+<p>So what can go wrong when using actors in Ruby? We’ve already hinted at the potential 
+issues that can arise due to the issue of <a href="http://en.wikipedia.org/wiki/Schizophrenia_%28object-oriented_programming%29">self schizophrenia</a> in 
+proxy objects. Perhaps more complicated is the issue of mutable state: while
+using actors guarantees that the state <em>within</em> an object will be accessed
+sequentially, it does not provide the same guarantee for the messages that are
+being passed around between objects. In languages like Erlang, messages consist of immutable parameters, so consistency 
+is enforced at the language level. In
+Ruby, we don’t have that constraint, so we either need to solve this problem by
+convention, or by freezing the objects we pass around as arguments – which is quite
+restrictive!</p>
+
+<p>Without attempting to enumerate all the other things that could
+go wrong, the point here is simply that there is no such thing as a golden hammer 
+when it comes to concurrent programming. Hopefully this article has
+given you a basic sense of both the benefits and drawbacks of applying the
+actor model in Ruby, along with enough background knowledge to apply some
+of these ideas in your own projects. If it has done so, please do share your
+story.</p>
+
+<h3 id="source-code-from-this-article">Source code from this article</h3>
+
+<p>All of the code from this article is in 
+Practicing Ruby’s <a href="https://github.com/elm-city-craftworks/practicing-ruby-examples/tree/master/v6/003">example repository</a>,
+but the links below highlight the main points of interest:</p>
+
+<ul>
+  <li><a href="https://github.com/elm-city-craftworks/practicing-ruby-examples/blob/master/v6/003/mutex_uncoordinated/dining_philosophers.rb">A solution that leads to deadlocks</a></li>
+  <li><a href="https://github.com/elm-city-craftworks/practicing-ruby-examples/blob/master/v6/003/mutex_coordinated/dining_philosophers.rb">A coordinated mutex-based solution</a></li>
+  <li><a href="https://github.com/elm-city-craftworks/practicing-ruby-examples/blob/master/v6/003/celluloid/dining_philosophers.rb">An actor-based solution using Celluloid</a></li>
+  <li><a href="https://github.com/elm-city-craftworks/practicing-ruby-examples/blob/master/v6/003/actors_from_scratch/dining_philosophers.rb">An actor-based solution using a hand-rolled actor library</a></li>
+  <li><a href="https://github.com/elm-city-craftworks/practicing-ruby-examples/blob/master/v6/003/lib/actors.rb">Minimal implementation of the actor model</a></li>
+  <li><a href="https://github.com/elm-city-craftworks/practicing-ruby-examples/blob/master/v6/003/lib/chopstick.rb">Chopsticks class definition</a></li>
+  <li><a href="https://github.com/elm-city-craftworks/practicing-ruby-examples/blob/master/v6/003/lib/table.rb">Table class definition</a></li>
+</ul>
+
+<p>If you see anything in the code that you have questions about, don’t hesitate to
+ask.</p>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

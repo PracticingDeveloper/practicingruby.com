@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Practicing Ruby</title>
+  <meta name="description" content="The world's largest collection of lessons for experienced Ruby developers.
+">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="home">
+  <ul class="post-list">
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/formula-processing">Safely evaluating user-defined formulas and calculations </a>
+        </div>
+        <div class="post-summary">Learn how to use the Dentaku formula parser/evaluator to run Excel-like formulas in Ruby programs (w. Solomon White)<br/><span class="post-meta">Issue 8.2 — September 10, 2015</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/problem-discovery">Problem discovery comes before problem solving</a>
+        </div>
+        <div class="post-summary">A brief story about why you should play around with problems before trying to solve them.<br/><span class="post-meta">Issue 8.1 — March 26, 2015</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/information-anatomy">The anatomy of information in software systems</a>
+        </div>
+        <div class="post-summary">Explore the tradeoffs involved in designing message formats, and the messy boundary between humans and computers.<br/><span class="post-meta">Issue 7.10 — September 8, 2014</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/study-guide-1">A self guided course on streams, files, file formats, and sockets</a>
+        </div>
+        <div class="post-summary">Explore UNIX-style stream processing, binary file formats, the Racc parser generator, and socket programming.<br/><span class="post-meta">Issue 7.9 — March 31, 2014</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/sustainable-foss-quality">Sustainable maintenance: Focus on quality first </a>
+        </div>
+        <div class="post-summary">Learn three useful practices for maintaining high quality open source projects (w. Eric Hodel)<br/><span class="post-meta">Issue 7.8 — February 17, 2014</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/wumpus">Hunt the Wumpus: An exercise in creative coding</a>
+        </div>
+        <div class="post-summary">Build Gregory Yob's classic text-based game from scratch, using the provided test suite as a guide. <br/><span class="post-meta">Issue 7.7 — December 11, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/infrastructure-automation">Infrastructure automation by example</a>
+        </div>
+        <div class="post-summary">Discover why infrastructure automation matters by exploring real Chef recipes. (w. Mathias Lafeldt)<br/><span class="post-meta">Issue 7.6 — November 12, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/low-level-computing">Exploring low-level computing concepts with Ruby</a>
+        </div>
+        <div class="post-summary">Implement a minimal simulator of the classic 6502 processor using nothing but JRuby.<br/><span class="post-meta">Issue 7.5 — October 1, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/improving-legacy-systems">Making incremental improvements to legacy systems</a>
+        </div>
+        <div class="post-summary">Experience the challenge of overhauling one of Practicing Ruby's oldest features. (w. Jordan Byron)<br/><span class="post-meta">Issue 7.4 — September 5, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/exploratory-data-analysis">Using data to explore questions about our lives</a>
+        </div>
+        <div class="post-summary">Aggregate and analyze 500+ data points from a SMS-based mood study using R and Ruby. (w. Jia Wu)<br/><span class="post-meta">Issue 7.3 — August 6, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/implementing-an-http-file-server">Implementing a minimal HTTP server in Ruby</a>
+        </div>
+        <div class="post-summary">Build just enough HTTP functionality from scratch to serve up static files. (w. Luke Francl)<br/><span class="post-meta">Issue 7.2 — July 2, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/simulating-tiny-worlds">Simulating tiny worlds for fun and profit</a>
+        </div>
+        <div class="post-summary">Practice exploratory programming by modeling forest fires, rabbit populations, and diseases.<br/><span class="post-meta">Issue 7.1 — June 4, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/low-cost-approach-to-side-projects">A low cost approach to working on side projects</a>
+        </div>
+        <div class="post-summary">Save time by building a standalone feature before designing a complete product.<br/><span class="post-meta">Issue 6.10 — May 7, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/avoiding-brittleness-in-data-munging">Avoiding brittleness in data munging projects</a>
+        </div>
+        <div class="post-summary">Process data and generate reports without writing unmaintainable spaghetti code.<br/><span class="post-meta">Issue 6.9 — April 23, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/from-scripting-to-oop">From adhoc script  to object-oriented program </a>
+        </div>
+        <div class="post-summary">Gradually convert a  "throwaway" procedural program into a well-defined domain model.<br/><span class="post-meta">Issue 6.8 — April 10, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/demeter-archaeology">The Law of Demeter: Some archaeological notes</a>
+        </div>
+        <div class="post-summary">Explore the history of a classic design principle and how it relates to Ruby. (w. David A. Black)<br/><span class="post-meta">Issue 6.7 — March 26, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/cleaning-up-bloated-method-interfaces">Cleaning up bloated method interfaces</a>
+        </div>
+        <div class="post-summary">Tame a complex method interface using keyword arguments and parameter objects.<br/><span class="post-meta">Issue 6.6 — March 12, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/debugging-without-doom-and-gloom">Debugging without the doom and gloom</a>
+        </div>
+        <div class="post-summary">Use stack traces, the Pry console, and tests to hunt bugs with confidence. (w. Carol Nichols)<br/><span class="post-meta">Issue 6.5 — February 26, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/code-reuse-is-complicated">Code reuse in Ruby: It's complicated!</a>
+        </div>
+        <div class="post-summary">Learn the costs and benefits of the many ways that Ruby lets you reuse code.
+
+<br/><span class="post-meta">Issue 6.4 — February 12, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/gentle-intro-to-actor-based-concurrency">A gentle introduction to actor-based concurrency</a>
+        </div>
+        <div class="post-summary">Solve "Dining Philosophers" using mutex locks, then do it again using actors. (w. Alberto F. Capel)<br/><span class="post-meta">Issue 6.3 — January 25, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/self-guided-code-tour">A self-guided tour of an interesting codebase</a>
+        </div>
+        <div class="post-summary">Practice your code reading skills by walking through a small GUI client to the GNU Go game engine.<br/><span class="post-meta">Issue 6.2 — January 15, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/parsing-json-the-hard-way">Parsing JSON the hard way</a>
+        </div>
+        <div class="post-summary">Learn about low-level parser and compiler tools by implementing a JSON parser. (w. Aaron Patterson)<br/><span class="post-meta">Issue 6.1 — January 1, 2013</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/adventure-in-prototypes">An adventure in prototypes</a>
+        </div>
+        <div class="post-summary">Build a text adventure game and a prototype-based object model, at the same time! (w. Avdi Grimm)<br/><span class="post-meta">Issue 5.10 — December 11, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/ant-colony-simulation">Simulating the emergent behavior of ant colonies</a>
+        </div>
+        <div class="post-summary">Explore how simple rules for individuals can yield complex group behavior by simulating an ant colony.<br/><span class="post-meta">Issue 5.9 — November 27, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/expanding-your-code-reading-horizons">Expanding your code reading horizons</a>
+        </div>
+        <div class="post-summary">See how much even a few dozen lines of code can tell you about a programming language.<br/><span class="post-meta">Issue 5.8 — November 13, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/relationships-between-objects">Understanding the relationships between objects</a>
+        </div>
+        <div class="post-summary">Learn how to model dependencies, notifications, adjustments, and internal object relationships.<br/><span class="post-meta">Issue 5.7 — October 28, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/growing-a-stable-codebase">Guidelines for growing a stable codebase</a>
+        </div>
+        <div class="post-summary">Discover the process we use for continuously improving practicingruby.com. (w. Jordan Byron)<br/><span class="post-meta">Issue 5.6 — October 16, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/process-spawning-patterns">Process spawning patterns</a>
+        </div>
+        <div class="post-summary">Implement Ruby's system and backticks methods using the fork/exec pattern. (w. Jesse Storimer)<br/><span class="post-meta">Issue 5.5 — October 2, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/building-the-rstatus-api">Building the rstat.us API: Choices and challenges</a>
+        </div>
+        <div class="post-summary">Consider the design tradeoffs between the JSON API and hypermedia API styles. (w. Carol Nichols)<br/><span class="post-meta">Issue 5.4 — September 18, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/event-loops-demystified">Event loops demystified</a>
+        </div>
+        <div class="post-summary">Build a Node.js/EventMachine-style event loop in roughly 150 lines of Ruby code. (w. Magnus Holm)<br/><span class="post-meta">Issue 5.3 — September 4, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/temporal-coupling-and-the-law-of-demeter">Temporal coupling and the Law of Demeter</a>
+        </div>
+        <div class="post-summary">See how NASA JPL's take on the Law of Demeter simplifies building robust asynchronous code.<br/><span class="post-meta">Issue 5.2 — August 19, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/intro-to-basic-statistical-methods">A practical application of basic statistical methods</a>
+        </div>
+        <div class="post-summary">Crunch some numbers to see how Olympic medal wins relate to GDP and population. (w. Jia Wu)<br/><span class="post-meta">Issue 5.1 — August 7, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/spiking-is-not-cowboy-coding">Spiking is not cowboy coding</a>
+        </div>
+        <div class="post-summary">Search for the boundary lines between organized chaos and wild, unstructured hacking.<br/><span class="post-meta">Issue 4.12.4 — July 26, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/mock-objects-deeply-influence-design">Mock objects deeply influence design</a>
+        </div>
+        <div class="post-summary">Learn the rules that you need to follow in order to use mock objects as an effective design tool.<br/><span class="post-meta">Issue 4.12.3 — July 24, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/refactoring-is-not-redesign">Refactoring is not redesign</a>
+        </div>
+        <div class="post-summary">Discover how the differences between refactoring and redesign affect testing strategies. <br/><span class="post-meta">Issue 4.12.2 — July 19, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/end-to-end-testing-is-essential">End-to-end testing is essential</a>
+        </div>
+        <div class="post-summary">Build acceptance tests that reflect application behavior, rather than implementation details.<br/><span class="post-meta">Issue 4.12.1 — July 18, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/tdd-lessons-learned">Lessons learned from my TDD self-study</a>
+        </div>
+        <div class="post-summary">Revisit the reasons for Gregory's 90-day self-study on TDD, and see the results.<br/><span class="post-meta">Issue 4.12 — July 17, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/responsibility-centric-vs-data-centric-design">Responsibility-centric vs. data-centric design</a>
+        </div>
+        <div class="post-summary">Work through two approaches to object modeling and examine their tradeoffs. (w. Greg Moeck)<br/><span class="post-meta">Issue 4.11 — July 10, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/implementing-the-active-record-pattern-2">Implementing the Active Record pattern, Part 2</a>
+        </div>
+        <div class="post-summary">Consider using "object-oriented mixins" to reduce inheritance-related problems in ActiveRecord.<br/><span class="post-meta">Issue 4.10 — July 3, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/hidden-costs-of-inheritance">The hidden costs of inheritance</a>
+        </div>
+        <div class="post-summary">Think through some problems with inheritance-based modeling and then try a few related exercises.<br/><span class="post-meta">Issue 4.9 — June 19, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/implementing-the-active-record-pattern-1">Implementing the Active Record pattern, Part 1</a>
+        </div>
+        <div class="post-summary">Build a basic foundation to serve as the groundwork for implementing an ActiveRecord-style ORM.<br/><span class="post-meta">Issue 4.8 — June 12, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/confident-ruby">Writing confident code</a>
+        </div>
+        <div class="post-summary">Develop intention-revealing code that is confident about its responsibilities. (w. Avdi Grimm)<br/><span class="post-meta">Issue 4.7 — June 5, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/persisting-relations-in-a-polyglot-world">Persisting relations in a polyglot world</a>
+        </div>
+        <div class="post-summary">Explore some non-traditional persistence mechanisms and their uses.  (w. Piotr Szotkowski)<br/><span class="post-meta">Issue 4.6 — May 21, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/solving-the-scoring-predictions-kata">Solving the "Scoring Predictions" kata</a>
+        </div>
+        <div class="post-summary">Work through a coding puzzle and learn some fun tricks along the way. (w. James Edward Gray II)<br/><span class="post-meta">Issue 4.5 — May 15, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/tricks-for-working-with-text-and-files">Tricks for working with text and files</a>
+        </div>
+        <div class="post-summary">Tear apart a minimal clone of the Jekyll blog engine in search of helpful Ruby idioms.<br/><span class="post-meta">Issue 4.4 — May 10, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/tdd-costs-and-benefits">What are the costs and benefits of TDD?</a>
+        </div>
+        <div class="post-summary">Think through how to evaluate the impact of test-driven development on your work.<br/><span class="post-meta">Issue 4.1 — April 10, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/coding-in-the-danger-zone">Lessons learned from coding in the danger zone</a>
+        </div>
+        <div class="post-summary">Establish a few survival skills for working in hostile programming environments.<br/><span class="post-meta">Issue 3.10 — March 13, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/using-games-to-practice-domain-modeling">Using games to practice domain modeling</a>
+        </div>
+        <div class="post-summary">Learn about modeling non-trivial business logic by implementing Minecraft's crafting table.<br/><span class="post-meta">Issue 3.9 — February 28, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/disciplined-inheritance-2">Criteria for disciplined inheritance, Part 2</a>
+        </div>
+        <div class="post-summary">Discover how Barbara Liskov's concept of "behavioral subtypes" apply to object modeling in Ruby.<br/><span class="post-meta">Issue 3.8 — February 21, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/disciplined-inheritance-1">Criteria for disciplined inheritance, Part 1</a>
+        </div>
+        <div class="post-summary">See how M. Sakkinen's notion of "Disciplined Inheritance" in 1989 still applies to modern Ruby code.<br/><span class="post-meta">Issue 3.7 — February 15, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/framework-design-and-implementation-2">Framework design and implementation, Part 2</a>
+        </div>
+        <div class="post-summary">Explore some lessons learned the hard way in developing the Newman mail framework.<br/><span class="post-meta">Issue 3.6 — February 8, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/framework-design-and-implementation-1">Framework design and implementation, Part 1</a>
+        </div>
+        <div class="post-summary">Dig through the Newman mail framework's source code in search of useful patterns and practices.<br/><span class="post-meta">Issue 3.5 — February 2, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/spiral-staircase-of-refactoring">Building a better Turing tarpit</a>
+        </div>
+        <div class="post-summary">In this issue, we improve the design of the Brainf*ck interpreter that was introduced in Issue 3.3<br/><span class="post-meta">Issue 3.4 — January 25, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/exploring-a-turing-tarpit">Exploring the depths of a Turing tarpit</a>
+        </div>
+        <div class="post-summary">Read the code for a simple Brainf*ck interpreter and think about how it might be improved.<br/><span class="post-meta">Issue 3.3 — January 17, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/patterns-for-building-excellent-examples">Patterns for building excellent examples</a>
+        </div>
+        <div class="post-summary">Learn how to write code samples that clearly communicate ideas to other programmers.<br/><span class="post-meta">Issue 3.2 — January 10, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/qualities-of-great-software">The qualities of great software</a>
+        </div>
+        <div class="post-summary">See what ISO/IEC 9126 has to say about software quality, and how its metrics apply to Ruby code.<br/><span class="post-meta">Issue 3.1 — January 3, 2012</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/arguments-and-results-2">Thoughts on "Arguments and Results", Part 2</a>
+        </div>
+        <div class="post-summary">Work through result objects inspired by James Noble's classic "Arguments and Results" paper.<br/><span class="post-meta">Issue 2.15 — November 30, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/arguments-and-results-1">Thoughts on "Arguments and Results", Part 1</a>
+        </div>
+        <div class="post-summary">Work through argument objects inspired by James Noble's classic "Arguments and Results" paper.<br/><span class="post-meta">Issue 2.14 — November 23, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/binary-file-formats">Working with binary file formats</a>
+        </div>
+        <div class="post-summary">Read and write bitmap files using only a few dozen lines of Ruby code.<br/><span class="post-meta">Issue 2.12 — November 9, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/domain-specific-apis">Domain specific API construction</a>
+        </div>
+        <div class="post-summary">Master classic Ruby DSL design patterns by ripping off well-known libraries and tools.<br/><span class="post-meta">Issue 2.11 — November 2, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/from-requirements-discovery-to-release">From requirements discovery to release</a>
+        </div>
+        <div class="post-summary">Watch a small game project develop from the brainstorming phase to its first public release.<br/><span class="post-meta">Issue 2.10 — October 27, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/building-unix-style-command-line-applications">Building Unix-style command line applications</a>
+        </div>
+        <div class="post-summary">Build a basic clone of the 'cat' utility while learning some Ruby idioms for command line applications.<br/><span class="post-meta">Issue 2.9 — October 18, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/ruby-and-the-singleton-pattern-dont-get-along">Ruby and the singleton pattern don't get along</a>
+        </div>
+        <div class="post-summary">Model the singleton pattern in seven different ways, without discovering an elegant solution.<br/><span class="post-meta">Issue 2.8 — October 11, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/unobtrusive-ruby-in-practice">"Unobtrusive Ruby" in Practice</a>
+        </div>
+        <div class="post-summary">Explore ideas from Mike Burns's "Unobtrusive Ruby" blog post via practical code samples.<br/><span class="post-meta">Issue 2.7 — October 4, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/learning-new-things-step-by-step">Learning new things step-by-step</a>
+        </div>
+        <div class="post-summary">Build a simple arcade game in 13 tiny steps.<br/><span class="post-meta">Issue 2.6 — September 27, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/regession-testing">Thoughts on regression testing</a>
+        </div>
+        <div class="post-summary">Benefit from two lessons about regression testing that were learned the hard way.<br/><span class="post-meta">Issue 2.5 — September 20, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/building-enumerable-and-enumerator">Building Enumerable & Enumerator in Ruby</a>
+        </div>
+        <div class="post-summary">Learn about Ruby's powerful iteration tools by implementing some of its functionality yourself.<br/><span class="post-meta">Issue 2.4 — September 13, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/closures-are-complicated">A closure is a double edged sword</a>
+        </div>
+        <div class="post-summary">Discover why the closure property can sometimes lead to hard-to-spot memory leaks.<br/><span class="post-meta">Issue 2.3 — September 6, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/attacking-sticky-problems">How to attack sticky problems</a>
+        </div>
+        <div class="post-summary">Work through a few lessons that will help you find a starting point whenever you feel stuck.<br/><span class="post-meta">Issue 2.2 — August 30, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/ways-to-load-code">Ways to load code</a>
+        </div>
+        <div class="post-summary">Explore the strengths and weaknesses of the many code loading mechanisms in Ruby.<br/><span class="post-meta">Issue 2.1 — August 23, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/structural-design-patterns">Structural Design Patterns</a>
+        </div>
+        <div class="post-summary">Examine a use case for each of the classic structural design patterns laid out by the Gang of Four.<br/><span class="post-meta">Issue 1.26 — February 28, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/creational-design-patterns">Creational Design Patterns</a>
+        </div>
+        <div class="post-summary">Examine a use case for each of the classic creational design patterns laid out by the Gang of Four.<br/><span class="post-meta">Issue 1.25 — February 22, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/connascence">Connascence as a Software Design Metric</a>
+        </div>
+        <div class="post-summary">Work through code samples inspired by Jim Weirich's "Building Blocks of Modularity" presentation.<br/><span class="post-meta">Issue 1.24 — February 11, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/solid-design-principles">SOLID Design Principles</a>
+        </div>
+        <div class="post-summary">Work through code samples inspired by Sandi Metz's "SOLID Object-oriented Design" presentation.<br/><span class="post-meta">Issue 1.23 — February 5, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/how-to-practice-2">How to practice, Part 2</a>
+        </div>
+        <div class="post-summary">See an example of how the practice methods outlined in Issue 1.21 can be applied to a real project. <br/><span class="post-meta">Issue 1.22 — January 28, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/how-to-practice-1">How to practice, Part 1</a>
+        </div>
+        <div class="post-summary">Discover a new way to practice your coding skills by asking yourself the right questions.<br/><span class="post-meta">Issue 1.21 — January 26, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/thoughts-on-mocking-2">Thoughts on Mocking, Part 2</a>
+        </div>
+        <div class="post-summary">Explore a few good uses of mock objects from a non-mockist's perspective.<br/><span class="post-meta">Issue 1.20 — January 22, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/thoughts-on-mocking-1">Thoughts on Mocking, Part 1</a>
+        </div>
+        <div class="post-summary">Consider how the ideas from Martin Fowler's "Mocks aren't Stubs" can be applied to Ruby.<br/><span class="post-meta">Issue 1.19 — January 19, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/dirty-testing-secrets">Dirty Little Secrets about Testing</a>
+        </div>
+        <div class="post-summary">Take a look at some dark corners of the traditional testing dogma.<br/><span class="post-meta">Issue 1.18 — January 14, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/ruby-hacker-writers">Interesting Ruby Hacker-Writers</a>
+        </div>
+        <div class="post-summary">Find out which Ruby hackers consistently write great content worth reading.<br/><span class="post-meta">Issue 1.17 — January 7, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/ruby-hackers">Interesting Ruby Hackers</a>
+        </div>
+        <div class="post-summary">Find out which Ruby hackers consistently write great code worth reading.<br/><span class="post-meta">Issue 1.16 — January 3, 2011</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/duck-typing-in-practice-2">Duck Typing in Practice, Part 2</a>
+        </div>
+        <div class="post-summary">Examine real uses of Ruby's duck-typing capabilities in various open source projects and Ruby itself.<br/><span class="post-meta">Issue 1.15 — December 31, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/duck-typing-in-practice-1">Duck Typing in Practice, Part 1</a>
+        </div>
+        <div class="post-summary">Investigate the three main ways of doing type checking in Ruby, then work on some related exercises.<br/><span class="post-meta">Issue 1.14 — December 28, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/obfuscations-of-christmas-past">Obfuscations of Christmas Past</a>
+        </div>
+        <div class="post-summary">Tear apart an obfuscated Ruby program from Christian Neukirchen to learn some neat tricks.<br/><span class="post-meta">Issue 1.13 — December 23, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/rapid-prototyping">Rapid Prototyping</a>
+        </div>
+        <div class="post-summary">Build a tiny prototype of a tetris game on the command line.<br/><span class="post-meta">Issue 1.12 — December 21, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/uses-for-modules-4">Uses for Modules, Part 4</a>
+        </div>
+        <div class="post-summary">Explore the use of mixins for customizing individual objects.<br/><span class="post-meta">Issue 1.11 — December 16, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/uses-for-modules-3a">Addendum to Uses For Modules, Part 3</a>
+        </div>
+        <div class="post-summary">Learn the subtle differences between "extend self", "def self.method", and "module_function".<br/><span class="post-meta">Issue 1.10.a — December 15, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/uses-for-modules-3">Uses for Modules, Part 3</a>
+        </div>
+        <div class="post-summary">See how modules can be used as namespaced function bags, and as singleton objects.<br/><span class="post-meta">Issue 1.10 — December 14, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/uses-for-modules-2">Uses for Modules, Part 2</a>
+        </div>
+        <div class="post-summary">Use mixins as an alternative to multiple inheritance to augment class definitions.<br/><span class="post-meta">Issue 1.9 — December 10, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/uses-for-modules-1">Uses for Modules, Part 1</a>
+        </div>
+        <div class="post-summary">Use modules as namespaces for your libraries and applications.<br/><span class="post-meta">Issue 1.8 — December 8, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/meditations-on-bad-and-good-code-2">Meditations on Bad and Good Code, Part 2</a>
+        </div>
+        <div class="post-summary">Read through a cleaned up version of the ugly "Tic Tac Toe" game created in Issue 1.5<br/><span class="post-meta">Issue 1.7 — December 3, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/meditations-on-bad-and-good-code-1">Meditations on Bad and Good Code, Part 1</a>
+        </div>
+        <div class="post-summary">Build an ugly tic-tac-toe game by writing the entire implementation as a single procedural script.<br/><span class="post-meta">Issue 1.6 — December 1, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/testing-private-methods">Testing Private Methods</a>
+        </div>
+        <div class="post-summary">Understand why testing private methods can be a code smell.<br/><span class="post-meta">Issue 1.5 — November 25, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/configurable-applications-2">Writing Configurable Applications, Part 2</a>
+        </div>
+        <div class="post-summary">Build dynamic Ruby-based configuration objects.<br/><span class="post-meta">Issue 1.4 — November 18, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/configurable-applications-1">Writing Configurable Applications, Part 1</a>
+        </div>
+        <div class="post-summary">Learn what not to do when configuring applications, then explore a simple YAML-based configuration.<br/><span class="post-meta">Issue 1.3 — November 16, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/method-lookup-2">Ruby's method lookup path, Part 2</a>
+        </div>
+        <div class="post-summary">Use your knowledge of Ruby's lookup path to determine where to add methods in a program.<br/><span class="post-meta">Issue 1.2 — November 11, 2010</span></div>
+      </li>
+    
+      <li>
+        <div class="post-link">
+          <a href="/articles/method-lookup-1">Ruby's method lookup path, Part 1</a>
+        </div>
+        <div class="post-summary">Discover the complicated, multi-step dance that is the Ruby method lookup path.<br/><span class="post-meta">Issue 1.1 — November 9, 2010</span></div>
+      </li>
+    
+  </ul>
+
+  <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

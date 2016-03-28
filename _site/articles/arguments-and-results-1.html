@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Thoughts on &quot;Arguments and Results&quot;, Part 1</title>
+  <meta name="description" content="Back in 1997, James Noble published a paper called Arguments and Results which outlined several useful patterns for designing better object protocols. Despit...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/arguments-and-results-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Thoughts on "Arguments and Results", Part 1</h1>
+    <p class="post-meta"><time datetime="2011-11-23T00:00:00-05:00" itemprop="datePublished">Nov 23, 2011</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Back in 1997, James Noble published a paper called <a href="http://www.laputan.org/pub/patterns/noble/noble.pdf">Arguments and Results</a> which outlined several useful patterns for designing better object protocols. Despite the fact that this paper was written nearly 15 years ago, it addresses design problems that programmers still struggle with today. In this two part article, I show how the patterns James came up with can be applied to modern Ruby programs.</p>
+
+<p><u>Arguments and Results</u> is written in such a way that it is natural to split the patterns it describes into two separate groups: patterns about method arguments and patterns about the results returned by methods. I’ve decided to split this Practicing Ruby article in the same manner in order to make it easier for me to write and easier for you to read.</p>
+
+<p>In this first installment, we will explore the patterns James lays out for working with method arguments, and in Issue 2.15 we’ll look into results objects. If you read this part, be sure to read the second part once it comes out, because the two concepts complement each other nicely.</p>
+
+<h3 id="establishing-a-context">Establishing a context</h3>
+
+<p>It is very difficult to study design patterns without applying them within a particular context. When I am trying to learn new patterns, I tend to start by looking for a realistic scenario that the pattern might be applicable to. I then examine the benefits and drawbacks of the design changes within that context. James uses a lot of graphics programming examples in his paper and this is for good reason: it’s an area where designing good interfaces for your objects can quickly become challenging.</p>
+
+<p>I’ve decided to follow in James’s footsteps here and use a trivial <a href="http://www.w3.org/TR/SVG/">SVG</a> generator as the common theme for the examples in this article. The following code illustrates the interface that I started with before applying any special patterns:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># image dimensions are provided to `Drawing` in cm, </span>
+<span class="c1"># all other measurements are done in units of 0.01 cm</span>
+
+<span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">drawing</span><span class="p">.</span><span class="nf">line</span><span class="p">(</span><span class="ss">:x1</span> <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span> <span class="ss">:y1</span> <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span> <span class="ss">:x2</span> <span class="o">=&gt;</span> <span class="mi">200</span><span class="p">,</span> <span class="ss">:y2</span> <span class="o">=&gt;</span> <span class="mi">250</span><span class="p">,</span>
+             <span class="ss">:stroke_color</span> <span class="o">=&gt;</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="ss">:stroke_width</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">drawing</span><span class="p">.</span><span class="nf">line</span><span class="p">(</span><span class="ss">:x1</span> <span class="o">=&gt;</span> <span class="mi">300</span><span class="p">,</span> <span class="ss">:y1</span> <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span> <span class="ss">:x2</span> <span class="o">=&gt;</span> <span class="mi">200</span><span class="p">,</span> <span class="ss">:y2</span> <span class="o">=&gt;</span> <span class="mi">250</span><span class="p">,</span>
+             <span class="ss">:stroke_color</span> <span class="o">=&gt;</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="ss">:stroke_width</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="no">File</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s2">"sample.svg"</span><span class="p">,</span> <span class="n">drawing</span><span class="p">.</span><span class="nf">to_svg</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>The implementation details are not important here, but if you would like to see how this code works, you can check out the <a href="https://github.com/elm-city-craftworks/pr-arguments-and-results/blob/7656768680b6a940a5ccf569fc0e0dce48a5dbfe/drawing.rb">source code for the Drawing class</a>. The interface for <code class="highlighter-rouge">Drawing#line</code> uses keyword-style arguments in a similar fashion to most other Ruby libraries. Because keyword arguments are easier to remember and more flexible than ordinal arguments, this style of interface has become very popular among Ruby programmers. However, the more arguments a method takes, the more unwieldy this sort of API becomes. That tipping point is where design patterns about arguments come into play.</p>
+
+<h3 id="arguments-object">Arguments object</h3>
+
+<p>As the number of arguments to a method increase, the amount of code within the method to handle those arguments tends to increase as well. This is because complex protocols typically require  arguments to be validated and transformed before they can be operated on. By introducing new objects to wrap related sets of arguments, it is possible to keep your argument processing logic somewhat separated from your business logic. The following code demonstrates how to use this concept to simplify the interface of the <code class="highlighter-rouge">Drawing#line</code> method:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">line1</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Shape</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
+<span class="n">line2</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Shape</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
+
+<span class="n">line_style</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Style</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:stroke_color</span> <span class="o">=&gt;</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="ss">:stroke_width</span> <span class="o">=&gt;</span> <span class="s2">"2"</span><span class="p">)</span>
+
+<span class="n">drawing</span><span class="p">.</span><span class="nf">line</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line_style</span><span class="p">)</span>
+
+<span class="n">drawing</span><span class="p">.</span><span class="nf">line</span><span class="p">(</span><span class="n">line2</span><span class="p">,</span> <span class="n">line_style</span><span class="p">)</span>
+
+<span class="no">File</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s2">"sample.svg"</span><span class="p">,</span> <span class="n">drawing</span><span class="p">.</span><span class="nf">to_svg</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>This approach takes a single complex method call on a single object and replaces it with several less complex method calls distributed across several objects. In the early stages of development, applying this pattern feels ugly because it involves writing a lot more code for both the library developer and application developer. However, as the complexity of the argument processing increases, the benefits of this approach begin to shine. The following example demonstrates how the newly introduced arguments objects raise the <code class="highlighter-rouge">Drawing#line</code> code up to a higher level of abstraction.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">line</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+  <span class="k">unless</span> <span class="n">data</span><span class="p">.</span><span class="nf">bounded_by?</span><span class="p">(</span><span class="vi">@viewbox_width</span><span class="p">,</span> <span class="vi">@viewbox_height</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">"shape is not within view box"</span>
+  <span class="k">end</span>
+
+  <span class="vi">@lines</span> <span class="o">&lt;&lt;</span> <span class="p">{</span> <span class="ss">:x1</span> <span class="o">=&gt;</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">x</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span> <span class="ss">:y1</span> <span class="o">=&gt;</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">y</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span>
+              <span class="ss">:x2</span> <span class="o">=&gt;</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">x</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span> <span class="ss">:y2</span> <span class="o">=&gt;</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">y</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span>
+              <span class="ss">:style</span> <span class="o">=&gt;</span> <span class="n">style</span><span class="p">.</span><span class="nf">to_css</span> <span class="p">}</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The cost of making <code class="highlighter-rouge">Drawing#line</code> so concise is a big chunk of boilerplate code that on the surface feels a bit overkill at this stage in the game. However, it does not take a very wild imagination to see how these new objects set the stage for future extensions:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Point</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="vi">@x</span><span class="p">,</span> <span class="vi">@y</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+  <span class="k">end</span>
+
+  <span class="kp">attr_reader</span> <span class="ss">:x</span><span class="p">,</span> <span class="ss">:y</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Shape</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="o">*</span><span class="n">point_data</span><span class="p">)</span>
+    <span class="vi">@points</span> <span class="o">=</span> <span class="n">point_data</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="no">Point</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">[]</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+    <span class="vi">@points</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">bounded_by?</span><span class="p">(</span><span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span>
+    <span class="vi">@points</span><span class="p">.</span><span class="nf">all?</span> <span class="p">{</span> <span class="o">|</span><span class="nb">p</span><span class="o">|</span> <span class="nb">p</span><span class="p">.</span><span class="nf">x</span> <span class="o">&lt;=</span> <span class="n">x_max</span> <span class="o">&amp;&amp;</span> <span class="nb">p</span><span class="p">.</span><span class="nf">y</span> <span class="o">&lt;=</span> <span class="n">y_max</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Style</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="vi">@stroke_width</span>  <span class="o">=</span> <span class="n">params</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="ss">:stroke_width</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="vi">@stroke_color</span>  <span class="o">=</span> <span class="n">params</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="ss">:stroke_color</span><span class="p">,</span> <span class="s2">"black"</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="kp">attr_reader</span> <span class="ss">:stroke_width</span><span class="p">,</span> <span class="ss">:stroke_color</span>
+
+  <span class="k">def</span> <span class="nf">to_css</span>
+    <span class="s2">"stroke: </span><span class="si">#{</span><span class="vi">@stroke_color</span><span class="si">}</span><span class="s2">; stroke-width: </span><span class="si">#{</span><span class="vi">@stroke_width</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The interesting thing about these objects is that they actually represent domain models even though their original purpose was simply to wrap up some arguments to a single method defined on the <code class="highlighter-rouge">Drawing</code> object. James mentions in his paper that this phenomena is common and would call these “Found objects”, i.e. objects that are part of the domain model that were found through refactoring rather than accounted for in the original design.</p>
+
+<p>You might have noticed that in the previous example, I set some default values for some of the variables on the <code class="highlighter-rouge">Style</code> object. If you compare this to setting defaults directly within the <code class="highlighter-rouge">Drawing#line</code> method itself, it becomes obvious that there is a benefit here. Properties like
+the color and thickness of the lines drawn to form a shape are universal properties, not things specific to straight lines only. Centralizing the defaults makes it so that they do not need to be repeated for each type of shape that the <code class="highlighter-rouge">Drawing</code> object supports.</p>
+
+<h3 id="selector-object">Selector object</h3>
+
+<p>Sometimes we end up with objects that have many methods that take similar arguments. While these methods may actually do different things, the only difference in the object protocol is the name of the message being sent. After adding a method for rendering polygons to my <code class="highlighter-rouge">Drawing</code> object, I ended up in exactly this situation. The following example shows just how similar the <code class="highlighter-rouge">Drawing#line</code> interface is to the newly created <code class="highlighter-rouge">Drawing#polygon</code> method:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">line1</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Shape</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
+<span class="n">line2</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Shape</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
+
+<span class="n">triangle</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Shape</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">350</span><span class="p">,</span> <span class="mi">150</span><span class="p">],</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="p">[</span><span class="mi">150</span><span class="p">,</span><span class="mi">150</span><span class="p">])</span>
+
+<span class="n">style</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Style</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:stroke_color</span> <span class="o">=&gt;</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="ss">:stroke_width</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">drawing</span><span class="p">.</span><span class="nf">line</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+
+<span class="n">drawing</span><span class="p">.</span><span class="nf">line</span><span class="p">(</span><span class="n">line2</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+
+<span class="n">drawing</span><span class="p">.</span><span class="nf">polygon</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+
+<span class="no">File</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s2">"sample.svg"</span><span class="p">,</span> <span class="n">drawing</span><span class="p">.</span><span class="nf">to_svg</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Taking a look at the implementation of both methods, it is easy to see that there are deep similarities in structure between the two:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
+  <span class="c1"># NOTE: other code omitted, not important...</span>
+
+  <span class="k">def</span> <span class="nf">line</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+    <span class="k">unless</span> <span class="n">data</span><span class="p">.</span><span class="nf">bounded_by?</span><span class="p">(</span><span class="vi">@viewbox_width</span><span class="p">,</span> <span class="vi">@viewbox_height</span><span class="p">)</span>
+      <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">"shape is not within view box"</span>
+    <span class="k">end</span>
+
+    <span class="vi">@elements</span> <span class="o">&lt;&lt;</span> <span class="p">[</span><span class="ss">:line</span><span class="p">,</span> <span class="p">{</span> <span class="ss">:x1</span>    <span class="o">=&gt;</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">x</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span> 
+                           <span class="ss">:y1</span>    <span class="o">=&gt;</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">y</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span> 
+                           <span class="ss">:x2</span>    <span class="o">=&gt;</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">x</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span> 
+                           <span class="ss">:y2</span>    <span class="o">=&gt;</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">y</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span>
+                           <span class="ss">:style</span> <span class="o">=&gt;</span> <span class="n">style</span><span class="p">.</span><span class="nf">to_css</span> <span class="p">}]</span> 
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">polygon</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+    <span class="k">unless</span> <span class="n">data</span><span class="p">.</span><span class="nf">bounded_by?</span><span class="p">(</span><span class="vi">@viewbox_width</span><span class="p">,</span> <span class="vi">@viewbox_height</span><span class="p">)</span>
+       <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">"shape is not within view box"</span>     
+    <span class="k">end</span>
+
+    <span class="vi">@elements</span> <span class="o">&lt;&lt;</span> <span class="p">[</span><span class="ss">:polygon</span><span class="p">,</span> <span class="p">{</span> 
+      <span class="ss">:points</span> <span class="o">=&gt;</span> <span class="n">data</span><span class="p">.</span><span class="nf">each</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">point</span><span class="o">|</span> <span class="s2">"</span><span class="si">#{</span><span class="n">point</span><span class="p">.</span><span class="nf">x</span><span class="si">}</span><span class="s2">,</span><span class="si">#{</span><span class="n">point</span><span class="p">.</span><span class="nf">y</span><span class="si">}</span><span class="s2">"</span> <span class="p">}.</span><span class="nf">join</span><span class="p">(</span><span class="s2">" "</span><span class="p">),</span>
+      <span class="ss">:style</span>  <span class="o">=&gt;</span> <span class="n">style</span><span class="p">.</span><span class="nf">to_css</span>
+    <span class="p">}]</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>To make this code more DRY, James recommends converting our arguments object into what he calls a selector object. A selector object is an object which uses similar arguments to do different things depending on the type of message it is meant to represent. James recommends using double dispatch or multi-methods to implement this pattern, but that approach is not appropriate for Ruby because the language does not provide built-in semantics for function overloading. The good news is that he also mentions that inheritance can be used as an alternative, and in this case it was a perfect fit.</p>
+
+<p>To simplify and clean up the previous example, I introduced <code class="highlighter-rouge">Line</code> and <code class="highlighter-rouge">Polygon</code> which inherit from <code class="highlighter-rouge">Shape</code>. I then combined the <code class="highlighter-rouge">Drawing#line</code> method and <code class="highlighter-rouge">Drawing#polygon</code> method into a single method called <code class="highlighter-rouge">Drawing#draw</code>. The following example demonstrates what the API ended up looking like as a result of this change:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">line1</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Line</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
+<span class="n">line2</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Line</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
+
+<span class="n">triangle</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Polygon</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">350</span><span class="p">,</span> <span class="mi">150</span><span class="p">],</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="p">[</span><span class="mi">150</span><span class="p">,</span><span class="mi">150</span><span class="p">])</span>
+
+<span class="n">style</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Style</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:stroke_color</span> <span class="o">=&gt;</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="ss">:stroke_width</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">drawing</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+<span class="n">drawing</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">line2</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+<span class="n">drawing</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+
+<span class="no">File</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s2">"sample.svg"</span><span class="p">,</span> <span class="n">drawing</span><span class="p">.</span><span class="nf">to_svg</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>The changes to the API are small but make the code a lot easier to read. This rearrangement introduces even more objects into the system, but simplifies the protocol between those objects. In large systems, this leads to greater maintainability and learnability at the cost of having a few more moving parts.</p>
+
+<p>In order to implement this new interface, some non-trivial changes needed to be made under the hood. You can check out the <a href="https://github.com/elm-city-craftworks/pr-arguments-and-results/commit/47924901552d0509f97a3083737709980139feba">exact commit</a> to see the details about what changed implementation-wise between this example and the last one, but most of the changes were just boring housekeeping. The general idea is that the <code class="highlighter-rouge">Drawing#draw</code> method now simply asks each shape object to represent itself as a hash which ultimately ends up getting converted into an XML tag within the SVG document. As an example, here is what the definition for the <code class="highlighter-rouge">Line</code> object looks like:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
+  <span class="k">class</span> <span class="nc">Line</span> <span class="o">&lt;</span> <span class="no">Shape</span>
+    <span class="k">def</span> <span class="nf">to_hash</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+      <span class="p">{</span> <span class="ss">:tag_name</span> <span class="o">=&gt;</span> <span class="ss">:line</span><span class="p">,</span>
+        <span class="ss">:params</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="ss">:x1</span>    <span class="o">=&gt;</span> <span class="nb">self</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">x</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span>
+                     <span class="ss">:y1</span>    <span class="o">=&gt;</span> <span class="nb">self</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">y</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span>
+                     <span class="ss">:x2</span>    <span class="o">=&gt;</span> <span class="nb">self</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">x</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span>
+                     <span class="ss">:y2</span>    <span class="o">=&gt;</span> <span class="nb">self</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nf">y</span><span class="p">.</span><span class="nf">to_s</span><span class="p">,</span>
+                     <span class="ss">:style</span> <span class="o">=&gt;</span> <span class="n">style</span><span class="p">.</span><span class="nf">to_css</span> <span class="p">}</span> <span class="p">}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>As you can imagine, the <code class="highlighter-rouge">Polygon</code> object uses a similar approach and this general pattern would be applicable for new types of shapes as well.</p>
+
+<h3 id="curried-object">Curried object</h3>
+
+<p>While method arguments exist to allow us to vary the objects we pass in, its not uncommon for the same method to be called many times with some of its arguments being held constant. In fact, all of the examples in this article have shown the same <code class="highlighter-rouge">Style</code> object being passed to the same method again and again, with only the shape varying. This has resulted in some repetitive code that looks ugly, and could be improved.</p>
+
+<p>James recommends creating a curried object to deal with this sort of problem. The curried object acts as a lightweight proxy over the original object, but keeps the constant data stored in variables so that you do not need to keep repeating it. The following code applies this concept to clean up our previous example:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">line1</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Line</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
+<span class="n">line2</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Line</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
+
+<span class="n">triangle</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Polygon</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">350</span><span class="p">,</span> <span class="mi">150</span><span class="p">],</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="p">[</span><span class="mi">150</span><span class="p">,</span><span class="mi">150</span><span class="p">])</span>
+
+<span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">style</span>   <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Style</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:stroke_color</span> <span class="o">=&gt;</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="ss">:stroke_width</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">pen</span>     <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Pen</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">drawing</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+
+<span class="n">pen</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">line1</span><span class="p">)</span>
+<span class="n">pen</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">line2</span><span class="p">)</span>
+<span class="n">pen</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">triangle</span><span class="p">)</span>
+
+<span class="no">File</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s2">"sample.svg"</span><span class="p">,</span> <span class="n">drawing</span><span class="p">.</span><span class="nf">to_svg</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>While introducing the new <code class="highlighter-rouge">Pen</code> object requires a change in the calling code so that <code class="highlighter-rouge">Pen#draw</code> gets called instead of <code class="highlighter-rouge">Drawing#draw</code>, no change to the implementation of <code class="highlighter-rouge">Drawing</code> was needed to introduce this new object. The following class definition will do the trick:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
+  <span class="k">class</span> <span class="nc">Pen</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">drawing</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+      <span class="vi">@drawing</span><span class="p">,</span> <span class="vi">@style</span> <span class="o">=</span> <span class="n">drawing</span><span class="p">,</span> <span class="n">style</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+      <span class="n">drawing</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+    <span class="k">end</span>
+    
+    <span class="kp">private</span>
+
+    <span class="kp">attr_reader</span> <span class="ss">:drawing</span><span class="p">,</span> <span class="ss">:style</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>In this particular case, <code class="highlighter-rouge">Pen</code> is easy to write because the interface on <code class="highlighter-rouge">Drawing</code> is so small. In more complicated cases, it would make sense to use some of Ruby’s metaprogramming features to implement a dynamic proxy of some sort. However, if you find yourself simultaneously facing a broad interface that has arguments that often remain constant in many of its functions, you may want to evaluate whether you have a flawed design before going down that road.</p>
+
+<p>An interesting thing to note is that curried objects are not necessarily limited to arguments that remain constant. This pattern can also be applied in situations where method calls made in sequence have a clear pattern in the way that one or more arguments are varied. The example James gives in his paper describes some logic for a text editor in which lines of text are rendered to the screen with all the same style attributes from line to line, but with the line number incremented as each new line is rendered. Taking inspiration from that example, I decided to build a simple turtle graphics system to demonstrate how curried objects can be used for predictably varying arguments as well as constant arguments. The code below generates an image of an X when run:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">style</span>   <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Style</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:stroke_color</span> <span class="o">=&gt;</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="ss">:stroke_width</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">turtle</span>  <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Turtle</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">drawing</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+
+<span class="n">turtle</span><span class="p">.</span><span class="nf">move_to</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">400</span><span class="p">])</span>
+
+<span class="n">turtle</span><span class="p">.</span><span class="nf">pen_down</span>
+<span class="n">turtle</span><span class="p">.</span><span class="nf">move_to</span><span class="p">([</span><span class="mi">400</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+<span class="n">turtle</span><span class="p">.</span><span class="nf">pen_up</span>
+<span class="n">turtle</span><span class="p">.</span><span class="nf">move_to</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">turtle</span><span class="p">.</span><span class="nf">pen_down</span>
+<span class="n">turtle</span><span class="p">.</span><span class="nf">move_to</span><span class="p">([</span><span class="mi">400</span><span class="p">,</span><span class="mi">400</span><span class="p">])</span>
+
+<span class="no">File</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s2">"sample.svg"</span><span class="p">,</span> <span class="n">drawing</span><span class="p">.</span><span class="nf">to_svg</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>The implementation code to make the previous example work was very easy to write and required no changes to the rest of the system:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
+  <span class="k">class</span> <span class="nc">Turtle</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">drawing</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+      <span class="vi">@drawing</span>  <span class="o">=</span> <span class="n">drawing</span>
+      <span class="vi">@style</span>    <span class="o">=</span> <span class="n">style</span>
+      <span class="vi">@inked</span>    <span class="o">=</span> <span class="kp">false</span>
+      <span class="vi">@position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">move_to</span><span class="p">(</span><span class="n">next_position</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">inked</span>
+        <span class="n">drawing</span><span class="p">.</span><span class="nf">draw</span><span class="p">(</span><span class="no">Line</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">next_position</span><span class="p">),</span> <span class="n">style</span><span class="p">)</span>
+      <span class="k">end</span>
+      
+      <span class="nb">self</span><span class="p">.</span><span class="nf">position</span> <span class="o">=</span> <span class="n">next_position</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">pen_up</span>
+      <span class="nb">self</span><span class="p">.</span><span class="nf">inked</span> <span class="o">=</span> <span class="kp">false</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">pen_down</span> 
+      <span class="nb">self</span><span class="p">.</span><span class="nf">inked</span> <span class="o">=</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="kp">private</span>
+
+    <span class="kp">attr_reader</span>   <span class="ss">:drawing</span><span class="p">,</span> <span class="ss">:style</span>
+    <span class="kp">attr_accessor</span> <span class="ss">:position</span><span class="p">,</span> <span class="ss">:inked</span> 
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>After taking a look at the finished <code class="highlighter-rouge">Turtle</code> object, I did wonder a little bit about whether the idea of a curried object in Ruby is nothing more than an ordinary object making use of object composition. However, because the name of the pattern is helpful for describing the intent of this sort of object in a succinct way, it may be a good label for us to use when discussing the merits of different design options.</p>
+
+<h3 id="reflections">Reflections</h3>
+
+<p>Applying these various argument patterns to a realistic example made it much easier for me to see the power behind these ideas. I have gradually picked up bits and pieces of the various techniques shown here before reading this paper largely due to my trial and error work on the Prawn PDF generator.</p>
+
+<p>In lots of places in Prawn, we let hash arguments grow to an insanely large size and it created a lot of problems for us. We also ignored using curried objects in a lot of places by instead placing instance variables directly on the target objects and then mutating the state within them over time to vary things. This led to complicated transactional code and made it easy for things to end up in an inconsistent state. The solutions to these problems tended to be refactorings that are quite similar to what you’ve seen in this article, even if we didn’t call them by a special name at the time.</p>
+
+<p>Still, I do have some concern that these patterns might be overkill for any interfaces that you are reasonably sure won’t get too complex over time. If we apply these patterns overzealously, you might end up needing to go through level after level of indirection just to accomplish anything useful, and that will make Ruby start to feel like Java. However, it seems like using some sort of formalized arguments object is obviously beneficial for highly complex interactions, and likely to be at least somewhat useful for medium complexity protocols as well.</p>
+
+<p>No matter what the complexity of the problem I was working on, it’s unlikely that I would make it so that the application developer needed to jump through so many hoops just to use my library. Instead, I would probably build a simple facade or DSL that made their life easier, even if a rich object structure was lurking under the hood. If I were really building an SVG generator, I might end up building a DSL for it that looked something like this:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="k">do</span>
+  <span class="n">style</span> <span class="ss">:stroke_color</span> <span class="o">=&gt;</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="ss">:stroke_width</span> <span class="o">=&gt;</span> <span class="mi">2</span> <span class="k">do</span>
+    <span class="n">line</span>    <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">]</span>
+    <span class="n">line</span>    <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">]</span>
+    <span class="n">polygon</span> <span class="p">[</span><span class="mi">350</span><span class="p">,</span> <span class="mi">150</span><span class="p">],</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="p">[</span><span class="mi">150</span><span class="p">,</span><span class="mi">150</span><span class="p">]</span>
+  <span class="k">end</span>
+
+  <span class="n">save_as</span> <span class="s2">"sample.svg"</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>If I implemented this as a thin veneer on top of code similar to what we ended up with in this article, I think that would be a pretty well designed library. The end user gets convenience for the normal case, but the underlying system would be easier to maintain, test, and learn. It would also give the user flexibility to interact with the system in ways I didn’t anticipate.</p>
+
+<p>Be sure to tune in next week for the second part of this article, where I’ll focus on the results side of the method interface. Until then, I’d love to hear any questions or thoughts you have about this topic.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

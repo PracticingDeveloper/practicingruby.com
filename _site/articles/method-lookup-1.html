@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Ruby&#39;s method lookup path, Part 1</title>
+  <meta name="description" content="I decided to start off this newsletter with one of the most basic but essential pieces of knowledge you can have about Ruby’s object model: the way it looks ...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/method-lookup-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Ruby's method lookup path, Part 1</h1>
+    <p class="post-meta"><time datetime="2010-11-09T00:00:00-05:00" itemprop="datePublished">Nov 9, 2010</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>I decided to start off this newsletter with one of the most basic but essential pieces of knowledge you can have about Ruby’s object model: the way it looks up methods. Let’s do a little exploration by working through a few examples.</p>
+
+<p>Below we have a simple report class tasked with performing some basic data manipulations and then producing some text output.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Report</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">ledger</span><span class="p">)</span>
+    <span class="vi">@balance</span>          <span class="o">=</span> <span class="n">ledger</span><span class="p">.</span><span class="nf">inject</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">sum</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span><span class="o">|</span> <span class="n">sum</span> <span class="o">+</span> <span class="n">v</span> <span class="p">}</span>
+    <span class="vi">@credits</span><span class="p">,</span> <span class="vi">@debits</span> <span class="o">=</span> <span class="n">ledger</span><span class="p">.</span><span class="nf">partition</span> <span class="p">{</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="o">|</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="kp">attr_reader</span> <span class="ss">:credits</span><span class="p">,</span> <span class="ss">:debits</span><span class="p">,</span> <span class="ss">:balance</span>
+
+  <span class="k">def</span> <span class="nf">formatted_output</span>
+    <span class="s2">"Current Balance: </span><span class="si">#{</span><span class="n">balance</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span> <span class="o">+</span>
+    <span class="s2">"Credits:</span><span class="se">\n\n</span><span class="si">#{</span><span class="n">formatted_line_items</span><span class="p">(</span><span class="n">credits</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span> <span class="o">+</span>
+    <span class="s2">"Debits:</span><span class="se">\n\n</span><span class="si">#{</span><span class="n">formatted_line_items</span><span class="p">(</span><span class="n">debits</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">formatted_line_items</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+    <span class="n">items</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">|</span> <span class="s2">"</span><span class="si">#{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="s1">'%.2f'</span> <span class="o">%</span> <span class="n">v</span><span class="p">.</span><span class="nf">abs</span><span class="si">}</span><span class="s2">"</span> <span class="p">}.</span><span class="nf">join</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The following example demonstrates how we’d make use of this class.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">ledger</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="s2">"Deposit Check #123"</span><span class="p">,</span> <span class="mi">500</span><span class="o">.</span><span class="mi">15</span><span class="p">],</span>
+           <span class="p">[</span><span class="s2">"Fancy Shoes"</span><span class="p">,</span>       <span class="o">-</span><span class="mi">200</span><span class="o">.</span><span class="mi">25</span><span class="p">],</span>
+           <span class="p">[</span><span class="s2">"Fancy Hat"</span><span class="p">,</span>          <span class="o">-</span><span class="mi">54</span><span class="o">.</span><span class="mi">40</span><span class="p">],</span>
+           <span class="p">[</span><span class="s2">"ATM Deposit"</span><span class="p">,</span>       <span class="mi">1200</span><span class="o">.</span><span class="mo">00</span><span class="p">],</span>
+           <span class="p">[</span><span class="s2">"Kitteh Litteh"</span><span class="p">,</span>       <span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mo">00</span><span class="p">]</span> <span class="p">]</span>
+
+<span class="n">report</span> <span class="o">=</span> <span class="no">Report</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">ledger</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="n">report</span><span class="p">.</span><span class="nf">formatted_output</span>
+</code></pre>
+</div>
+
+<p>And for those who don’t want to take the time to copy and paste this code and run it locally, the actual output is shown below.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Current Balance: 1440.5
+
+Credits:
+
+Deposit Check #123: 500.15
+ATM Deposit: 1200.00
+
+Debits:
+
+Fancy Shoes: 200.25
+Fancy Hat: 54.40
+Kitteh Litteh: 5.00
+</code></pre>
+</div>
+
+<p>While not particularly pretty, this report is mostly what we’d expect to see. You can probably imagine how this information might be embedded within another report, such as an email-based form letter with some header and footer information. One possible way to do this would be through class inheritance, as in the example below.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"date"</span>
+
+<span class="k">class</span> <span class="nc">EmailReport</span> <span class="o">&lt;</span> <span class="no">Report</span>
+  <span class="k">def</span> <span class="nf">header</span>
+    <span class="s2">"Dear Valued Customer,</span><span class="se">\n\n</span><span class="s2">"</span><span class="o">+</span>
+    <span class="s2">"This report shows your account activity as of </span><span class="si">#{</span><span class="no">Date</span><span class="p">.</span><span class="nf">today</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">banner</span>
+    <span class="s2">"</span><span class="se">\n</span><span class="s2">............................................................</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">formatted_output</span>
+    <span class="n">header</span> <span class="o">+</span> <span class="n">banner</span> <span class="o">+</span> <span class="k">super</span> <span class="o">+</span> <span class="n">banner</span> <span class="o">+</span> <span class="n">footer</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">footer</span>
+    <span class="s2">"</span><span class="se">\n</span><span class="s2">With Much Love,</span><span class="se">\n</span><span class="s2">Your Faceless Banking Institution"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>We only need to make a minor change to our calling code to make use of this new class.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">ledger</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="s2">"Deposit Check #123"</span><span class="p">,</span> <span class="mi">500</span><span class="o">.</span><span class="mi">15</span><span class="p">],</span>
+           <span class="p">[</span><span class="s2">"Fancy Shoes"</span><span class="p">,</span>       <span class="o">-</span><span class="mi">200</span><span class="o">.</span><span class="mi">25</span><span class="p">],</span>
+           <span class="p">[</span><span class="s2">"Fancy Hat"</span><span class="p">,</span>          <span class="o">-</span><span class="mi">54</span><span class="o">.</span><span class="mi">40</span><span class="p">],</span>
+           <span class="p">[</span><span class="s2">"ATM Deposit"</span><span class="p">,</span>       <span class="mi">1200</span><span class="o">.</span><span class="mo">00</span><span class="p">],</span>
+           <span class="p">[</span><span class="s2">"Kitteh Litteh"</span><span class="p">,</span>       <span class="o">-</span><span class="mi">5</span><span class="o">.</span><span class="mo">00</span><span class="p">]</span> <span class="p">]</span>
+
+<span class="n">report</span> <span class="o">=</span> <span class="no">EmailReport</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">ledger</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="n">report</span><span class="p">.</span><span class="nf">formatted_output</span>
+</code></pre>
+</div>
+
+<p>Below you can see what the new output ends up looking like.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Dear Valued Customer,
+
+The following report shows your account activity as of 2010-11-09
+
+............................................................
+Current Balance: 1440.5
+
+Credits:
+
+Deposit Check #123: 500.15
+ATM Deposit: 1200.00
+
+Debits:
+
+Fancy Shoes: 200.25
+Fancy Hat: 54.40
+Kitteh Litteh: 5.00
+............................................................
+
+With Much Love,
+Your Faceless Banking Institution
+</code></pre>
+</div>
+
+<p>Looking back at the <code class="highlighter-rouge">EmailReport</code> code, it’s easy to see what we’ve done to produce this new output. We’ve defined a new <code class="highlighter-rouge">formatted_output</code> method which adds the headers and footers, and combined this new behavior with the original behavior of our <code class="highlighter-rouge">Report</code> class by calling <code class="highlighter-rouge">super</code>. This is the same extension by inheritance pattern that you’ll learn in any basic computer science course or encounter in any of the reasonably traditional object oriented languages out there.</p>
+
+<p>But before you go asking for a refund and start telling your friends that this newsletter is painfully dull, consider this: While many languages have a method lookup path which is based on inheritance alone, that isn’t even close to being true about Ruby.</p>
+
+<p>Because Ruby allows for module mixins and per-object behavior, the <code class="highlighter-rouge">super</code> keyword takes on a whole new life in which an object’s superclass is the last stop on a five part journey through Ruby’s object model. The following example proves the point by composing a simple string which demonstrates the order in which methods are resolved in Ruby.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">W</span>
+  <span class="k">def</span> <span class="nf">foo</span>
+    <span class="s2">"- Mixed in method defined by W</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="k">super</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">module</span> <span class="nn">X</span>
+  <span class="k">def</span> <span class="nf">foo</span>
+    <span class="s2">"- Mixed in method defined by X</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="k">super</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">module</span> <span class="nn">Y</span>
+  <span class="k">def</span> <span class="nf">foo</span>
+    <span class="s2">"- Mixed in method defined by Y</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="k">super</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">module</span> <span class="nn">Z</span>
+  <span class="k">def</span> <span class="nf">foo</span>
+    <span class="s2">"- Mixed in method defined by Z</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="k">super</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">A</span>
+  <span class="k">def</span> <span class="nf">foo</span>
+    <span class="s2">"- Instance method defined by A</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">B</span> <span class="o">&lt;</span> <span class="no">A</span>
+  <span class="kp">include</span> <span class="no">W</span>
+  <span class="kp">include</span> <span class="no">X</span>
+
+  <span class="k">def</span> <span class="nf">foo</span>
+    <span class="s2">"- Instance method defined by B</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="k">super</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">object</span> <span class="o">=</span> <span class="no">B</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">object</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Y</span><span class="p">)</span>
+<span class="n">object</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Z</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nc">object</span><span class="o">.</span><span class="nf">foo</span>
+  <span class="s2">"- Method defined directly on an instance of B</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="k">super</span>
+<span class="k">end</span>
+
+<span class="nb">puts</span> <span class="n">object</span><span class="p">.</span><span class="nf">foo</span>
+</code></pre>
+</div>
+
+<p>When we run this code, we see the following output, which traces the <code class="highlighter-rouge">super</code> calls all the way up from the method defined directly on our object to its superclass.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>- Method defined directly on an instance of B
+- Mixed in method defined by Z
+- Mixed in method defined by Y
+- Instance method defined by B
+- Mixed in method defined by X
+- Mixed in method defined by W
+- Instance method defined by A
+</code></pre>
+</div>
+
+<p>As promised, it’s a five step journey. Particularly, the above is a demonstration that Ruby methods are looked up in the following order:</p>
+
+<ol>
+  <li>Methods defined in the object’s singleton class (i.e. the object itself)</li>
+  <li>Modules mixed into the singleton class in reverse order of inclusion</li>
+  <li>Methods defined by the object’s class</li>
+  <li>Modules included into the object’s class in reverse order of inclusion</li>
+  <li>Methods defined by the object’s superclass.</li>
+</ol>
+
+<p>This process is then repeated all the way up the inheritance chain until <code class="highlighter-rouge">BasicObject</code> is reached. Now that we know the basic order, we should stop and consider a few questions about what we’ve discussed so far.</p>
+
+<h3 id="open-questions--things-to-explore">Open Questions / Things To Explore</h3>
+
+<ul>
+  <li>
+    <p>Why would we want or need five distinct places to define methods? Do these other options really gain us anything over ordinary inheritance?</p>
+  </li>
+  <li>
+    <p>Does this change the way that classic object oriented design principles apply to Ruby? For example, how well do you think direct translations of design patterns map to Ruby?</p>
+  </li>
+  <li>
+    <p>Think of each place you can define a method in Ruby, and consider which ones are important for every day use, and which ones are edge cases. Is per-object behavior really that useful?</p>
+  </li>
+  <li>
+    <p>It is rare to use all of these options at once, and the only reason it was done in this exercise was for demonstration purposes. But taken individually, can you think of a practical use for each way of defining Ruby methods?</p>
+  </li>
+  <li>
+    <p>What are some disadvantages for each technique shown here?</p>
+  </li>
+</ul>
+
+<p>I will address these points and also go over some practical applications in the next issue, but please share your own thoughts in the comments section below.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> This article has also been published on the Ruby Best Practices blog. There <a href="http://blog.rubybestpractices.com/posts/gregory/030-issue-1-method-lookup.html#disqus_thread">may be additional commentary</a> 
+over there worth taking a look at.</p>
+</blockquote>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

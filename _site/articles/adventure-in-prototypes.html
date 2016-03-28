@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>An adventure in prototypes</title>
+  <meta name="description" content="This article was written by Avdi Grimm. Avdi is a Ruby Rogue, aconsulting pair programmer, and the head chef at RubyTapas. He writesabout software developmen...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/adventure-in-prototypes">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">An adventure in prototypes</h1>
+    <p class="post-meta"><time datetime="2012-12-11T00:00:00-05:00" itemprop="datePublished">Dec 11, 2012</time> • Avdi Grimm</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><em>This article was written by Avdi Grimm. Avdi is a <a href="http://rubyrogues.com/">Ruby Rogue</a>, a
+consulting pair programmer, and the head chef at <a href="http://devblog.avdi.org/rubytapas/">RubyTapas</a>. He writes
+about software development at <a href="http://devblog.avdi.org/">Virtuous Code.</a></em></p>
+
+<p>When you think of the term <em>object-oriented programming</em>, one of the
+first associated words that springs to mind is probably <em>classes</em>. For
+most of its history, the OOP paradigm has been almost inextricably
+linked with the idea of classes. Classes serve as <em>object factories</em>:
+they hold the blueprint for new objects, and can be called upon to
+manufacture as many as needed. Each object, or <em>instance</em>, has its
+state, but each derives its behavior from the class. Classes, in turn,
+share behavior through inheritance. In most OO programs, the class
+structure is the primary organizing principle.</p>
+
+<p>Even though classes have gone hand-in-hand with OOP for decades, they
+aren’t the only way to build families of objects with shared behavior.
+The most common alternative to <em>class-based</em> programming is
+<em>prototype-based</em> programming. Languages that use prototypes rather than
+classes include <a href="http://en.wikipedia.org/wiki/Self_(programming_language">Self</a>, <a href="http://en.wikipedia.org/wiki/Io_(programming_language)">Io</a>, and (most well known of all) JavaScript.</p>
+
+<p>Ruby comes from the class-based school of OO language design. But it’s
+flexible enough that with a little cleverness, we can experiment with
+prototype-style coding. In this article that’s just what we’ll do.</p>
+
+<h2 id="getting-started">Getting started</h2>
+
+<p>So how do we write OO programs without classes? Let’s explore this
+question in Ruby. We’ll use the example of a text-adventure game in the
+style of “<a href="http://en.wikipedia.org/wiki/Colossal_Cave_Adventure">Colossal Cave
+Adventure</a>”. This
+is one of my favorite programming examples for object-oriented systems,
+since it involves modeling a virtual world of interacting objects,
+including characters, items, and interconnected rooms.</p>
+
+<p>We open up an interactive Ruby session, and start typing. We begin with
+an <code class="highlighter-rouge">adventurer</code> object. This object will serve as our avatar in the
+game’s world, translating our commands into interactions between
+objects:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">adventurer</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+</code></pre>
+</div>
+
+<p>The first ability we give to our adventurer is the ability to look at
+its surroundings. The <code class="highlighter-rouge">look</code> command will cause the adventurer to output
+a description of its current location:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="n">adventurer</span>
+  <span class="kp">attr_accessor</span> <span class="ss">:location</span>
+
+  <span class="k">def</span> <span class="nf">look</span>
+    <span class="nb">puts</span> <span class="n">location</span><span class="p">.</span><span class="nf">description</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Then we add a starting location, called <code class="highlighter-rouge">end_of_road</code>, and put the
+adventurer in that location:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">end_of_road</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+<span class="k">def</span> <span class="nc">end_of_road</span><span class="o">.</span><span class="nf">description</span>
+  <span class="o">&lt;&lt;</span><span class="no">END</span><span class="sh">
+You are standing at the end of a road before a small brick building.
+Around you is a forest.  A small stream flows out of the building and
+down a gully.
+</span><span class="no">END</span>
+<span class="k">end</span>
+
+<span class="n">adventurer</span><span class="p">.</span><span class="nf">location</span> <span class="o">=</span> <span class="n">end_of_road</span>
+</code></pre>
+</div>
+
+<p>Now we can tell our adventurer to take a look around:</p>
+
+<pre><code class="language-console">&gt; adventurer.look
+
+You are standing at the end of a road before a small brick building.
+Around you is a forest.  A small stream flows out of the building and
+down a gully.
+</code></pre>
+
+<h2 id="adding-some-conveniences">Adding some conveniences</h2>
+
+<p>So far we’ve created an adventurer and a starting room without any kind
+of <code class="highlighter-rouge">Adventurer</code> or <code class="highlighter-rouge">Room</code> classes. This adventure is getting off to a
+good start! Although, if we’re going to be creating a lot of these
+objects we’d like for the process to be a little less verbose. We decide
+to take a step back and build some syntax sugar before moving onward.</p>
+
+<p>We start with an <code class="highlighter-rouge">ObjectBuilder</code> helper class. Yes, this is a class, when
+we are supposed to be using only prototypes. However, Ruby doesn’t offer
+a lot of support for prototype-based programming out of the box. So we
+have to build our tools with the class-oriented materials at hand. This
+is intended to be behind-the-scenes support code. In other words, pay no
+attention to the man behind the green curtain!</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ObjectBuilder</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">object</span><span class="p">)</span>
+    <span class="vi">@object</span> <span class="o">=</span> <span class="n">object</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">respond_to_missing?</span><span class="p">(</span><span class="n">missing_method</span><span class="p">,</span> <span class="n">include_private</span><span class="o">=</span><span class="kp">false</span><span class="p">)</span>
+    <span class="n">missing_method</span> <span class="o">=~</span> <span class="sr">/=\z/</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="n">missing_method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">respond_to_missing?</span><span class="p">(</span><span class="n">missing_method</span><span class="p">)</span>
+      <span class="n">method_name</span> <span class="o">=</span> <span class="n">missing_method</span><span class="p">.</span><span class="nf">to_s</span><span class="p">.</span><span class="nf">sub</span><span class="p">(</span><span class="sr">/=\z/</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+      <span class="n">value</span>       <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="nf">first</span>
+      <span class="n">ivar_name</span>   <span class="o">=</span> <span class="s2">"@</span><span class="si">#{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">"</span>
+     <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Proc</span><span class="p">)</span>
+        <span class="n">define_code_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="n">ivar_name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+      <span class="k">else</span>
+        <span class="n">define_value_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="n">ivar_name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">else</span>
+      <span class="k">super</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">define_value_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="n">ivar_name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="vi">@object</span><span class="p">.</span><span class="nf">instance_variable_set</span><span class="p">(</span><span class="n">ivar_name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="vi">@object</span><span class="p">.</span><span class="nf">define_singleton_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span> <span class="k">do</span>
+      <span class="nb">instance_variable_get</span><span class="p">(</span><span class="n">ivar_name</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">define_code_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="n">ivar_name</span><span class="p">,</span> <span class="n">implementation</span><span class="p">)</span>
+    <span class="vi">@object</span><span class="p">.</span><span class="nf">instance_variable_set</span><span class="p">(</span><span class="n">ivar_name</span><span class="p">,</span> <span class="n">implementation</span><span class="p">)</span>
+    <span class="vi">@object</span><span class="p">.</span><span class="nf">define_singleton_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span> <span class="k">do</span> <span class="o">|*</span><span class="n">args</span><span class="o">|</span>
+      <span class="n">instance_exec</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="nb">instance_variable_get</span><span class="p">(</span><span class="n">ivar_name</span><span class="p">))</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>There’s a lot going on in this class. Going over it line-by-line might
+be interesting in its own right, but it wouldn’t advance our
+understanding of prototype-based programming all that much. Suffice to
+say for now that this class can help us add new attributes and methods
+to a singleton object using a concise assignment-style syntax. This will
+make more sense when we start to make use of it.</p>
+
+<p>We add another bit of syntax sugar: a global method named <code class="highlighter-rouge">Object</code> (not
+to be confused with the class of the same name):</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">Object</span><span class="p">(</span><span class="o">&amp;</span><span class="n">definition</span><span class="p">)</span>
+  <span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+  <span class="n">obj</span><span class="p">.</span><span class="nf">singleton_class</span><span class="p">.</span><span class="nf">instance_exec</span><span class="p">(</span><span class="no">ObjectBuilder</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">definition</span><span class="p">)</span>
+  <span class="n">obj</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This method takes a block, instantiates a new object, and evaluates the
+block in the context of the object’s singleton class, passing an
+<code class="highlighter-rouge">ObjectBuilder</code> as a block argument. Then it returns the new object.</p>
+
+<p>Now we recreate our adventurer using this new helper:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">adventurer</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
+  <span class="n">o</span><span class="p">.</span><span class="nf">location</span> <span class="o">=</span> <span class="n">end_of_road</span>
+
+  <span class="kp">attr_writer</span> <span class="ss">:location</span>
+
+  <span class="n">o</span><span class="p">.</span><span class="nf">look</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">puts</span> <span class="n">location</span><span class="p">.</span><span class="nf">description</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>The combination of the <code class="highlighter-rouge">Object</code> factory method and the <code class="highlighter-rouge">ObjectBuilder</code>
+gives us a convenient, powerful notation for creating new ad-hoc
+objects. We can create attribute reader methods and assign the value of
+the attribute all at once:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">o</span><span class="p">.</span><span class="nf">location</span> <span class="o">=</span> <span class="n">end_of_road</span>
+</code></pre>
+</div>
+
+<p>We can use standard Ruby class-level code:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kp">attr_writer</span> <span class="ss">:location</span>
+</code></pre>
+</div>
+
+<p>And finally we can define new methods by assigning a lambda to an 
+attribute:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">o</span><span class="p">.</span><span class="nf">look</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">location</span><span class="p">.</span><span class="nf">description</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>We’ve deliberately avoided defining methods using <code class="highlighter-rouge">def</code> or
+<code class="highlighter-rouge">define_method</code>. We’ll get into the reasons for that later on.</p>
+
+<p>Before we move on, let’s take a moment to make sure our shiny new adventurer still works the
+same as before:</p>
+
+<pre><code class="language-console">&gt; adventurer.look
+
+You are standing at the end of a road before a small brick building.
+Around you is a forest.  A small stream flows out of the building and
+down a gully.
+</code></pre>
+
+<h2 id="moving-around">Moving around</h2>
+
+<p>It’s time to let our adventurer object stretch its legs a bit.
+We want to give it the ability to move from location to location. First,
+we make a small modification to our <code class="highlighter-rouge">Object()</code> method:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">Object</span><span class="p">(</span><span class="n">object</span><span class="o">=</span><span class="kp">nil</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">definition</span><span class="p">)</span>
+  <span class="n">obj</span> <span class="o">=</span> <span class="n">object</span> <span class="o">||</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+  <span class="n">obj</span><span class="p">.</span><span class="nf">singleton_class</span><span class="p">.</span><span class="nf">instance_exec</span><span class="p">(</span><span class="no">ObjectBuilder</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">definition</span><span class="p">)</span>
+  <span class="n">obj</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Now along with creating new objects, <code class="highlighter-rouge">Object()</code> can also augment an
+existing object which is passed in as an argument.</p>
+
+<p>We pass the <code class="highlighter-rouge">adventurer</code> to <code class="highlighter-rouge">Object()</code>, and add a new <code class="highlighter-rouge">#go</code> method. This
+method will take a direction (like <code class="highlighter-rouge">:east</code>), and attempt to move to the
+new location using the <code class="highlighter-rouge">exits</code> association on its current location:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">adventurer</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
+  <span class="n">o</span><span class="p">.</span><span class="nf">go</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">direction</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">destination</span> <span class="o">=</span> <span class="n">location</span><span class="p">.</span><span class="nf">exits</span><span class="p">[</span><span class="n">direction</span><span class="p">])</span>
+      <span class="nb">self</span><span class="p">.</span><span class="nf">location</span> <span class="o">=</span> <span class="n">destination</span>
+      <span class="nb">puts</span> <span class="n">location</span><span class="p">.</span><span class="nf">description</span>
+    <span class="k">else</span>
+      <span class="nb">puts</span> <span class="s2">"You can't go that way"</span>
+    <span class="k">end</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>We add a destination room to the system:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">wellhouse</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
+  <span class="n">o</span><span class="p">.</span><span class="nf">description</span> <span class="o">=</span> <span class="o">&lt;&lt;</span><span class="no">END</span><span class="sh">
+You are inside a small building, a wellhouse for a large spring.
+</span><span class="no">END</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Then we add an <code class="highlighter-rouge">exits</code> Hash to <code class="highlighter-rouge">end_of_road</code>, with an entry saying that
+the <code class="highlighter-rouge">wellhouse</code> is to the <code class="highlighter-rouge">:north</code> of it:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">end_of_road</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">exits</span> <span class="o">=</span> <span class="p">{</span><span class="ss">north: </span><span class="n">wellhouse</span><span class="p">}</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>With that done, we are now ready to set off on our journey!</p>
+
+<pre><code class="language-console">&gt; adventurer.go(:north)
+
+You are inside a small building, a wellhouse for a large spring.
+</code></pre>
+
+<h2 id="cloning-prototypes">Cloning prototypes</h2>
+
+<p>We try to go north again, expecting to see the admonition “You can’t go
+that way” as we bump into the wall:</p>
+
+<pre><code class="language-console">&gt; adventurer.go(:north)
+</code></pre>
+
+<p>Instead, we get an exception:</p>
+
+<pre><code class="language-console">-:82:in `block (2 levels) in &lt;main&gt;': undefined method `exits' for 
+#&lt;Object:0x0000000434d768&gt; (NoMethodError)
+        from -:56:in `instance_exec'
+        from -:56:in `block (2 levels) in define_code_method'
+        from -:100:in `&lt;main&gt;'
+</code></pre>
+
+<p>This is because we never got around to adding an <code class="highlighter-rouge">exits</code> Hash to
+<code class="highlighter-rouge">wellhouse</code>. We could go ahead and do that now. But as we think about
+it, we realize that now that our adventurer is capable of travel, it
+would make sense if all rooms started out with an empty <code class="highlighter-rouge">exits</code> Hash,
+instead of us having to add it manually every time.</p>
+
+<p>Toward that end, we create a <em>prototypical room</em>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">room</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">exits</span> <span class="o">=</span> <span class="p">{}</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>We then experiment with creating a new <code class="highlighter-rouge">wellhouse</code>, this one based on
+the <code class="highlighter-rouge">room</code> prototype. We do this by simply cloning the <code class="highlighter-rouge">room</code> object. We
+use <code class="highlighter-rouge">#clone</code> rather than <code class="highlighter-rouge">#dup</code> because <code class="highlighter-rouge">#clone</code> copies singleton class
+methods:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">new_wellhouse</span> <span class="o">=</span> <span class="n">room</span><span class="p">.</span><span class="nf">clone</span>
+
+<span class="n">new_wellhouse</span><span class="p">.</span><span class="nf">exits</span><span class="p">[</span><span class="ss">:south</span><span class="p">]</span> <span class="o">=</span> <span class="n">end_of_road</span>
+</code></pre>
+</div>
+
+<p>We quickly uncover a problem with this naive cloning technique. Because
+Ruby’s <code class="highlighter-rouge">#clone</code> (as well as <code class="highlighter-rouge">#dup</code>) are <em>shallow copies</em>, <code class="highlighter-rouge">room</code> and
+<code class="highlighter-rouge">new_wellhouse</code> now share the same <code class="highlighter-rouge">exits</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'pp'</span>
+
+<span class="nb">puts</span> <span class="s2">"new_wellhouse exits:"</span>
+<span class="n">pp</span> <span class="n">new_wellhouse</span><span class="p">.</span><span class="nf">exits</span>
+<span class="nb">puts</span> <span class="s2">"room exits:"</span>
+<span class="n">pp</span> <span class="n">room</span><span class="p">.</span><span class="nf">exits</span>
+</code></pre>
+</div>
+
+<pre><code class="language-console">new_wellhouse exits:
+{:south=&gt;
+  #&lt;Object:0x0000000482c8d8
+   @exits=
+    {:north=&gt;
+      #&lt;Object:0x0000000482bcd0
+       @description=
+        "You are inside a small building, a wellhouse for a large spring.\n"&gt;}&gt;}
+room exits:
+{:south=&gt;
+  #&lt;Object:0x0000000482c8d8
+   @exits=
+    {:north=&gt;
+      #&lt;Object:0x0000000482bcd0
+       @description=
+        "You are inside a small building, a wellhouse for a large spring.\n"&gt;}&gt;}
+</code></pre>
+
+<p>To fix this, we could possibly customize the way Ruby does cloning by overriding
+the <a href="http://jonathanleighton.com/articles/2011/initialize_clone-initialize_dup-and-initialize_copy-in-ruby/">Object#initialize_clone</a>
+method, but that would be an invasive change with broad reaching effects.
+Because extending core objects is a bit safer than modifying them, we opt to
+define our own <code class="highlighter-rouge">Object#copy</code> method which does a one-level-deep copying of
+instance variables:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Object</span>
+  <span class="k">def</span> <span class="nf">copy</span>
+    <span class="n">prototype</span> <span class="o">=</span> <span class="nb">clone</span>
+
+    <span class="nb">instance_variables</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">ivar_name</span><span class="o">|</span>
+      <span class="n">prototype</span><span class="p">.</span><span class="nf">instance_variable_set</span><span class="p">(</span>
+        <span class="n">ivar_name</span><span class="p">,</span>
+        <span class="nb">instance_variable_get</span><span class="p">(</span><span class="n">ivar_name</span><span class="p">).</span><span class="nf">clone</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">prototype</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Then we recreate <code class="highlighter-rouge">room</code> and <code class="highlighter-rouge">new_wellhouse</code>, and confirm that they no
+longer share exits:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">room</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">exits</span> <span class="o">=</span> <span class="p">{}</span> <span class="p">}</span>
+
+<span class="c1"># Use the newly defined Object#copy here instead of Object#clone</span>
+<span class="n">new_wellhouse</span> <span class="o">=</span> <span class="n">room</span><span class="p">.</span><span class="nf">copy</span>
+
+<span class="n">new_wellhouse</span><span class="p">.</span><span class="nf">exits</span><span class="p">[</span><span class="ss">:south</span><span class="p">]</span> <span class="o">=</span> <span class="n">end_of_road</span>
+
+<span class="nb">puts</span> <span class="s2">"new_wellhouse exits:"</span>
+<span class="n">pp</span> <span class="n">new_wellhouse</span><span class="p">.</span><span class="nf">exits</span>
+<span class="nb">puts</span> <span class="s2">"room exits:"</span>
+<span class="n">pp</span> <span class="n">room</span><span class="p">.</span><span class="nf">exits</span>
+</code></pre>
+</div>
+
+<pre><code class="language-console">new_wellhouse exits:
+{:south=&gt;
+  #&lt;Object:0x00000002ea85d8
+   @exits=
+    {:north=&gt;
+      #&lt;Object:0x00000002ea79d0
+       @description=
+        "You are inside a small building, a wellhouse for a large spring.\n"&gt;}&gt;}
+room exits:
+{}
+</code></pre>
+
+<p>Cloning a prototypical object in order to create new
+objects is the most basic form of prototype-based programming. In fact,
+the “Kevo” research language (I’d link to it, but all the information
+about it seems to have fallen off the Internet) used copying as the sole
+way to share behavior between objects.</p>
+
+<h2 id="building-dynamic-prototypes">Building dynamic prototypes</h2>
+
+<p>There are drawbacks to copying, however. It’s a very static way to share
+behavior between objects. Clones of <code class="highlighter-rouge">room</code> only share the behavior which
+was defined at the time of the copy. If we were to modify <code class="highlighter-rouge">room</code>, we’d
+have to recreate the <code class="highlighter-rouge">new_wellhouse</code> object once again in order to take
+advantage of any new methods added to it.</p>
+
+<p>Cloning also implies single inheritance. An object can only be a clone
+of one “parent” object.</p>
+
+<p>Finally, we also can’t add any new behavior to our existing <code class="highlighter-rouge">wellhouse</code>
+object this way. We’d have to throw away our program’s state and rebuild
+it, this time cloning our <code class="highlighter-rouge">end_of_road</code> and <code class="highlighter-rouge">wellhouse</code> objects from
+<code class="highlighter-rouge">room</code>.</p>
+
+<p>In Ruby, we’re used to being able to make changes to a live session and
+see how they play out. Thus far, we’ve done this all in a live
+interpreter session. It seems a shame to have to lose our state and
+start again. So we decide to find out if we can come up with a more
+dynamic form of prototypical inheritance than plain copying.</p>
+
+<p>We start by adding a helper method called <code class="highlighter-rouge">#implementation_of</code> to
+Object. Given a method name that the object supports, it will return a
+<code class="highlighter-rouge">Proc</code> object containing the code of that method. We make it aware of
+the style of method definition used in <code class="highlighter-rouge">ObjectBuilder</code>, where the
+implementation <code class="highlighter-rouge">Procs</code> of new methods were stored in instance variables
+named for the methods:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Object</span>
+  <span class="k">def</span> <span class="nf">implementation_of</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">respond_to?</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span>
+      <span class="n">implementation</span> <span class="o">=</span> <span class="nb">instance_variable_get</span><span class="p">(</span><span class="s2">"@</span><span class="si">#{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">implementation</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Proc</span><span class="p">)</span>
+        <span class="n">implementation</span>
+      <span class="k">elsif</span> <span class="n">instance_variable_defined?</span><span class="p">(</span><span class="s2">"@</span><span class="si">#{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="c1"># Assume the method is a reader</span>
+        <span class="o">-&gt;</span><span class="p">{</span> <span class="nb">instance_variable_get</span><span class="p">(</span><span class="s2">"@</span><span class="si">#{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="p">}</span>
+      <span class="k">else</span>
+        <span class="nb">method</span><span class="p">(</span><span class="n">method_name</span><span class="p">).</span><span class="nf">to_proc</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>We then define a new kind of <code class="highlighter-rouge">Module</code>, called <code class="highlighter-rouge">Prototype</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Prototype</span> <span class="o">&lt;</span> <span class="no">Module</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="vi">@target</span> <span class="o">=</span> <span class="n">target</span>
+    <span class="k">super</span><span class="p">()</span> <span class="k">do</span>
+      <span class="n">define_method</span><span class="p">(</span><span class="ss">:respond_to_missing?</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">missing_method</span><span class="p">,</span> <span class="n">include_private</span><span class="o">|</span>
+        <span class="n">target</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="n">missing_method</span><span class="p">)</span>
+      <span class="k">end</span>
+
+      <span class="n">define_method</span><span class="p">(</span><span class="ss">:method_missing</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">missing_method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="o">|</span>
+        <span class="k">if</span> <span class="n">target</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="n">missing_method</span><span class="p">)</span>
+          <span class="n">implementation</span> <span class="o">=</span> <span class="n">target</span><span class="p">.</span><span class="nf">implementation_of</span><span class="p">(</span><span class="n">missing_method</span><span class="p">)</span>
+          <span class="n">instance_exec</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">implementation</span><span class="p">)</span>
+        <span class="k">else</span>
+          <span class="k">super</span><span class="p">(</span><span class="n">missing_method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>A <code class="highlighter-rouge">Prototype</code> is instantiated with a prototypical object. When a
+<code class="highlighter-rouge">Prototype</code> instance is added to an object using <code class="highlighter-rouge">#extend</code>, it makes the
+methods of the prototype available to the extended object. It does this
+by implementing <code class="highlighter-rouge">#method_missing?</code> (and the associated
+<code class="highlighter-rouge">#respond_to_missing?</code>). When a message is sent to the extended object
+that matches a method on the prototype object, the <code class="highlighter-rouge">Prototype</code> grabs the
+implementation <code class="highlighter-rouge">Proc</code> from the prototype. Then it uses <code class="highlighter-rouge">#instance_exec</code>
+to evaluate the <code class="highlighter-rouge">prototype</code>’s method in the context of the extended
+object. In effect, the extended object “borrows” a method from the
+prototype object for just long enough to execute it.</p>
+
+<p>Note that this is different from delegation. In delegation, one object
+hands off a message to be handled by another object. If object <code class="highlighter-rouge">a</code>
+delegates a <code class="highlighter-rouge">#foo</code> message to object <code class="highlighter-rouge">b</code>, using, for instance, Ruby’s
+<code class="highlighter-rouge">forwardable</code> library, <code class="highlighter-rouge">self</code> in that method will be object <code class="highlighter-rouge">b</code>. This is
+easily demonstrated:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'forwardable'</span>
+
+<span class="k">class</span> <span class="nc">A</span>
+  <span class="kp">extend</span> <span class="no">Forwardable</span>
+  <span class="kp">attr_accessor</span> <span class="ss">:b</span>
+  <span class="n">def_delegator</span> <span class="ss">:b</span><span class="p">,</span> <span class="ss">:foo</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">B</span>
+  <span class="k">def</span> <span class="nf">foo</span>
+    <span class="nb">puts</span> <span class="s2">"executing #foo in </span><span class="si">#{</span><span class="nb">self</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="no">A</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">b</span> <span class="o">=</span> <span class="no">B</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">foo</span>
+<span class="c1"># &gt;&gt; executing #foo in #&lt;B:0x00000003295e20&gt;</span>
+</code></pre>
+</div>
+
+<p>But delegation is not what we want. We want to execute the methods from
+prototypes as if they had been defined on the inheriting object. We want
+this because we want them to work with the instance variables of the
+inheriting object. If we send <code class="highlighter-rouge">wellhouse.exits</code>, we want the reader
+method to show us the content of <code class="highlighter-rouge">wellhouse</code>’s <code class="highlighter-rouge">@exits</code> instance
+variable, not <code class="highlighter-rouge">room</code>’s instance variable.</p>
+
+<p>Remember how, in <code class="highlighter-rouge">ObjectBuilder</code>, we stored the implementations of
+methods as <code class="highlighter-rouge">Procs</code> in instance variables rather than defining them
+directly as methods? This need to call prototype methods on the
+inheriting object is the reason for that. In Ruby, it is not possible to
+execute a method from class A on an instance of unrelated class B. Since
+in this program we are using the singleton classes of objects to define
+all of their methods, Ruby considers all of our objects as belonging to
+different classes for the purposes of method binding. We can see this if
+we try to rebind a method from <code class="highlighter-rouge">room</code> onto <code class="highlighter-rouge">wellhouse</code> and then call it:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">room</span><span class="p">.</span><span class="nf">method</span><span class="p">(</span><span class="ss">:exits</span><span class="p">).</span><span class="nf">unbind</span><span class="p">.</span><span class="nf">bind</span><span class="p">(</span><span class="n">wellhouse</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<pre><code class="language-console">-:115:in `bind': singleton method called for a different object (TypeError)
+        from -:115:in `&lt;main&gt;'
+</code></pre>
+
+<p>By storing the implementation of methods as raw <code class="highlighter-rouge">Procs</code>, without any
+association to a specific class, we are able to take the implementations
+and <code class="highlighter-rouge">instance_exec</code> them in other contexts.</p>
+
+<p>The last change we make to support dynamic prototype inheritance is to
+add a new <code class="highlighter-rouge">#prototype</code> method to our <code class="highlighter-rouge">ObjectBuilder</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ObjectBuilder</span>
+  <span class="k">def</span> <span class="nf">prototype</span><span class="p">(</span><span class="n">proto</span><span class="p">)</span>
+    <span class="c1"># Leave method implementations on the proto object</span>
+    <span class="n">ivars</span> <span class="o">=</span> <span class="n">proto</span><span class="p">.</span><span class="nf">instance_variables</span><span class="p">.</span><span class="nf">reject</span><span class="p">{</span> <span class="o">|</span><span class="n">ivar_name</span><span class="o">|</span>
+      <span class="n">proto</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="n">ivar_name</span><span class="p">.</span><span class="nf">to_s</span><span class="p">[</span><span class="mi">1</span><span class="p">.</span><span class="nf">.</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+      <span class="n">proto</span><span class="p">.</span><span class="nf">instance_variable_get</span><span class="p">(</span><span class="n">ivar_name</span><span class="p">).</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Proc</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">ivars</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">ivar_name</span><span class="o">|</span>
+      <span class="k">unless</span> <span class="vi">@object</span><span class="p">.</span><span class="nf">instance_variable_defined?</span><span class="p">(</span><span class="n">ivar_name</span><span class="p">)</span>
+        <span class="vi">@object</span><span class="p">.</span><span class="nf">instance_variable_set</span><span class="p">(</span>
+          <span class="n">ivar_name</span><span class="p">,</span>
+          <span class="n">proto</span><span class="p">.</span><span class="nf">instance_variable_get</span><span class="p">(</span><span class="n">ivar_name</span><span class="p">).</span><span class="nf">dup</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+    <span class="vi">@object</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Prototype</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">proto</span><span class="p">))</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This method does two things:</p>
+
+<ol>
+  <li>It copies instance variables from a prototype object to the object
+being built.</li>
+  <li>It extends the object being built with a <code class="highlighter-rouge">Prototype</code> module
+referencing the prototype object.</li>
+</ol>
+
+<p>We can now use all of this new machinery to dynamically add <code class="highlighter-rouge">room</code> as a
+prototype of <code class="highlighter-rouge">wellhouse</code>. We are then able to set the south exit to
+point back to <code class="highlighter-rouge">end_of_road</code>, using the <code class="highlighter-rouge">exits</code> association that
+<code class="highlighter-rouge">wellhouse</code> now inherits from <code class="highlighter-rouge">room</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">wellhouse</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">prototype</span> <span class="n">room</span> <span class="p">}</span>
+
+<span class="n">wellhouse</span><span class="p">.</span><span class="nf">exits</span><span class="p">[</span><span class="ss">:south</span><span class="p">]</span> <span class="o">=</span> <span class="n">end_of_road</span>
+
+<span class="n">adventurer</span><span class="p">.</span><span class="nf">location</span> <span class="o">=</span> <span class="n">wellhouse</span>
+</code></pre>
+</div>
+
+<p>Then we can move around again to make sure things are working as expected:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">puts</span> <span class="s2">"* trying to go north from wellhouse"</span>
+<span class="n">adventurer</span><span class="p">.</span><span class="nf">go</span><span class="p">(</span><span class="ss">:north</span><span class="p">)</span>
+
+<span class="nb">puts</span> <span class="s2">"* going back south"</span>
+<span class="n">adventurer</span><span class="p">.</span><span class="nf">go</span><span class="p">(</span><span class="ss">:south</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<pre><code class="language-console">* trying to go north from wellhouse
+You can't go that way
+* going back south
+You are standing at the end of a road before a small brick building.
+Around you is a forest.  A small stream flows out of the building and
+down a gully.
+</code></pre>
+
+<h2 id="carrying-items-around">Carrying items around</h2>
+
+<p>We now have some powerful tools at our disposal for composing objects
+from prototypes. We quickly proceed to implement the ability to pick up
+and drop items to our game. We start by creating a prototypical
+“container” object, which has an array of items and the ability to
+transfer an item from itself to another container:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">container</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
+  <span class="n">o</span><span class="p">.</span><span class="nf">items</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">o</span><span class="p">.</span><span class="nf">transfer_item</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">recipient</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">recipient</span><span class="p">.</span><span class="nf">items</span> <span class="o">&lt;&lt;</span> <span class="n">items</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>  
+</code></pre>
+</div>
+
+<p>We then make the <code class="highlighter-rouge">adventurer</code> a container, and add some commands for
+taking items, dropping items, and listing the adventurer’s current
+inventory:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">adventurer</span><span class="p">)</span> <span class="p">{</span><span class="o">|</span><span class="n">o</span><span class="o">|</span>
+  <span class="n">o</span><span class="p">.</span><span class="nf">prototype</span> <span class="n">container</span>
+
+  <span class="n">o</span><span class="p">.</span><span class="nf">look</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">{</span>
+    <span class="nb">puts</span> <span class="n">location</span><span class="p">.</span><span class="nf">description</span>
+    <span class="n">location</span><span class="p">.</span><span class="nf">items</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">item</span><span class="o">|</span>
+      <span class="nb">puts</span> <span class="s2">"There is </span><span class="si">#{</span><span class="n">item</span><span class="si">}</span><span class="s2"> here."</span>
+    <span class="k">end</span>
+  <span class="p">}</span>
+
+  <span class="n">o</span><span class="p">.</span><span class="nf">take</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">item_name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="n">location</span><span class="p">.</span><span class="nf">items</span><span class="p">.</span><span class="nf">detect</span><span class="p">{</span><span class="o">|</span><span class="n">item</span><span class="o">|</span> <span class="n">item</span><span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="n">item_name</span><span class="p">)</span> <span class="p">}</span>
+    <span class="k">if</span> <span class="n">item</span>
+      <span class="n">location</span><span class="p">.</span><span class="nf">transfer_item</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">self</span><span class="p">)</span>
+      <span class="nb">puts</span> <span class="s2">"You take </span><span class="si">#{</span><span class="n">item</span><span class="si">}</span><span class="s2">."</span>
+    <span class="k">else</span>
+      <span class="nb">puts</span> <span class="s2">"You see no </span><span class="si">#{</span><span class="n">item_name</span><span class="si">}</span><span class="s2"> here"</span>
+    <span class="k">end</span>
+  <span class="p">}</span>
+
+  <span class="n">o</span><span class="p">.</span><span class="nf">drop</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">item_name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="n">items</span><span class="p">.</span><span class="nf">detect</span><span class="p">{</span><span class="o">|</span><span class="n">item</span><span class="o">|</span> <span class="n">item</span><span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="n">item_name</span><span class="p">)</span> <span class="p">}</span>
+    <span class="k">if</span> <span class="n">item</span>
+      <span class="n">transfer_item</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span>
+      <span class="nb">puts</span> <span class="s2">"You drop </span><span class="si">#{</span><span class="n">item</span><span class="si">}</span><span class="s2">."</span>
+    <span class="k">else</span>
+      <span class="nb">puts</span> <span class="s2">"You are not carrying </span><span class="si">#{</span><span class="n">item_name</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">end</span>
+  <span class="p">}</span>
+
+  <span class="n">o</span><span class="p">.</span><span class="nf">inventory</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">{</span>
+    <span class="n">items</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">item</span><span class="o">|</span>
+      <span class="nb">puts</span> <span class="s2">"You have </span><span class="si">#{</span><span class="n">item</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">end</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>For convenience, we’ve implemented <code class="highlighter-rouge">#take</code> and <code class="highlighter-rouge">#drop</code> so that they can
+accept any substring of the intended object’s name.</p>
+
+<p>Next we make <code class="highlighter-rouge">wellhouse</code> a container, and add a list of starting items
+to it:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">wellhouse</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
+  <span class="n">o</span><span class="p">.</span><span class="nf">prototype</span> <span class="n">container</span>
+  <span class="n">o</span><span class="p">.</span><span class="nf">items</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"a shiny brass lamp"</span><span class="p">,</span>
+    <span class="s2">"some food"</span><span class="p">,</span>
+    <span class="s2">"a bottle of water"</span>
+  <span class="p">]</span>
+  <span class="n">o</span><span class="p">.</span><span class="nf">exits</span> <span class="o">=</span> <span class="p">{</span><span class="ss">south: </span><span class="n">end_of_road</span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>As you may recall, <code class="highlighter-rouge">wellhouse</code> already has a prototype: <code class="highlighter-rouge">room</code>. But this
+is not a problem. One of the advantages of our dynamic prototyping
+system is that objects may have any number of prototypes. Since
+prototyping is implemented using specialized modules, when an object is
+sent a message that it can’t handle itself, Ruby will keep searching up an
+object’s ancestor chain, from one <code class="highlighter-rouge">Prototype</code> to the next, looking for a
+matching method. (This also puts us one-up on JavaScript’s
+single-inheritance prototype system!)</p>
+
+<p>Finally, we make <code class="highlighter-rouge">end_of_road</code> a container:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">end_of_road</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">prototype</span><span class="p">(</span><span class="n">container</span><span class="p">)</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>We then proceed to tell our adventurer to pick up a bottle of water from
+the wellhouse, and put it down at the end of the road:</p>
+
+<pre><code class="language-console">&gt; adventurer.go(:north)
+You are inside a small building, a wellhouse for a large spring.
+&gt; adventurer.take("water")
+You take a bottle of water.
+&gt; adventurer.inventory
+You have a bottle of water
+&gt; adventurer.look
+You are inside a small building, a wellhouse for a large spring.
+There is a shiny brass lamp here.
+There is some food here.
+&gt; adventurer.go(:south)
+You are standing at the end of a road before a small brick building.
+Around you is a forest.  A small stream flows out of the building and
+down a gully.
+&gt; adventurer.drop("water")
+You drop a bottle of water.
+&gt; adventurer.look
+You are standing at the end of a road before a small brick building.
+Around you is a forest.  A small stream flows out of the building and
+down a gully.
+There is a bottle of water here.
+</code></pre>
+
+<p>And with that, we now have a small but functional system which allows us to move
+around the game world and interact with it.</p>
+
+<h2 id="reflections">Reflections</h2>
+
+<p>We’ve written the beginnings of a text adventure game in a
+prototype-based style. Now, let’s take a step back and talk about what
+the point of this exercise was.</p>
+
+<p>There is a strong argument to be made that prototype-based inheritance
+more closely maps to how humans normally think through problems than
+does class-based inheritance. Quoting the paper “<a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.56.4713">Classes vs.
+Prototypes: Some Philosophical and Historical
+Observations</a>”:</p>
+
+<blockquote>
+  <p>A typical argument in favor of prototypes is that people seem to be a
+lot better at dealing with specific examples first, then generalizing
+from them, than they are at absorbing general abstract principles
+first and later applying them in particular cases, … the ability to
+modify and evolve objects at the level of individual objects reduces
+the need for a priori classification and encourages a more iterative
+programming and design style.</p>
+</blockquote>
+
+<p>As we built up our adventure game, we immediately added concrete objects
+to the system as soon as we thought them up. We added an <code class="highlighter-rouge">adventurer</code>,
+and then an <code class="highlighter-rouge">end_of_road</code> for the adventurer to start out in. Then
+later, as we added more objects, we generalized out commonalities into
+objects like <code class="highlighter-rouge">room</code> and <code class="highlighter-rouge">container</code>. Our program design emerged
+completely organically, and our abstractions emerged as soon as we
+needed them, but no sooner. This kind of emergent, organic design
+process is one of the ideals of agile software development, and
+prototype-based systems seem to encourage it.</p>
+
+<p>Of course, the way we jammed prototypes into a class-based language here
+is a horrendous hack: please don’t use it in a production system!
+But the experience of writing code in a prototyped style can teach
+us a lot. We can use what we’ve learned to influence our daily
+coding. We might prototype (heh) a system’s design by writing one-off
+objects at first, adding methods to their singleton classes. Then, as
+patterns of interaction emerge, we might capture the design using
+classes. Prototypes can also teach us to do more with delegation and
+composition, building families of collaborating objects rather than
+hierarchies of related behavior.</p>
+
+<p>Now that we’ve reached the end of our journey, I hope you’ve found 
+this trip through prototype-land illuminating and thought-provoking. 
+I’m still a relative newb to this way of thinking, so if you
+have anything to add‚ i.e. other benefits of using prototypes; subtle gotchas;
+experiences from prototype-based languages, or alternative implementations of
+any of the code above, please don’t hesitate to pipe up in the comments. Also,
+if you want clarifications about any of the gnarly metaprogramming I used to
+bash Ruby into a semblance of a prototype-based language, feel free to ask –
+but I can’t guarantee that the answers will make any more sense than the
+code :-)</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> If you had fun reading this article, you may also enjoy reading Advi’s 
+blog post on the <a href="http://devblog.avdi.org/?p=5560">Prototype Pattern</a>, a design pattern that takes 
+ideas from prototype-based programming and applies them to class-based
+modeling. That post started as a section of this article that gained a life
+of its own.</p>
+</blockquote>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>The hidden costs of inheritance</title>
+  <meta name="description" content="As a Ruby programmer, you almost certainly make use of inheritance-based objectmodeling on a daily basis. In fact, extending base classes and mixingmodules i...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/hidden-costs-of-inheritance">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">The hidden costs of inheritance</h1>
+    <p class="post-meta"><time datetime="2012-06-19T00:00:00-04:00" itemprop="datePublished">Jun 19, 2012</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>As a Ruby programmer, you almost certainly make use of inheritance-based object
+modeling on a daily basis. In fact, extending base classes and mixing
+modules into your objects may be so common for you that you rarely 
+need to think about the mechanics involved in doing so. If you are like 
+most Ruby programmers, your readiness to apply this complex design paradigm 
+throughout your projects is both a blessing and a curse.</p>
+
+<p>On the one hand, your ability to make good use of inheritance-based modeling
+without thinking about its complexity is a sign that it works well as an
+abstraction. But on the other hand, having this familiar tool constantly within
+reach makes it harder to recognize alternative approaches that may lead to
+greater simplicity in certain contexts. Because no one tool is a golden hammer,
+it is a good idea to understand the limitations of your preferred modeling
+techniques as well as their virtues.</p>
+
+<p>In this article, I will guide you through three properties of
+inheritance-based modeling that can lead to design complications unless they are
+given careful consideration. These are meant to be starting points for
+conversation more-so than tutorials on what to do and what not to do, so please
+attempt some of the homework exercises I’ve included at the bottom of the
+article!</p>
+
+<h3 id="problem-1-there-is-no-encapsulation-along-ancestry-chains">PROBLEM 1: There is no encapsulation along ancestry chains</h3>
+
+<p>Inheritance-based modeling is most commonly used for behavior sharing, but 
+what it actually provides is implementation sharing. Among other things,
+this means that no matter how many ancestors an object has, all of its 
+methods and state end up getting defined in a single namespace. If you 
+aren’t careful, this lack of encapsulation between objects in an 
+inheritance relationship can easily bite you.</p>
+
+<p>To test your understanding of this problem, see if you can spot the bug in the
+following example:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"prawn"</span>
+
+<span class="k">class</span> <span class="nc">StyledDocument</span> <span class="o">&lt;</span> <span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span>
+  <span class="k">def</span> <span class="nf">style</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="vi">@font_name</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="ss">:font</span><span class="p">]</span>
+    <span class="vi">@font_size</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="ss">:size</span><span class="p">]</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">styled_text</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="n">font</span><span class="p">(</span><span class="vi">@font_name</span><span class="p">)</span> <span class="k">do</span>
+      <span class="n">text</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="ss">:size</span> <span class="o">=&gt;</span> <span class="vi">@font_size</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">StyledDocument</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="s2">"example.pdf"</span><span class="p">)</span> <span class="k">do</span> 
+  <span class="n">text</span> <span class="s2">"This is the default font size and face"</span>
+
+  <span class="n">style</span><span class="p">(</span><span class="ss">:font</span> <span class="o">=&gt;</span> <span class="s2">"Courier"</span><span class="p">,</span> <span class="ss">:size</span> <span class="o">=&gt;</span> <span class="mi">20</span><span class="p">)</span>
+
+  <span class="n">styled_text</span> <span class="s2">"This line should be in size 20 Courier"</span>
+
+  <span class="n">text</span> <span class="s2">"This line should be in the default font size and face"</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This example runs without raising any sort of explicit error, but produces
+the following incorrect output:</p>
+
+<p><img src="http://i.imgur.com/xjOpU.png" alt="" /></p>
+
+<p>There aren’t a whole lot of things that can go wrong in this example,
+and so you have probably figured out the source of the problem by now:
+<code class="highlighter-rouge">StyledDocument</code> and <code class="highlighter-rouge">Prawn::Document</code> each define <code class="highlighter-rouge">@font_size</code>, but 
+they each use it for a completely different purpose. As a result, calling 
+<code class="highlighter-rouge">StyledDocument#style</code> triggers a side effect that leads to this
+subtle defect.</p>
+
+<p>To verify that a naming collision to blame for this problem, you can 
+try renaming the <code class="highlighter-rouge">@font_size</code> variable in <code class="highlighter-rouge">StyledDocument</code> to 
+something else, such as <code class="highlighter-rouge">@styled_font_size</code>. Making that tiny 
+change will cause the example to produce the correct output, 
+as shown below:</p>
+
+<p><img src="http://i.imgur.com/1O23U.png" alt="" /></p>
+
+<p>However, this is only a superficial fix, and does not address the root problem.
+The real issue is that without true subobjects with isolated state, the chance
+of clashing with a variable used by an ancestor increases as your
+ancestry chain grows. If you look at the mixins that <code class="highlighter-rouge">ActiveRecord::Base</code> 
+depends on, you’ll find examples of a 
+<a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/transactions.rb#L327-345">scary lack of encapsulation</a>
+that will make you wonder how things don’t break more often.</p>
+
+<p>To make matters worse, the lack of encapsulation between objects in an
+inheritance relationship also means that methods can clash in the same way that
+variables can. A lack of true private methods in Ruby complicates the problem
+even further, because there simply isn’t a way to write a method in a parent
+object that a child object can’t clash with or override. One of the homework
+questions for this article addresses this issue, but is worth thinking 
+about for a moment before you read on.</p>
+
+<h3 id="problem-2-interfaces-tend-to-grow-rapidly-under-inheritance">PROBLEM 2: Interfaces tend to grow rapidly under inheritance</h3>
+
+<p>I am going to attempt a proof without words for this particular problem, and
+leave it up to you to figure out <em>why</em> this can be a source of maintenance
+headaches, but please share your thoughts in the comments:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="p">(</span><span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">instance_methods</span> <span class="o">|</span> 
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">private_instance_methods</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:logger</span><span class="p">,</span> <span class="ss">:configurations</span><span class="p">,</span> <span class="ss">:default_timezone</span><span class="p">,</span> <span class="ss">:schema_format</span><span class="p">,</span>
+<span class="ss">:timestamped_migrations</span><span class="p">,</span> <span class="ss">:init_with</span><span class="p">,</span> <span class="ss">:initialize_dup</span><span class="p">,</span> <span class="ss">:encode_with</span><span class="p">,</span> <span class="ss">:==</span><span class="p">,</span> <span class="ss">:eql?</span><span class="p">,</span>
+<span class="ss">:hash</span><span class="p">,</span> <span class="ss">:freeze</span><span class="p">,</span> <span class="ss">:frozen?</span><span class="p">,</span> <span class="ss">:&lt;=&gt;</span><span class="p">,</span> <span class="ss">:readonly?</span><span class="p">,</span> <span class="ss">:readonly!</span><span class="p">,</span> <span class="ss">:inspect</span><span class="p">,</span> <span class="ss">:to_yaml</span><span class="p">,</span>
+<span class="ss">:yaml_initialize</span><span class="p">,</span> <span class="ss">:_attr_readonly</span><span class="p">,</span> <span class="ss">:_attr_readonly?</span><span class="p">,</span> <span class="ss">:primary_key_prefix_type</span><span class="p">,</span>
+<span class="ss">:table_name_prefix</span><span class="p">,</span> <span class="ss">:table_name_prefix?</span><span class="p">,</span> <span class="ss">:table_name_suffix</span><span class="p">,</span>
+<span class="ss">:table_name_suffix?</span><span class="p">,</span> <span class="ss">:pluralize_table_names</span><span class="p">,</span> <span class="ss">:pluralize_table_names?</span><span class="p">,</span>
+<span class="ss">:store_full_sti_class</span><span class="p">,</span> <span class="ss">:store_full_sti_class?</span><span class="p">,</span> <span class="ss">:store_full_sti_class</span><span class="o">=</span><span class="p">,</span>
+<span class="ss">:default_scopes</span><span class="p">,</span> <span class="ss">:default_scopes?</span><span class="p">,</span> <span class="ss">:_accessible_attributes</span><span class="p">,</span>
+<span class="ss">:_accessible_attributes?</span><span class="p">,</span> <span class="ss">:_accessible_attributes</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_protected_attributes</span><span class="p">,</span>
+<span class="ss">:_protected_attributes?</span><span class="p">,</span> <span class="ss">:_protected_attributes</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_active_authorizer</span><span class="p">,</span>
+<span class="ss">:_active_authorizer?</span><span class="p">,</span> <span class="ss">:_active_authorizer</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_mass_assignment_sanitizer</span><span class="p">,</span>
+<span class="ss">:_mass_assignment_sanitizer?</span><span class="p">,</span> <span class="ss">:_mass_assignment_sanitizer</span><span class="o">=</span><span class="p">,</span> <span class="ss">:validation_context</span><span class="p">,</span>
+<span class="ss">:validation_context</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_validate_callbacks</span><span class="p">,</span> <span class="ss">:_validate_callbacks?</span><span class="p">,</span>
+<span class="ss">:_validate_callbacks</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_validators</span><span class="p">,</span> <span class="ss">:_validators?</span><span class="p">,</span> <span class="ss">:_validators</span><span class="o">=</span><span class="p">,</span>
+<span class="ss">:lock_optimistically</span><span class="p">,</span> <span class="ss">:attribute_method_matchers</span><span class="p">,</span> <span class="ss">:attribute_method_matchers?</span><span class="p">,</span>
+<span class="ss">:attribute_types_cached_by_default</span><span class="p">,</span> <span class="ss">:time_zone_aware_attributes</span><span class="p">,</span>
+<span class="ss">:skip_time_zone_conversion_for_attributes</span><span class="p">,</span>
+<span class="ss">:skip_time_zone_conversion_for_attributes?</span><span class="p">,</span> <span class="ss">:partial_updates</span><span class="p">,</span> <span class="ss">:partial_updates?</span><span class="p">,</span>
+<span class="ss">:partial_updates</span><span class="o">=</span><span class="p">,</span> <span class="ss">:serialized_attributes</span><span class="p">,</span> <span class="ss">:serialized_attributes?</span><span class="p">,</span>
+<span class="ss">:serialized_attributes</span><span class="o">=</span><span class="p">,</span> <span class="ss">:[]</span><span class="p">,</span> <span class="ss">:[]=</span><span class="p">,</span> <span class="ss">:record_timestamps</span><span class="p">,</span> <span class="ss">:record_timestamps?</span><span class="p">,</span>
+<span class="ss">:record_timestamps</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_validation_callbacks</span><span class="p">,</span> <span class="ss">:_validation_callbacks?</span><span class="p">,</span>
+<span class="ss">:_validation_callbacks</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_initialize_callbacks</span><span class="p">,</span> <span class="ss">:_initialize_callbacks?</span><span class="p">,</span>
+<span class="ss">:_initialize_callbacks</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_find_callbacks</span><span class="p">,</span> <span class="ss">:_find_callbacks?</span><span class="p">,</span> <span class="ss">:_find_callbacks</span><span class="o">=</span><span class="p">,</span>
+<span class="ss">:_touch_callbacks</span><span class="p">,</span> <span class="ss">:_touch_callbacks?</span><span class="p">,</span> <span class="ss">:_touch_callbacks</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_save_callbacks</span><span class="p">,</span>
+<span class="ss">:_save_callbacks?</span><span class="p">,</span> <span class="ss">:_save_callbacks</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_create_callbacks</span><span class="p">,</span> <span class="ss">:_create_callbacks?</span><span class="p">,</span>
+<span class="ss">:_create_callbacks</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_update_callbacks</span><span class="p">,</span> <span class="ss">:_update_callbacks?</span><span class="p">,</span>
+<span class="ss">:_update_callbacks</span><span class="o">=</span><span class="p">,</span> <span class="ss">:_destroy_callbacks</span><span class="p">,</span> <span class="ss">:_destroy_callbacks?</span><span class="p">,</span>
+<span class="ss">:_destroy_callbacks</span><span class="o">=</span><span class="p">,</span> <span class="ss">:auto_explain_threshold_in_seconds</span><span class="p">,</span>
+<span class="ss">:auto_explain_threshold_in_seconds?</span><span class="p">,</span> <span class="ss">:nested_attributes_options</span><span class="p">,</span>
+<span class="ss">:nested_attributes_options?</span><span class="p">,</span> <span class="ss">:include_root_in_json</span><span class="p">,</span> <span class="ss">:include_root_in_json?</span><span class="p">,</span>
+<span class="ss">:include_root_in_json</span><span class="o">=</span><span class="p">,</span> <span class="ss">:reflections</span><span class="p">,</span> <span class="ss">:reflections?</span><span class="p">,</span> <span class="ss">:reflections</span><span class="o">=</span><span class="p">,</span>
+<span class="ss">:_commit_callbacks</span><span class="p">,</span> <span class="ss">:_commit_callbacks?</span><span class="p">,</span> <span class="ss">:_commit_callbacks</span><span class="o">=</span><span class="p">,</span>
+<span class="ss">:_rollback_callbacks</span><span class="p">,</span> <span class="ss">:_rollback_callbacks?</span><span class="p">,</span> <span class="ss">:_rollback_callbacks</span><span class="o">=</span><span class="p">,</span>
+<span class="ss">:connection_handler</span><span class="p">,</span> <span class="ss">:connection_handler?</span><span class="p">,</span> <span class="ss">:connection</span><span class="p">,</span>
+<span class="ss">:clear_aggregation_cache</span><span class="p">,</span> <span class="ss">:transaction</span><span class="p">,</span> <span class="ss">:destroy</span><span class="p">,</span> <span class="ss">:save</span><span class="p">,</span> <span class="ss">:save!</span><span class="p">,</span>
+<span class="ss">:rollback_active_record_state!</span><span class="p">,</span> <span class="ss">:committed!</span><span class="p">,</span> <span class="ss">:rolledback!</span><span class="p">,</span> <span class="ss">:add_to_transaction</span><span class="p">,</span>
+<span class="ss">:with_transaction_returning_status</span><span class="p">,</span> <span class="ss">:remember_transaction_record_state</span><span class="p">,</span>
+<span class="ss">:clear_transaction_record_state</span><span class="p">,</span> <span class="ss">:restore_transaction_record_state</span><span class="p">,</span>
+<span class="ss">:transaction_record_state</span><span class="p">,</span> <span class="ss">:transaction_include_action?</span><span class="p">,</span> <span class="ss">:serializable_hash</span><span class="p">,</span>
+<span class="ss">:to_xml</span><span class="p">,</span> <span class="ss">:from_xml</span><span class="p">,</span> <span class="ss">:as_json</span><span class="p">,</span> <span class="ss">:from_json</span><span class="p">,</span> <span class="ss">:read_attribute_for_serialization</span><span class="p">,</span>
+<span class="ss">:reload</span><span class="p">,</span> <span class="ss">:mark_for_destruction</span><span class="p">,</span> <span class="ss">:marked_for_destruction?</span><span class="p">,</span>
+<span class="ss">:changed_for_autosave?</span><span class="p">,</span> <span class="ss">:_destroy</span><span class="p">,</span> <span class="ss">:reinit_with</span><span class="p">,</span> <span class="ss">:clear_association_cache</span><span class="p">,</span>
+<span class="ss">:association_cache</span><span class="p">,</span> <span class="ss">:association</span><span class="p">,</span> <span class="ss">:run_validations!</span><span class="p">,</span> <span class="ss">:touch</span><span class="p">,</span> <span class="ss">:_attribute</span><span class="p">,</span>
+<span class="ss">:type_cast_attribute_for_write</span><span class="p">,</span> <span class="ss">:read_attribute_before_type_cast</span><span class="p">,</span> <span class="ss">:changed?</span><span class="p">,</span>
+<span class="ss">:changed</span><span class="p">,</span> <span class="ss">:changes</span><span class="p">,</span> <span class="ss">:previous_changes</span><span class="p">,</span> <span class="ss">:changed_attributes</span><span class="p">,</span> <span class="ss">:to_key</span><span class="p">,</span> <span class="ss">:id</span><span class="p">,</span> <span class="ss">:id</span><span class="o">=</span><span class="p">,</span>
+<span class="ss">:id?</span><span class="p">,</span> <span class="ss">:query_attribute</span><span class="p">,</span> <span class="ss">:attributes_before_type_cast</span><span class="p">,</span> <span class="ss">:raw_write_attribute</span><span class="p">,</span>
+<span class="ss">:read_attribute</span><span class="p">,</span> <span class="ss">:method_missing</span><span class="p">,</span> <span class="ss">:attribute_missing</span><span class="p">,</span> <span class="ss">:respond_to?</span><span class="p">,</span>
+<span class="ss">:has_attribute?</span><span class="p">,</span> <span class="ss">:attribute_names</span><span class="p">,</span> <span class="ss">:attributes</span><span class="p">,</span> <span class="ss">:attribute_for_inspect</span><span class="p">,</span>
+<span class="ss">:attribute_present?</span><span class="p">,</span> <span class="ss">:column_for_attribute</span><span class="p">,</span> <span class="ss">:clone_attributes</span><span class="p">,</span>
+<span class="ss">:clone_attribute_value</span><span class="p">,</span> <span class="ss">:arel_attributes_values</span><span class="p">,</span> <span class="ss">:attribute_method?</span><span class="p">,</span>
+<span class="ss">:respond_to_without_attributes?</span><span class="p">,</span> <span class="ss">:locking_enabled?</span><span class="p">,</span> <span class="ss">:lock!</span><span class="p">,</span> <span class="ss">:with_lock</span><span class="p">,</span> <span class="ss">:valid?</span><span class="p">,</span>
+<span class="ss">:perform_validations</span><span class="p">,</span> <span class="ss">:validates_acceptance_of</span><span class="p">,</span> <span class="ss">:validates_confirmation_of</span><span class="p">,</span>
+<span class="ss">:validates_exclusion_of</span><span class="p">,</span> <span class="ss">:validates_format_of</span><span class="p">,</span> <span class="ss">:validates_inclusion_of</span><span class="p">,</span>
+<span class="ss">:validates_length_of</span><span class="p">,</span> <span class="ss">:validates_size_of</span><span class="p">,</span> <span class="ss">:validates_numericality_of</span><span class="p">,</span>
+<span class="ss">:validates_presence_of</span><span class="p">,</span> <span class="ss">:errors</span><span class="p">,</span> <span class="ss">:invalid?</span><span class="p">,</span> <span class="ss">:read_attribute_for_validation</span><span class="p">,</span>
+<span class="ss">:validates_with</span><span class="p">,</span> <span class="ss">:run_callbacks</span><span class="p">,</span> <span class="ss">:to_model</span><span class="p">,</span> <span class="ss">:to_param</span><span class="p">,</span> <span class="ss">:to_partial_path</span><span class="p">,</span>
+<span class="ss">:attributes</span><span class="o">=</span><span class="p">,</span> <span class="ss">:assign_attributes</span><span class="p">,</span> <span class="ss">:mass_assignment_options</span><span class="p">,</span>
+<span class="ss">:mass_assignment_role</span><span class="p">,</span> <span class="ss">:sanitize_for_mass_assignment</span><span class="p">,</span>
+<span class="ss">:mass_assignment_authorizer</span><span class="p">,</span> <span class="ss">:cache_key</span><span class="p">,</span> <span class="ss">:quoted_id</span><span class="p">,</span>
+<span class="ss">:populate_with_current_scope_attributes</span><span class="p">,</span> <span class="ss">:new_record?</span><span class="p">,</span> <span class="ss">:destroyed?</span><span class="p">,</span> <span class="ss">:persisted?</span><span class="p">,</span>
+<span class="ss">:delete</span><span class="p">,</span> <span class="ss">:becomes</span><span class="p">,</span> <span class="ss">:update_attribute</span><span class="p">,</span> <span class="ss">:update_column</span><span class="p">,</span> <span class="ss">:update_attributes</span><span class="p">,</span>
+<span class="ss">:update_attributes!</span><span class="p">,</span> <span class="ss">:increment</span><span class="p">,</span> <span class="ss">:increment!</span><span class="p">,</span> <span class="ss">:decrement</span><span class="p">,</span> <span class="ss">:decrement!</span><span class="p">,</span> <span class="ss">:toggle</span><span class="p">,</span>
+<span class="ss">:toggle!</span><span class="p">,</span> <span class="ss">:psych_to_yaml</span><span class="p">,</span> <span class="ss">:to_yaml_properties</span><span class="p">,</span> <span class="ss">:in?</span><span class="p">,</span> <span class="ss">:blank?</span><span class="p">,</span> <span class="ss">:present?</span><span class="p">,</span>
+<span class="ss">:presence</span><span class="p">,</span> <span class="ss">:acts_like?</span><span class="p">,</span> <span class="ss">:try</span><span class="p">,</span> <span class="ss">:duplicable?</span><span class="p">,</span> <span class="ss">:to_json</span><span class="p">,</span> <span class="ss">:instance_values</span><span class="p">,</span>
+<span class="ss">:instance_variable_names</span><span class="p">,</span> <span class="ss">:require_or_load</span><span class="p">,</span> <span class="ss">:require_dependency</span><span class="p">,</span>
+<span class="ss">:require_association</span><span class="p">,</span> <span class="ss">:load_dependency</span><span class="p">,</span> <span class="ss">:load</span><span class="p">,</span> <span class="ss">:require</span><span class="p">,</span> <span class="ss">:unloadable</span><span class="p">,</span> <span class="ss">:nil?</span><span class="p">,</span>
+<span class="ss">:===</span><span class="p">,</span> <span class="p">:</span><span class="o">=~</span><span class="p">,</span> <span class="p">:</span><span class="o">!~</span><span class="p">,</span> <span class="ss">:class</span><span class="p">,</span> <span class="ss">:singleton_class</span><span class="p">,</span> <span class="ss">:clone</span><span class="p">,</span> <span class="ss">:dup</span><span class="p">,</span> <span class="ss">:initialize_clone</span><span class="p">,</span>
+<span class="ss">:taint</span><span class="p">,</span> <span class="ss">:tainted?</span><span class="p">,</span> <span class="ss">:untaint</span><span class="p">,</span> <span class="ss">:untrust</span><span class="p">,</span> <span class="ss">:untrusted?</span><span class="p">,</span> <span class="ss">:trust</span><span class="p">,</span> <span class="ss">:to_s</span><span class="p">,</span> <span class="ss">:methods</span><span class="p">,</span>
+<span class="ss">:singleton_methods</span><span class="p">,</span> <span class="ss">:protected_methods</span><span class="p">,</span> <span class="ss">:private_methods</span><span class="p">,</span> <span class="ss">:public_methods</span><span class="p">,</span>
+<span class="ss">:instance_variables</span><span class="p">,</span> <span class="ss">:instance_variable_get</span><span class="p">,</span> <span class="ss">:instance_variable_set</span><span class="p">,</span>
+<span class="ss">:instance_variable_defined?</span><span class="p">,</span> <span class="ss">:instance_of?</span><span class="p">,</span> <span class="ss">:kind_of?</span><span class="p">,</span> <span class="ss">:is_a?</span><span class="p">,</span> <span class="ss">:tap</span><span class="p">,</span> <span class="ss">:send</span><span class="p">,</span>
+<span class="ss">:public_send</span><span class="p">,</span> <span class="ss">:respond_to_missing?</span><span class="p">,</span> <span class="ss">:extend</span><span class="p">,</span> <span class="ss">:display</span><span class="p">,</span> <span class="ss">:method</span><span class="p">,</span> <span class="ss">:public_method</span><span class="p">,</span>
+<span class="ss">:define_singleton_method</span><span class="p">,</span> <span class="ss">:object_id</span><span class="p">,</span> <span class="ss">:to_enum</span><span class="p">,</span> <span class="ss">:enum_for</span><span class="p">,</span> <span class="ss">:psych_y</span><span class="p">,</span>
+<span class="ss">:class_eval</span><span class="p">,</span> <span class="ss">:silence_warnings</span><span class="p">,</span> <span class="ss">:enable_warnings</span><span class="p">,</span> <span class="ss">:with_warnings</span><span class="p">,</span>
+<span class="ss">:silence_stderr</span><span class="p">,</span> <span class="ss">:silence_stream</span><span class="p">,</span> <span class="ss">:suppress</span><span class="p">,</span> <span class="ss">:capture</span><span class="p">,</span> <span class="ss">:silence</span><span class="p">,</span> <span class="ss">:quietly</span><span class="p">,</span>
+<span class="ss">:equal?</span><span class="p">,</span> <span class="p">:</span><span class="o">!</span><span class="p">,</span> <span class="p">:</span><span class="o">!=</span><span class="p">,</span> <span class="ss">:instance_eval</span><span class="p">,</span> <span class="ss">:instance_exec</span><span class="p">,</span> <span class="ss">:__send__</span><span class="p">,</span> <span class="ss">:__id__</span><span class="p">,</span>
+<span class="ss">:initialize</span><span class="p">,</span> <span class="ss">:to_ary</span><span class="p">,</span> <span class="ss">:_run_validate_callbacks</span><span class="p">,</span> <span class="ss">:_run_validation_callbacks</span><span class="p">,</span>
+<span class="ss">:_run_initialize_callbacks</span><span class="p">,</span> <span class="ss">:_run_find_callbacks</span><span class="p">,</span> <span class="ss">:_run_touch_callbacks</span><span class="p">,</span>
+<span class="ss">:_run_save_callbacks</span><span class="p">,</span> <span class="ss">:_run_create_callbacks</span><span class="p">,</span> <span class="ss">:_run_update_callbacks</span><span class="p">,</span>
+<span class="ss">:_run_destroy_callbacks</span><span class="p">,</span> <span class="ss">:_run_commit_callbacks</span><span class="p">,</span> <span class="ss">:_run_rollback_callbacks</span><span class="p">,</span>
+<span class="ss">:serializable_add_includes</span><span class="p">,</span> <span class="ss">:associated_records_to_validate_or_save</span><span class="p">,</span>
+<span class="ss">:nested_records_changed_for_autosave?</span><span class="p">,</span> <span class="ss">:validate_single_association</span><span class="p">,</span>
+<span class="ss">:validate_collection_association</span><span class="p">,</span> <span class="ss">:association_valid?</span><span class="p">,</span>
+<span class="ss">:before_save_collection_association</span><span class="p">,</span> <span class="ss">:save_collection_association</span><span class="p">,</span>
+<span class="ss">:save_has_one_association</span><span class="p">,</span> <span class="ss">:save_belongs_to_association</span><span class="p">,</span>
+<span class="ss">:assign_nested_attributes_for_one_to_one_association</span><span class="p">,</span>
+<span class="ss">:assign_nested_attributes_for_collection_association</span><span class="p">,</span>
+<span class="ss">:assign_to_or_mark_for_destruction</span><span class="p">,</span> <span class="ss">:has_destroy_flag?</span><span class="p">,</span> <span class="ss">:reject_new_record?</span><span class="p">,</span>
+<span class="ss">:call_reject_if</span><span class="p">,</span> <span class="ss">:raise_nested_attributes_record_not_found</span><span class="p">,</span> <span class="ss">:unassignable_keys</span><span class="p">,</span>
+<span class="ss">:association_instance_get</span><span class="p">,</span> <span class="ss">:association_instance_set</span><span class="p">,</span> <span class="ss">:create_or_update</span><span class="p">,</span>
+<span class="ss">:create</span><span class="p">,</span> <span class="ss">:update</span><span class="p">,</span> <span class="ss">:notify_observers</span><span class="p">,</span> <span class="ss">:should_record_timestamps?</span><span class="p">,</span>
+<span class="ss">:timestamp_attributes_for_create_in_model</span><span class="p">,</span>
+<span class="ss">:timestamp_attributes_for_update_in_model</span><span class="p">,</span> <span class="ss">:all_timestamp_attributes_in_model</span><span class="p">,</span>
+<span class="ss">:timestamp_attributes_for_update</span><span class="p">,</span> <span class="ss">:timestamp_attributes_for_create</span><span class="p">,</span>
+<span class="ss">:all_timestamp_attributes</span><span class="p">,</span> <span class="ss">:current_time_from_proper_timezone</span><span class="p">,</span>
+<span class="ss">:clear_timestamp_attributes</span><span class="p">,</span> <span class="ss">:write_attribute</span><span class="p">,</span> <span class="ss">:field_changed?</span><span class="p">,</span>
+<span class="ss">:clone_with_time_zone_conversion_attribute?</span><span class="p">,</span> <span class="ss">:attribute_changed?</span><span class="p">,</span>
+<span class="ss">:attribute_change</span><span class="p">,</span> <span class="ss">:attribute_was</span><span class="p">,</span> <span class="ss">:attribute_will_change!</span><span class="p">,</span> <span class="ss">:reset_attribute!</span><span class="p">,</span>
+<span class="ss">:attribute?</span><span class="p">,</span> <span class="ss">:attribute_before_type_cast</span><span class="p">,</span> <span class="ss">:attribute</span><span class="o">=</span><span class="p">,</span>
+<span class="ss">:convert_number_column_value</span><span class="p">,</span> <span class="ss">:attribute</span><span class="p">,</span> <span class="ss">:match_attribute_method?</span><span class="p">,</span>
+<span class="ss">:missing_attribute</span><span class="p">,</span> <span class="ss">:increment_lock</span><span class="p">,</span> <span class="ss">:_merge_attributes</span><span class="p">,</span> <span class="ss">:halted_callback_hook</span><span class="p">,</span>
+<span class="ss">:assign_multiparameter_attributes</span><span class="p">,</span> <span class="ss">:instantiate_time_object</span><span class="p">,</span>
+<span class="ss">:execute_callstack_for_multiparameter_attributes</span><span class="p">,</span> <span class="ss">:read_value_from_parameter</span><span class="p">,</span>
+<span class="ss">:read_time_parameter_value</span><span class="p">,</span> <span class="ss">:read_date_parameter_value</span><span class="p">,</span>
+<span class="ss">:read_other_parameter_value</span><span class="p">,</span> <span class="ss">:extract_max_param_for_multiparameter_attributes</span><span class="p">,</span>
+<span class="ss">:extract_callstack_for_multiparameter_attributes</span><span class="p">,</span> <span class="ss">:type_cast_attribute_value</span><span class="p">,</span>
+<span class="ss">:find_parameter_position</span><span class="p">,</span> <span class="ss">:quote_value</span><span class="p">,</span> <span class="ss">:ensure_proper_type</span><span class="p">,</span>
+<span class="ss">:destroy_associations</span><span class="p">,</span> <span class="ss">:default_src_encoding</span><span class="p">,</span> <span class="ss">:irb_binding</span><span class="p">,</span> <span class="ss">:Digest</span><span class="p">,</span>
+<span class="ss">:initialize_copy</span><span class="p">,</span> <span class="ss">:remove_instance_variable</span><span class="p">,</span> <span class="ss">:sprintf</span><span class="p">,</span> <span class="ss">:format</span><span class="p">,</span> <span class="ss">:Integer</span><span class="p">,</span>
+<span class="ss">:Float</span><span class="p">,</span> <span class="ss">:String</span><span class="p">,</span> <span class="ss">:Array</span><span class="p">,</span> <span class="ss">:warn</span><span class="p">,</span> <span class="ss">:raise</span><span class="p">,</span> <span class="ss">:fail</span><span class="p">,</span> <span class="ss">:global_variables</span><span class="p">,</span> <span class="ss">:__method__</span><span class="p">,</span>
+<span class="ss">:__callee__</span><span class="p">,</span> <span class="ss">:eval</span><span class="p">,</span> <span class="ss">:local_variables</span><span class="p">,</span> <span class="ss">:iterator?</span><span class="p">,</span> <span class="ss">:block_given?</span><span class="p">,</span> <span class="ss">:catch</span><span class="p">,</span> <span class="ss">:throw</span><span class="p">,</span>
+<span class="ss">:loop</span><span class="p">,</span> <span class="ss">:caller</span><span class="p">,</span> <span class="ss">:trace_var</span><span class="p">,</span> <span class="ss">:untrace_var</span><span class="p">,</span> <span class="ss">:at_exit</span><span class="p">,</span> <span class="ss">:syscall</span><span class="p">,</span> <span class="ss">:open</span><span class="p">,</span> <span class="ss">:printf</span><span class="p">,</span>
+<span class="ss">:print</span><span class="p">,</span> <span class="ss">:putc</span><span class="p">,</span> <span class="ss">:puts</span><span class="p">,</span> <span class="ss">:gets</span><span class="p">,</span> <span class="ss">:readline</span><span class="p">,</span> <span class="ss">:select</span><span class="p">,</span> <span class="ss">:readlines</span><span class="p">,</span> <span class="ss">:`</span><span class="p">,</span> <span class="ss">:p</span><span class="p">,</span> <span class="ss">:test</span><span class="p">,</span>
+<span class="ss">:srand</span><span class="p">,</span> <span class="ss">:rand</span><span class="p">,</span> <span class="ss">:trap</span><span class="p">,</span> <span class="ss">:exec</span><span class="p">,</span> <span class="ss">:fork</span><span class="p">,</span> <span class="ss">:exit!</span><span class="p">,</span> <span class="ss">:system</span><span class="p">,</span> <span class="ss">:spawn</span><span class="p">,</span> <span class="ss">:sleep</span><span class="p">,</span> <span class="ss">:exit</span><span class="p">,</span>
+<span class="ss">:abort</span><span class="p">,</span> <span class="ss">:require_relative</span><span class="p">,</span> <span class="ss">:autoload</span><span class="p">,</span> <span class="ss">:autoload?</span><span class="p">,</span> <span class="ss">:proc</span><span class="p">,</span> <span class="ss">:lambda</span><span class="p">,</span> <span class="ss">:binding</span><span class="p">,</span>
+<span class="ss">:set_trace_func</span><span class="p">,</span> <span class="ss">:Rational</span><span class="p">,</span> <span class="ss">:Complex</span><span class="p">,</span> <span class="ss">:gem</span><span class="p">,</span> <span class="ss">:gem_original_require</span><span class="p">,</span> <span class="ss">:BigDecimal</span><span class="p">,</span>
+<span class="ss">:y</span><span class="p">,</span> <span class="ss">:Pathname</span><span class="p">,</span> <span class="ss">:j</span><span class="p">,</span> <span class="ss">:jj</span><span class="p">,</span> <span class="ss">:JSON</span><span class="p">,</span> <span class="ss">:singleton_method_added</span><span class="p">,</span>
+<span class="ss">:singleton_method_removed</span><span class="p">,</span> <span class="ss">:singleton_method_undefined</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<p>There is a specific issue I have with interface explosion, and it isn’t so much
+to do with code organization as it is with state management. Can you 
+guess what my concern is?</p>
+
+<h3 id="problem-3-balancing-reuse-and-customization-can-be-tricky">PROBLEM 3: Balancing reuse and customization can be tricky</h3>
+
+<p>Some ancestors provide methods that are designed to be replaced by 
+their descendants. When executed well, this pattern provides a convenient
+balance between code reuse and customization. However, because it is 
+impossible to account for all possible customizations that descendants 
+of a base object will want to make, this approach has its
+limitations.</p>
+
+<p>This design problem is best explained by example, and you can find a great 
+one in Ruby itself. Start by considering the following trivial code, paying
+particular attention to its output:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+    <span class="vi">@name</span>  <span class="o">=</span> <span class="nb">name</span>
+    <span class="vi">@email</span> <span class="o">=</span> <span class="n">email</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">person</span> <span class="o">=</span> <span class="no">Person</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Gregory Brown"</span><span class="p">,</span> <span class="s2">"gregory@practicingruby.com"</span><span class="p">)</span>
+
+<span class="nb">p</span> <span class="n">person</span>    <span class="c1">#=~</span>
+<span class="c1">#&lt;Person:0x0000010108bbf8 @name="Gregory Brown", </span>
+<span class="c1">#                         @email="gregory@practicingruby.com"&gt;</span>
+
+<span class="nb">puts</span> <span class="n">person</span> <span class="c1">#=~</span>
+<span class="c1">#&lt;Person:0x0000010108bbf8&gt;     </span>
+</code></pre>
+</div>
+
+<p>Under the hood, <code class="highlighter-rouge">p</code> calls <code class="highlighter-rouge">person.inspect</code>, and <code class="highlighter-rouge">puts</code> calls
+<code class="highlighter-rouge">person.to_s</code>. What you see above is output from the default implementation 
+of each of those methods. Arguably, <code class="highlighter-rouge">Object#inspect</code> 
+provides useful debugging output, but <code class="highlighter-rouge">Object#to_s</code> is
+more of a template method that needs to be overridden in order to be useful. The
+following code shows how easy to customize things by simply adding your own <code class="highlighter-rouge">to_s</code>
+definition:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+    <span class="vi">@name</span>  <span class="o">=</span> <span class="nb">name</span>
+    <span class="vi">@email</span> <span class="o">=</span> <span class="n">email</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">to_s</span>
+    <span class="s2">"</span><span class="si">#{</span><span class="vi">@name</span><span class="si">}</span><span class="s2"> &lt;</span><span class="si">#{</span><span class="vi">@email</span><span class="si">}</span><span class="s2">&gt;"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">person</span> <span class="o">=</span> <span class="no">Person</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Gregory Brown"</span><span class="p">,</span> <span class="s2">"gregory@practicingruby.com"</span><span class="p">)</span>
+
+<span class="nb">puts</span> <span class="n">person</span> <span class="c1">#=~ Gregory Brown &lt;gregory@practicingruby.com&gt;  </span>
+</code></pre>
+</div>
+
+<p>On the surface, there is nothing wrong with this code: this is exactly what a
+template-method based extension mechanism should look like. However, due to the
+weird way that <code class="highlighter-rouge">Object#inspect</code> works in Ruby 1.9, defining your own <code class="highlighter-rouge">to_s</code>
+implementation has some unpleasant side effects that are likely to surprise you:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">p</span> <span class="n">person</span> <span class="c1">#=~ Gregory Brown &lt;gregory@practicingruby.com&gt;  </span>
+</code></pre>
+</div>
+
+<p>If you look at the <a href="https://github.com/ruby/ruby/blob/trunk/object.c#L486-511">definition of
+Object#inspect</a>,
+you’ll find that this behavior is by design. In a nutshell, the method is set
+up to provide its default output if <code class="highlighter-rouge">to_s</code> has not been overridden, but simply
+delegate to <code class="highlighter-rouge">to_s</code> if it has been. This is problematic, because <code class="highlighter-rouge">to_s</code> is meant
+to be used for humanized output such as what you saw in the previous
+example, not debugging output.</p>
+
+<p>The unfortunate consequence of this problem is that if you define <code class="highlighter-rouge">to_s</code> in your
+objects, you must also define a meaningful <code class="highlighter-rouge">inspect</code>, and if you want to 
+reproduce the same behavior as <code class="highlighter-rouge">Object#inspect</code>, you need to implement 
+it yourself. While this is mostly a problem of brittle code and it is not
+specifically related to inheritance, the problem is compounded by
+inheritance-based modeling. For example, suppose the <code class="highlighter-rouge">Person</code> class was defined
+as shown above, and you decided to subclass it:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">Person</span> 
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+    <span class="k">super</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+    <span class="vi">@role</span> <span class="o">=</span> <span class="n">role</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>If <code class="highlighter-rouge">Person</code> does define its own <code class="highlighter-rouge">inspect</code> method, <code class="highlighter-rouge">Employee</code> will inherit the
+same problem. On the other hand, if <code class="highlighter-rouge">Person</code> does implement <code class="highlighter-rouge">inspect</code>, it needs
+to take care to implement it in a way that’s suitably general to account for
+what its descendants might find useful. This invites the same design challenges
+that caused this problem in the first place, which means that <code class="highlighter-rouge">Employee</code> may end
+up cleaning up after its parent object in a similar way. Unfortunately,
+brittleness tends to cascade downwards throughout ancestry chains.</p>
+
+<h3 id="homework-exercises">Homework exercises</h3>
+
+<p>This article is on the short-side, and it also leaves out a lot of the story
+from each of these points. I did this intentionally to encourage you to
+participate in an active discussion on this topic. To get the most out of this
+article, please complete at least one of the following homework exercises:</p>
+
+<p>1) Show a realistic example of an accidental method naming collision, in a
+similar spirit to the state-based example shown in Problem #1. For bonus
+points, choose an example that involves private methods.</p>
+
+<p>2) Post a comment in response to the “interface explosion” example shown 
+in Problem #2. You can either try to guess what my main concern about 
+it is, or share your own concerns. If instead you feel that there is 
+nothing wrong with this kind of design, explain why you think that.</p>
+
+<p>3) Come up with another downside of inheritance-based modeling, and provide an
+example of it. If you have trouble coming up with your own, you may want to look
+into issues that can arise from overriding methods, or perhaps explore what
+happens when you mix traditional inheritance-based modeling with
+<code class="highlighter-rouge">method_missing</code>.</p>
+
+<p>4) Share an example of a library or project which is difficult to work with
+because of the way it uses inheritance-based modeling, or describe problems you’ve run
+into with your own projects due to inheritance.</p>
+
+<p>5) Share the conventions and guidelines you follow to avoid the problems
+described in this article, as well as other problems you’ve encountered with
+inheritance-based modeling.</p>
+
+<p>Looking forward to seeing your responses! Don’t worry about getting the <em>right</em>
+answers, discussion threads here on Practicing Ruby are about learning, not
+necessarily showing off what you already know.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

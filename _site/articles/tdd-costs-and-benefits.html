@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>What are the costs and benefits of TDD?</title>
+  <meta name="description" content="Over the last several years, Ruby programmers have gained a reputation of beingtest obsessed – a designation that many of our community members consider tobe...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/tdd-costs-and-benefits">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">What are the costs and benefits of TDD?</h1>
+    <p class="post-meta"><time datetime="2012-04-10T00:00:00-04:00" itemprop="datePublished">Apr 10, 2012</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Over the last several years, Ruby programmers have gained a reputation of being
+<em>test obsessed</em> – a designation that many of our community members consider to
+be a badge of honor. While I share their enthusiasm to some extent, I can’t help but notice
+how dangerous it is to treat any single methodology as if it were a panacea.</p>
+
+<p>Our unchecked passion about <a href="http://en.wikipedia.org/wiki/Test-driven_development">test-driven
+development</a> (TDD) has paved the way for deeply
+dogmatic thinking to become our cultural norm. As a result, many vocal members
+of our community have oversold the benefits of test-driven development 
+while downplaying or outright ignoring some of its costs. While I don’t doubt
+the good intentions of those who have advocated TDD in this
+way, I feel strongly that this tendency to play fast and loose with very complex
+ideas ends up generating more heat than light.</p>
+
+<p>To truly evaluate the impact that TDD can have on our work, we need to go 
+beyond the anecdotes of our community leaders and seek answers to 
+two important questions:</p>
+
+<blockquote>
+  <p>1) What evidence-based arguments are there for using TDD?</p>
+</blockquote>
+
+<blockquote>
+  <p>2) How can we evaluate the costs and benefits of TDD in our own work?</p>
+</blockquote>
+
+<p>In this article, I will address both of these questions and share with you my
+plans to investigate the true costs and benefits of TDD in a more rigorous and
+introspective way than I have done in the past. My hope is that by considering a
+broad spectrum of concerns with a fair amount of precision, I will be able to
+share relevant experiences that may help you challenge and test your own 
+assumptions about test-driven development.</p>
+
+<h3 id="what-evidence-based-arguments-are-there-for-using-tdd">What evidence-based arguments are there for using TDD?</h3>
+
+<p>Before publishing this article, I conducted a survey that collected thoughts
+from Practicing Ruby readers about the costs and benefits of test-driven
+development that they have personally experienced. Over 50 individuals responded, and
+as you might expect there was a good deal of diversity in replies. However, the
+following common assumptions about TDD stood out:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="gi">+ Increased confidence in developers working on test-driven codebases
++ Increased protection from defects, especially regressions
++ Better code quality (in particular, less coupling and higher cohesion)
++ Tests as a replacement/supplement to other forms of documentation
++ Improved maintainability and changeability of codebases
++ Ability to refactor without fear of breaking things
++ Ability of tests to act as a "living specification" of expected behavior
++ Earlier detection of misunderstandings/ambiguities in requirements
++ Smaller production codebases with more simple designs
++ Easier detection of flaws in the interactions between objects
++ Reduced need for manual testing
++ Faster feedback loop for discovering whether an implementation is correct
+</span><span class="gd">- Slower per-feature development work because tests take a lot of time to write
+- Steep learning curve due to so many different testing tools / methodologies
+- Increased cost of test maintenance as projects get larger
+- Some time wasted on fixing "brittle tests"
+- Effectiveness is highly dependent on experience/discipline of dev team
+- Difficulty figuring out where to get started on new projects
+- Reduced ability to quickly produce quick and dirty prototypes
+- Difficulty in evaluating how much time TDD costs vs. how much it saves
+- Reduced productivity due to slow test runs
+- High setup costs
+</span></code></pre>
+</div>
+
+<p>Before conducting this survey, I compiled <a href="https://gist.github.com/2277788">my own list of
+assumptions</a> about test-driven 
+development, and I was initially relieved to see that there was a high degree of
+overlap between my intuition and the experiences that Practicing Ruby 
+readers had reported on. However, my hopes of finding some solid ground to stand
+on were shattered when I realized that virtually all of these claims did not have
+any conclusive empirical evidence to support them.</p>
+
+<p>Searching the web for answers, I stumbled across a great <a href="http://scrumology.com/the-benefits-of-tdd-are-neither-clear-nor-are-they-immediately-apparent/">three-part
+article</a>
+ called “The benefits of TDD are neither clear nor are they immediately
+apparent”, which presents a fairly convincing argument that we don’t know as
+much about the effect of TDD on our craft as we think we do. The whole article is
+worth reading, but this paragraph in <a href="http://scrumology.com/the-benefits-of-tdd-why-tdd-part-3/">part
+3</a> really grabbed my
+attention:</p>
+
+<blockquote>
+  <p>Eighteen months ago, I would have said that TDD was a slam dunk. Now that I’ve taken the time to look at the papers more closely … and actually read more than just the introduction and conclusion … I would say that the only honest conclusion is that TDD results in more tests and by implication, fewer defects. Any other conclusions such as better design, better APIs, simpler design, lower complexity, increased productivity, more maintainable code etc., are simply not supported.</p>
+</blockquote>
+
+<p>Throughout the article, the author emphasizes that he believes in the value of
+TDD and seems to think that the inconsistency of rigor and quality in the
+studies at least partially explain why their results do not mirror the 
+expectations of practitioners. He even offers some standards for what he 
+believes would make for more reliable studies on TDD:</p>
+
+<blockquote>
+  <p>My off-the-top-of-my-head list of criteria for such a study, includes (a) a multi year study with a minimum of 3 years consecutive years (b) a study of several teams (c) team sizes must be 7 (+/-2) team members and have (d) at least 4 full time developers. Finally, (e) it needs to be a study of a product in production, as opposed to a study based on student exercises. Given such as study it would be difficult to argue their conclusions, whatever they be.</p>
+</blockquote>
+
+<p>His points (c) and (d) about team size seem subject to debate, but it is fair
+to say that studies should at least consider many different team sizes as
+opposed to focusing on individual developers exclusively. All other points he
+makes seem essential to ensuring that results remain tied to reality, but he
+goes on to conclude that his requirements are so complicated and costly to 
+implement that it could explain why all existing studies fall short of this gold
+standard.</p>
+
+<p>Intrigued by this article, I went on to look into whether there were other, more
+authoritative sources of information about the overall findings of research on
+test-driven development. As luck would have it, the O’Reilly book on
+evidence-based software engineering (<a href="http://www.amazon.com/Making-Software-Really-Works-Believe/dp/0596808321">Making
+Software</a>) had a chapter on this
+topic called “How effective is test-driven development?” which followed a
+similar story arc.</p>
+
+<p>In this chapter, five researchers present the result of their systematic review of 
+quantitative studies on test driven development. After analyzing what published 
+literature says about internal quality, external quality, productivity, 
+and correctness testing, the researchers found some evidence that both 
+correctness  testing and external quality are improved through TDD. However, 
+upon limiting the scope to well-defined studies only, the positive effect 
+on external quality disappears, and even the effect on correctness 
+testing weakens significantly. In other words, their conclusion matched the
+conclusions of the previously mentioned article: <u>*there is simply not a whole lot of
+science supporting our feverish advocacy of TDD and its benefits.*</u></p>
+
+<p>While the lack of rigorous and conclusive evidence is disconcerting, it is not 
+necessarily a sign that our perception of the costs and benefits of 
+TDD is invalid. Instead, we should treat these findings as an invitation to
+slow down and look at our own decision making process in a more careful and
+introspective way.</p>
+
+<h3 id="how-can-we-evaluate-the-costs-and-benefits-of-tdd-in-our-own-work">How can we evaluate the costs and benefits of TDD in our own work?</h3>
+
+<p>Because there are very few evidence-supported generalizations that can be made
+about test-driven development, we each have the responsibility to discover for
+ourselves what effects the red-green-refactor cycle truly has on our work. But
+based on my personal experience, many of us have a long way to go before we can
+even begin to answer this question.</p>
+
+<p>In the process of preparing this article, I ended up identifying three
+guidelines that I feel are essential for any sort of introspective evaluation. I
+have listed them below, along with some brief notes on how I have failed
+miserably at meeting these preconditions when it comes to analyzing TDD.</p>
+
+<hr />
+
+<p><strong>1) We must be aware of our assumptions, and be willing to test them.</strong></p>
+
+<p><em>How I failed to do this:</em> As someone who learned TDD primarily because other smart people
+told me it was the right way to do things, my personal opinions about testing
+were developed reactively rather than proactively. As a result, I have ignored certain 
+observations and amplified others to fit a particular mental model that is
+mostly informed by gut reactions rather than reasoned choices.</p>
+
+<p><strong>2) We must be aware of our limitations and try to overcome them.</strong></p>
+
+<p><em>How I failed to do this:</em> My mixed feelings towards TDD are in part due to my
+own lack of effort to fully understand the methodology. 
+While I may have done enough formal practice to have some basic intuitive sense of what
+the red-green-refactor cycle is like, I have never been able to sustain 
+a pure TDD workflow over the entire lifetime of any reasonably complex
+project that I have worked on. As a result, it is likely that I have been 
+blaming testing tools and methodologies for my some of my own deficiencies.</p>
+
+<p><strong>3) We must be continuously mindful of context and avoid over-generalization.</strong></p>
+
+<p><em>How I failed to do this:</em> I have always been irked by the lack of sufficient context in literature about
+test-driven development, but I have found myself guilty of committing a similar
+crime on numerous occasions. Even when I have tried to use specific examples to support
+my arguments, I have often failed to consider that my working environment is very
+different than that of most programmers. As a result, I have made more than few
+sweeping generalizations which could be invalid at best and misleading at worst.</p>
+
+<hr />
+
+<p>If I had to guess why I approached TDD in such a haphazard way despite my
+tendency to treat other areas of software development with a lot more 
+careful attention, I would say it was a combination of immaturity and a 
+deeply overcommitted work schedule. When I first learned Ruby in 2004, I 
+studied just enough about software testing and the TDD workflow to get 
+by, and then after that only brushed up on my software testing skills 
+when it was absolutely essential to do so. There was simply too much to learn
+about and not enough time, and so I never ended up giving TDD as much attention 
+as it might have deserved.</p>
+
+<p>Like most things that get learned in this fashion, my knowledge of software
+testing in the test-driven style is full of gaping holes and 
+dark corners. Until recently this is something I have always been able to work
+around, but my role as a teacher has forced me to identify this as a real weak 
+spot of mine that needs to be dealt with.</p>
+
+<h3 id="looking-at-tdd-from-a-fresh-perspective">Looking at TDD from a fresh perspective</h3>
+
+<p>Relearning the fundamentals of test-driven development is the only way 
+I am ever going to come up with a coherent explanation for <a href="https://gist.github.com/2277788">my 
+assumptions</a> about the costs and benefits of this kind of workflow, 
+and is also the only way that I will be able to break free from various 
+misconceptions that I have been carrying around for the better part of 
+a decade.</p>
+
+<p>For a period of 90 days from 2012-04-10 to 2012-07-09, I plan to follow 
+disciplined TDD practices as much as possible. The exact process I want 
+to adopt is reflected in the handy-dandy flow chart shown below:</p>
+
+<div align="center">
+<img src="http://upload.wikimedia.org/wikipedia/en/9/9c/Test-driven_development.PNG" title="Image Credit: Excirial on Wikipedia CC-SA" />
+</div>
+
+<p>This is a workflow that I am already quite familiar with and have practiced
+before, but the difference this time around is that I’m going to avoid cutting
+corners. In the past, I have usually started projects by spiking a rough
+prototype before settling into a TDD workflow, and that may have dampened the
+effect that writing tests up front could have had on my early design process in
+those projects. I have also practicing refactoring in the large rather than the
+small fairly often, favoring a Red-Green-Red-Green-…-Red-Green-Refactor
+pattern which almost certainly lead to more brittle tests and implementations
+than I might have been able to come up with if I were more disciplined.
+Throughout this three month trial period, I plan to think long and hard before
+making any deviations from standard practice, and will be sure to note whenever
+I do so.</p>
+
+<p>The benefit of revisiting this methodology as an experienced developer is that I
+have a whole lot more confidence in my ability to be diligent in my efforts. In
+particular, I plan to take careful notes during each and every coding session
+about my TDD struggles and triumphs, which I will associate with particular
+changesets on particular projects. Before writing this article I did a test run
+of how this might work out, and you can 
+<a href="https://gist.github.com/2286918">check out these notes</a> to get a sense of what 
+I am shooting for. I think the <a href="https://github.com/sandal/puzzlenode-solutions/compare/9070...3b79">github compare
+view</a> will 
+really come in handy for this kind of note-taking, as it will allow me to track 
+my progress with a high degree of precision.</p>
+
+<p>I don’t plan to simply use these notes for subjectively analyzing my own
+progress, but also expect to use them as a way to seek out advice and help from
+my friends who seem to have strongly integrated test-driven development into their
+working practices. Having particular code samples to share along with some additional 
+context will go a long way towards helping me ask the right kinds of 
+questions that will move me forward. Each time I reach a stumbling point or
+discover a pattern that is influencing my work (for better or for worse), I will
+request some feedback from someone who might be able to help. When I was
+learning TDD the first time around I might have avoided asking “stupid
+questions” as a way to hide my ignorance, but this time I am intentionally
+trying to expose my weaknesses so that they can be dealt with.</p>
+
+<p>After this 90 day period of disciplined study and practice of test-driven
+development, I will collect my notes and attempt to summarize my findings.
+If I have enough interesting results to share, I will publish them in Issue 4.12
+of Practicing Ruby towards the end of July 2012. At that time, I will also
+attempt to take a slightly more informed guess at the “cost and benefits”
+question that lead me to write this article in the first place, and will comment
+on how this disciplined period of practice has influenced my assumptions about
+TDD.</p>
+
+<h3 id="predictions-about-what-will-be-discovered">Predictions about what will be discovered</h3>
+
+<p>While certain things are best left to be a mystery, there are a few predictions
+can make about the outcomes of this project. These are mostly “just
+for fun”, but also may help reveal some of my biases and expectations:</p>
+
+<ul>
+  <li>
+    <p>I expect that I will reverse my position on several criticisms of test-driven
+development as I learn more about practicing it properly.</p>
+  </li>
+  <li>
+    <p>I expect that I will understand more of the claims that I feel are either
+overstated or lacking in context, and will either be able a more balanced
+view of them or meaningfully express my reservations about them.</p>
+  </li>
+  <li>
+    <p>I expect that I will stop exclusively doing pure test-driven development as
+soon as this trial period is over, but think it is very likely that I will
+use TDD more often and more skillfully in the future.</p>
+  </li>
+  <li>
+    <p>I expect to be just as frustrated about the extra work involved in TDD
+by the end of this study as I am now.</p>
+  </li>
+  <li>
+    <p>I expect that simply by measuring my progress and reflecting on it, that I
+will learn a lot of interesting things that aren’t related to TDD at all,
+and that will help me write better Practicing Ruby articles!</p>
+  </li>
+</ul>
+
+<p>I will do my best not to allow these predictions to become self-fulfilling
+prophecies and just go with the flow, but I feel it is important to expose 
+the lens that I will be viewing my experiences through.</p>
+
+<h3 id="limitations-of-this-method-of-study">Limitations of this method of study</h3>
+
+<p>The method I am using to reflect on my studies is to some extent a legitimate
+form of qualitative research that may be useful for more than just improving
+my own skillset. I am essentially conducting a diary study, which is 
+the <a href="http://books.google.com/books?id=DxuGi5h2-HEC&amp;lpg=PA58&amp;dq=Reading%20Qualitative%20Research%20Knuth&amp;pg=PA58#v=onepage&amp;q=Reading%20Qualitative%20Research%20Knuth&amp;f=false">same technique that Donald Knuth used</a>
+in an attempt to categorize the different kinds of errors found in TeX. This 
+technique is also used in marketing and usability
+research, and can provide interesting insights into the experiences of
+individuals with sufficient context to be analyzed in a fairly rigorous way.
+However, I am not a scientist and this is not a scientific study, and so there
+are a ton of limitations can threaten the validity of any claims made about 
+the results of this project.</p>
+
+<p>The first and most obvious limitation is that this is a self-study, and that I
+am already chock full of my own assumptions and biases. My main goal is to learn
+more about TDD and come up with better reasons for the decisions I make about
+how I practice software testing, but it is impossible for me to wipe the slate
+completely clean and serve as an objective source of information on this topic.</p>
+
+<p>On top of this, I will be discussing things entirely in terms of my experiences
+and won’t have many objective measures to work with. My hope is that tagging
+my notes with links back to particular changesets will make it possibly to apply 
+some quantitative measures after this study is completed, but it is hard to say
+whether that will be feasible or whether it would even mean anything if I
+attempted to do that. Without hard numbers, my results will not be
+directly comparable to anyone else’s nor can it say anything about the average
+developer’s experience.</p>
+
+<p>Lastly, when I look back on my notes from the 90 day period, it may be hard for
+me to reestablish the context of the early days of the study. This means that my
+final report may be strongly biased by whatever ends up happening towards the 
+end of the trial period. While I expect that I will be able to make some high-level 
+comparisons across the whole time period, I will not be able to precisely 
+compare my experiences on day 5 with my experiences on day 85 even if I take
+very detailed notes. This may cause some important insights to get lost in the
+shuffle.</p>
+
+<p>My hope is that by staying communicative during this study and by sharing most
+or all of my raw data (code, notes, etc.), the effects of these limitations will
+be reduced so that others can still gain something useful from my
+efforts. At the very least, this transparency will allow individuals 
+to decide for themselves to what extent my conclusions match up with my
+evidence, and whether my results are relevant to other contexts.</p>
+
+<h3 id="some-things-you-can-do-to-help-me">Some things you can do to help me</h3>
+
+<p>One thing I know about Practicing Ruby readers is that you folks really enjoy 
+improving the craft of software development. That is the reason why I decided 
+to announce my plans for this study via an article here rather than 
+somewhere else. If you would like to support this project,
+there are a few ways you can contribute.</p>
+
+<p><strong>If you have a few seconds to spare:</strong> You can spread the word about this
+project by sharing this article with your friends and colleagues. This will help
+me make sure to get adequate critical review from the community, which is a key
+part of the improvement process. To create a share link, just click the handy
+dandy robot down in the bottom right corner of the screen.</p>
+
+<p><strong>If you have a few minutes to spare:</strong> You can leave a comment sharing your
+thoughts on this article as well as any questions or suggestions you might have
+for me. I take all reader feedback to heart, and comments are one of the best
+ways that you can support my work on these articles.</p>
+
+<p><strong>If you have a few minutes to spare each week:</strong> You can subscribe to the
+<a href="http://lists.rubymendicant.org/listinfo.cgi/mendicant-research-rubymendicant.org">mendicant-research</a>
+mailing list, where I plan to post my questions about TDD as
+I study, as well as any interesting problems I run into or helpful learning
+resources I end up using. I am also going to invite a few folks from the Ruby
+community that I think have specific skills that will help me with this study,
+but I feel that every practicing Rubyist could be a meaningful contributor to
+these discussions.</p>
+
+<p><strong>If you have a large amount of free time:</strong> You can try to do this study along with me.
+I can’t promise that I’ll have time during the 90 day period to regularly review
+your progress, but I can definitely help you get set up and also would love to
+compare notes at the end of the trial period. If this is something that
+interests you, please post to the
+<a href="http://lists.rubymendicant.org/listinfo.cgi/mendicant-research-rubymendicant.org">mendicant-research</a> mailing list and I’ll provide additional details.</p>
+
+<p>Any little bit of effort you spend on helping me make this project better will
+absolutely be appreciated! Our readers are what make this journal what it is, I
+just work here. :wink:</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

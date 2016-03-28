@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Lessons learned from coding in the danger zone</title>
+  <meta name="description" content="Writing robust code is always challenging, even when dealing with extremely well controlled environments. But when you enter the danger zone where software f...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/coding-in-the-danger-zone">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Lessons learned from coding in the danger zone</h1>
+    <p class="post-meta"><time datetime="2012-03-13T00:00:00-04:00" itemprop="datePublished">Mar 13, 2012</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Writing robust code is always challenging, even when dealing with extremely well controlled environments. But when you enter the danger zone where software failures can result in data loss or extended service interruptions, coding for robustness becomes essential even if it is inconvenient to do so.</p>
+
+<p>In this article, I will share some of the lessons I’ve learned about building
+stable software through my work on the <a href="https://github.com/mendicant-original/newman">Newman mail framework</a>. While the techniques I’ve discovered so far are fairly ordinary, it was easy to underestimate their importance in the early stages of the project’s development. My hope is that by exposing my stumbling points, it will save others from making the same mistakes.</p>
+
+<h3 id="lesson-1-collect-enough-information-about-your-workflow">Lesson 1: Collect enough information about your workflow.</h3>
+
+<p>In many contexts, collecting the information you need to analyze a failure is the easy part of the debugging process. When your environment is well controlled, a good stack trace combined with a few well placed <code class="highlighter-rouge">puts</code> statements are often all you need to start reproducing an error in your development environment. Unfortunately, these well-worn strategies are not nearly as effective for debugging application frameworks.</p>
+
+<p>To get a clearer sense of the problem, consider that Newman’s server software knows almost nothing about the applications it runs, nor does it know much of anything about the structures of the emails it is processing. It also cannot assume that its interactions with external IMAP and SMTP servers will be perfectly stable. In this kind of environment, something can go wrong at every possible turn. This means that in order to find out where and why a failure occured, it is necessary to make the sequence of events easier to analyze by introducing some sort of logging system.</p>
+
+<p>A good place to start when introducing event logging is with the outermost layer of the system. In Newman’s case, this means tracking information about every incoming and outgoing email, as shown below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>I, [2012-03-10T12:46:57.274091 #9841]  INFO -- REQUEST: 
+{:from=&gt;["gregory_brown@letterboxes.org"], :to=&gt;["test+ping@test.com"],
+:bcc=&gt;nil, :subject=&gt;"hi there!", :reply_to=&gt;nil}
+
+I, [2012-03-10T12:46:57.274896 #9841]  INFO -- RESPONSE: 
+{:from=&gt;["test@test.com"], :to=&gt;["gregory_brown@letterboxes.org"], 
+:bcc=&gt;nil, :subject=&gt;"pong", :reply_to=&gt;nil}
+</code></pre>
+</div>
+
+<p>Because Newman currently only understands how to filter messages based on their TO and SUBJECT fields, the standard log information is fairly helpful for basic application debugging needs. However, when dealing with complex problems, it is nice to be able to see <a href="https://raw.github.com/gist/01fbab481a21f4d43bbf/0778e1a0ae887e6423bce985298e3f8d60eb37a0/gistfile1.txt">the raw contents of the messages</a>. Rather than choosing one or the other, Newman handles both log formats by outputting them at different log levels:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Newman</span>
+  <span class="k">module</span> <span class="nn">EmailLogger</span>
+    <span class="k">def</span> <span class="nf">log_email</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+      <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"</span><span class="se">\n</span><span class="si">#{</span><span class="n">email</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+      <span class="n">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">{</span> <span class="n">email_summary</span><span class="p">(</span><span class="n">email</span><span class="p">)</span> <span class="p">}</span>
+    <span class="k">end</span>
+
+    <span class="kp">private</span>
+
+    <span class="k">def</span> <span class="nf">email_summary</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+      <span class="p">{</span> <span class="ss">:from</span>     <span class="o">=&gt;</span> <span class="n">email</span><span class="p">.</span><span class="nf">from</span><span class="p">,</span>
+        <span class="ss">:to</span>       <span class="o">=&gt;</span> <span class="n">email</span><span class="p">.</span><span class="nf">to</span><span class="p">,</span>
+        <span class="ss">:bcc</span>      <span class="o">=&gt;</span> <span class="n">email</span><span class="p">.</span><span class="nf">bcc</span><span class="p">,</span>
+        <span class="ss">:subject</span>  <span class="o">=&gt;</span> <span class="n">email</span><span class="p">.</span><span class="nf">subject</span><span class="p">,</span>
+        <span class="ss">:reply_to</span> <span class="o">=&gt;</span> <span class="n">email</span><span class="p">.</span><span class="nf">reply_to</span> <span class="p">}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Having the ability to dynamically decide what level of detail your log output should contain is one of the main advantages of using a proper logging system instead of directly outputting messages to the console. While it would be possible to implement some sort of information filtering mechanism without using a formal logging system, doing so would involve reinventing many of the things that the <code class="highlighter-rouge">Logger</code> standard library already provides for you.</p>
+
+<p>The cost of introducing a logging system is that once you depend on logs for your debugging information, some form of exception logging becomes absolutely necessary. Because failures can be very context-dependent, deciding how handle them can be tricky.</p>
+
+<h3 id="lesson-2-plan-for-various-kinds-of-predictable-failures">Lesson 2: Plan for various kinds of predictable failures.</h3>
+
+<p>Because Newman does not know anything about the applications it runs except that they all implement a <code class="highlighter-rouge">call</code> method, it is not possible to be selective about what kinds of errors to handle. Instead, a catch-all mechanism is implemented in the <code class="highlighter-rouge">process_request</code> method:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Newman</span>
+  <span class="k">class</span> <span class="nc">Server</span>
+    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+      <span class="n">apps</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+        <span class="n">app</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="ss">:request</span>  <span class="o">=&gt;</span> <span class="n">request</span><span class="p">,</span> 
+                 <span class="ss">:response</span> <span class="o">=&gt;</span> <span class="n">response</span><span class="p">,</span> 
+                 <span class="ss">:settings</span> <span class="o">=&gt;</span> <span class="n">settings</span><span class="p">,</span>
+                 <span class="ss">:logger</span>   <span class="o">=&gt;</span> <span class="n">logger</span><span class="p">)</span>
+      <span class="k">end</span>
+
+      <span class="k">return</span> <span class="kp">true</span>
+    <span class="k">rescue</span> <span class="no">StandardError</span> <span class="o">=&gt;</span> <span class="n">e</span>
+      <span class="k">if</span> <span class="n">settings</span><span class="p">.</span><span class="nf">service</span><span class="p">.</span><span class="nf">raise_exceptions</span>
+        <span class="k">raise</span>
+      <span class="k">else</span>
+        <span class="n">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">"APP ERROR"</span><span class="p">)</span>  <span class="p">{</span> <span class="n">e</span><span class="p">.</span><span class="nf">inspect</span> <span class="p">}</span>
+        <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="s2">"APP ERROR"</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"</span><span class="si">#{</span><span class="n">e</span><span class="p">.</span><span class="nf">inspect</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="n">e</span><span class="p">.</span><span class="nf">backtrace</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">  "</span><span class="p">)</span> <span class="p">}</span>
+
+        <span class="k">return</span> <span class="kp">false</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>If you trace the execution path through this method, you’ll find that there are three possible outcomes. If everything worked as expected, the method simply returns true. However, if an exception is raised by one of the applications, then the <code class="highlighter-rouge">raise_exceptions</code> configuration setting is used to determine whether to simply re-raise the exception or log the error and return false.</p>
+
+<p>The reason <code class="highlighter-rouge">Newman::Server#process_request</code> is implemented in this somewhat awkward way is that it is necessary to let the application developer determine whether or not application errors should crash the server. Generally speaking, this would be a bad behavior in production, because it means that a single fault in an edge case of a single feature could halt a whole service that is otherwise working as expected. However, when it comes to writing tests, it might be nice for applications to raise their exceptions rather than quietly writing stack traces to a log file and moving on. This pair of competing concerns explains why the <code class="highlighter-rouge">raise_exceptions</code> configuration option exists, even if it leads to ugly implementation code.</p>
+
+<p>While <code class="highlighter-rouge">Newman::Server#process_request</code> does a good job of handling application errors, there are a range of failures that can happen as a result of server operations as well. This means that <code class="highlighter-rouge">Newman::Server#tick</code> needs to implement its own exception handling and logging, as shown below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Newman</span>
+  <span class="k">class</span> <span class="nc">Server</span>
+    <span class="k">def</span> <span class="nf">tick</span>         
+      <span class="n">mailer</span><span class="p">.</span><span class="nf">messages</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">request</span><span class="o">|</span> 
+        <span class="n">response</span> <span class="o">=</span> <span class="n">mailer</span><span class="p">.</span><span class="nf">new_message</span><span class="p">(</span><span class="ss">:to</span>   <span class="o">=&gt;</span> <span class="n">request</span><span class="p">.</span><span class="nf">from</span><span class="p">,</span> 
+                                      <span class="ss">:from</span> <span class="o">=&gt;</span> <span class="n">settings</span><span class="p">.</span><span class="nf">service</span><span class="p">.</span><span class="nf">default_sender</span><span class="p">)</span>
+
+        <span class="n">process_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">response</span><span class="p">.</span><span class="nf">deliver</span>
+      <span class="k">end</span>
+    <span class="k">rescue</span> <span class="no">StandardError</span> <span class="o">=&gt;</span> <span class="n">e</span>
+      <span class="n">logger</span><span class="p">.</span><span class="nf">fatal</span><span class="p">(</span><span class="s2">"SERVER ERROR"</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"</span><span class="si">#{</span><span class="n">e</span><span class="p">.</span><span class="nf">inspect</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="n">e</span><span class="p">.</span><span class="nf">backtrace</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">  "</span><span class="p">)</span> <span class="p">}</span>
+      <span class="k">raise</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>While it may be possible to recover from some of the errors that occur at the server level, there are many problems which simply cannot be recovered from automatically. For this reason, <code class="highlighter-rouge">Newman::Server#tick</code> always re-raises the exceptions it encounters after logging them as fatal errors. While implementing this method in such a conservative way helps shield against dangerous failures, it does not completely prevent them from occurring. Sadly, that is a lesson I ended up learning the hard way.</p>
+
+<h3 id="lesson-3-reduce-the-impact-of-catastrophic-failures">Lesson 3: Reduce the impact of catastrophic failures.</h3>
+
+<p>A few days before this article was published, I accidentally introduced an
+infinite send/receive loop into the experimental Newman-based mailing list system <a href="https://github.com/mendicant-original/mail_whale">MailWhale</a>. I caught the problem right away, but not before my email provider banned me for 1 hour for exceeding my send quota. In the few minutes of chaos before I figured out what was going wrong, there was a window of time in which any incoming emails would simply be dropped, resulting in data loss.</p>
+
+<p>It’s painful to imagine what would have happened if this failure occured while someone wasn’t actively babysitting the server. While the process was crashing with a <code class="highlighter-rouge">Net::SMTPFatalError</code> each time cron ran it, this happened after reading all incoming mail. As a result, the incoming mail would get dropped from the inbox without any response, failing silently. Once the quota was lifted, a single email would cause the server to start thrashing again, eventually leading to a permanent ban. In addition to these problems, anyone using the mailing list would be bombarded with at least a few duplicate emails before the quota kicked in each time. Although I was fortunate to not live out this scenario, the mere thought of it sends chills down my spine.</p>
+
+<p>While the infinite loop I introduced could probably be avoided by doing some simple checks in Newman, the problem of the server failing repeatedly is a general defect that could cause all sorts of different problems down the line. To solve this problem, I’ve implemented a simplified version of the <a href="http://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">circuit breaker</a> pattern in MailWhale, as shown below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"fileutils"</span>
+
+<span class="c1"># unimportant details omitted...</span>
+
+<span class="k">begin</span>
+  <span class="k">if</span> <span class="no">File</span><span class="p">.</span><span class="nf">exists?</span><span class="p">(</span><span class="s2">"server.lock"</span><span class="p">)</span>
+    <span class="nb">abort</span><span class="p">(</span><span class="s2">"Server is locked because of an unclean shutdown. Check "</span><span class="o">+</span>
+          <span class="s2">"the logs to see what went wrong, and delete server.lock "</span><span class="o">+</span>
+          <span class="s2">"if the problem has been resolved"</span><span class="p">)</span> 
+  <span class="k">end</span>
+
+  <span class="n">server</span><span class="p">.</span><span class="nf">tick</span>
+<span class="k">rescue</span> <span class="no">Exception</span> <span class="c1"># used to match *all* exceptions</span>
+  <span class="no">FileUtils</span><span class="p">.</span><span class="nf">touch</span><span class="p">(</span><span class="s2">"server.lock"</span><span class="p">)</span>
+  <span class="k">raise</span> 
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>With this small change, any exception raised by the server will cause a lock file to be written out to disk, which will then be detected the next time the server runs. As long as the <code class="highlighter-rouge">server.lock</code> file is present, the server will immediately shut itself down rather than continuing on with its processing. This forces someone (or some other automated process) to intervene in order for the server to resume normal operations. As a result, repeated failure is a whole lot less likely to occur.</p>
+
+<p>If this circuit breaker were in place when I triggered the original infinite loop, I would have still exceeded my quota, but the only data loss would be the first request the server failed to respond to. All email that was sent in the interim would remain in the inbox until the problem was fixed, and there would be no chance that the server would continue to thrash without someone noticing that an unclean shutdown had occurred. This is clearly a better behavior, and perhaps this is how things should have been implemented in the first place.</p>
+
+<p>Of course, we now have the problem that this code is a bit too aggressive. There are likely to be many kinds of failures which are transient in nature, and shutting down the server and hard-locking it like this feels overkill for those scenarios. However, I am gradually learning that it is better to whitelist things than blacklist them when you can’t easily enumerate what can possibly go wrong. For that reason I’ve chosen to go with this extremely conservative solution, but I will need to put this technique through its paces a bit before I can decide whether it is really the right approach.</p>
+
+<h3 id="reflections">Reflections</h3>
+
+<p>I originally planned to cover many more lessons in this article, but the more I worked on it, the more I realized my own lack of experience in producing truly robust software. When it comes to email, it’s like the entire problem space is one big fuzz test: there seems to be an infinite amount of ways for things to crash and burn.</p>
+
+<p>In addition to the few issues I have already outlined, Newman is going to need to jump many more hurdles before it can be considered stable. In particular, I need to sort out the following problems:</p>
+
+<ul>
+  <li>
+    <p>Sometimes connections via IMAP can hang indefinitely, so some sort of timeout logic needs to be introduced. To deal with this, I’m thinking of looking into the <a href="https://github.com/kamui/retriable">retriable</a> gem.</p>
+  </li>
+  <li>
+    <p>In one of my test runs of our simple ping/pong application, I ended up causing newman to reply to a Gmail mailer daemon, which caused a request/response loop to occur. Thankfully, Gmail’s daemon gave up after a few tries, but if it didn’t I would have ended up melting my inbox again. This means that Newman will need some way to deal with bounced emails. We’ve looked at some options for this, but most involve some pretty messy heuristics that make the cure look worse than the disease.</p>
+  </li>
+  <li>
+    <p>Currently it is relatively straightforward to write automated tests to reproduce known issues, but very hard for me to come up with realistic test scenarios in a proactive way. This means that while we can shore up Newman’s stability over time in this fashion, we’ll always be trailing behind on the problems we haven’t encountered yet. I need to look into whether there are some email-based acid tests I can run the server against.</p>
+  </li>
+  <li>
+    <p>There is still a great deal of ugliness / fragility in the way Newman does its exception handling. The techniques I’ve shown in this article are meant to be considered a rough starting point, not a set of best practices. I plan to re-read Avdi Grimm’s <a href="http://exceptionalruby.com/">Exceptional Ruby</a> and see what ideas I can apply from it. When I first read that book I thought many of the techniques it recommended were overkill for day to day Ruby applications, but several of them may be just what Newman needs.</p>
+  </li>
+</ul>
+
+<p>The bad news is that all of the above problems seem challenging enough to deal with, but they’re likely to be just the first set of roadblocks on the highway to the danger zone. There are still a lot of unknown-unknowns that may get in my way. The good news is that because I can take my time while working on this project, the uncertainty of things is part of what makes this a fun problem to work on.</p>
+
+<p>Have you ever had a similar experience of coding in a dangerous and poorly-defined environment before? If so, I’d love to hear your story, as well as any advice you might have for me.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

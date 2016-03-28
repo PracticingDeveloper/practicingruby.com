@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Writing confident code</title>
+  <meta name="description" content="This article was contributed by Avdi Grimm. Avdi has been wrangling Ruby code for over adecade and shows no signs of slowing down. He is the author of*Except...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/confident-ruby">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Writing confident code</h1>
+    <p class="post-meta"><time datetime="2012-06-05T00:00:00-04:00" itemprop="datePublished">Jun 5, 2012</time> • Avdi Grimm</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><em>This article was contributed by <a href="http://avdi.org">Avdi Grimm</a>. Avdi has been wrangling Ruby code for over a
+decade and shows no signs of slowing down. He is the author of
+<a href="http://exceptionalruby.com">*Exceptional Ruby*</a> and
+<a href="http://objectsonrails.com">*Objects on Rails*</a>. His next book,
+<a href="http://confidentruby.com">*Confident Ruby*</a>, focuses on writing Ruby
+code with a confident and straightforward style.</em></p>
+
+<h3 id="losing-the-plot">Losing the plot</h3>
+
+<p>Have you ever read a “choose your own adventure” book? Nearly every page ends with a question like this:</p>
+
+<blockquote>
+  <ul>
+    <li>If you fight the angry troll with your bare hands, turn to page 137.</li>
+    <li>If you try to reason with the troll, turn to page 29.</li>
+    <li>If you don your invisibility cloak, turn to page 6.</li>
+  </ul>
+</blockquote>
+
+<p>You’d pick one option, turn to the indicated page, and the story would
+continue.</p>
+
+<p>Did you ever try to read one of those books from front to back? It’s a
+surreal experience. The story jumps forward and back in
+time. Characters appear out of nowhere. One page you’re crushed by the
+fist of an angry troll, and on the next you’re just entering the
+troll’s realm for the first time.</p>
+
+<p>What if <em>each individual page</em> was this kind of mish-mash? What if
+every page read like this:</p>
+
+<blockquote>
+  <p>You exit the passageway into a large cavern. Unless you came from
+  page 59, in which case you fall down the sinkhole into a large
+  cavern. A huge troll, or possibly a badger (if you already visited
+  Queen Pelican), blocks your path. Unless you threw a button down the
+  wishing well on page 8, in which case there nothing blocking your
+  way. The [troll or badger or nothing at all] does not look happy to
+  see you.</p>
+
+  <ul>
+    <li>
+      <p>If you came here from chapter 7 (the Pool of Time), go back to the
+top of the page and read it again, only imagine you are watching the
+events happen to someone else.</p>
+    </li>
+    <li>
+      <p>If you already received the invisibility cloak from the aged
+lighthouse-keeper, and you want to use it now, go to page 67. Otherwise, forget you read anything about an invisibility cloak.</p>
+    </li>
+    <li>
+      <p>If you are facing a badger (see above), and you choose to run away,
+turn to page 93…</p>
+    </li>
+  </ul>
+</blockquote>
+
+<p>Not the most compelling narrative, is it? The story asks you to carry
+so much mental baggage for it that just getting through a page is
+exhausting.</p>
+
+<h3 id="code-as-narrative">Code as narrative</h3>
+
+<p>What does this have to do with software? Well, code can tell a story
+as well. It might not be a tale of high adventure and intrigue. But
+it’s a story nonetheless; one about a problem that needed to be
+solved, and the path the developer(s) chose to accomplish that task.</p>
+
+<p>A single method is like a page in that story. And unfortunately, a lot
+of methods are just as convoluted, equivical, and confusing as that
+made-up page above.</p>
+
+<p>In the following sections, we’ll take a look at some examples of code
+that unnecessarily obscures the storyline of a method. We’ll also
+explore some techniques for minimizing distractions and writing
+methods that straightforwardly convey their intent.</p>
+
+<h3 id="secure-the-borders">Secure the borders</h3>
+
+<p>Here is some code that’s having some trouble sticking to the plot:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'date'</span>
+
+<span class="k">class</span> <span class="nc">Employee</span>
+  <span class="kp">attr_accessor</span> <span class="ss">:name</span>
+  <span class="kp">attr_accessor</span> <span class="ss">:hire_date</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">hire_date</span><span class="p">)</span>
+    <span class="vi">@name</span>      <span class="o">=</span> <span class="nb">name</span>
+    <span class="vi">@hire_date</span> <span class="o">=</span> <span class="n">hire_date</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">due_for_tie_pin?</span>
+    <span class="k">raise</span> <span class="s2">"Missing hire date!"</span> <span class="k">unless</span> <span class="n">hire_date</span>
+    <span class="p">((</span><span class="no">Date</span><span class="p">.</span><span class="nf">today</span> <span class="o">-</span> <span class="n">hire_date</span><span class="p">)</span> <span class="o">/</span> <span class="mi">365</span><span class="p">).</span><span class="nf">to_i</span> <span class="o">&gt;=</span> <span class="mi">10</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">covered_by_pension_plan?</span>
+    <span class="c1"># TODO Someone in HR should probably check this logic</span>
+    <span class="p">((</span><span class="n">hire_date</span> <span class="o">&amp;&amp;</span> <span class="n">hire_date</span><span class="p">.</span><span class="nf">year</span><span class="p">)</span> <span class="o">||</span> <span class="mi">2000</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2000</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">bio</span>
+    <span class="k">if</span> <span class="n">hire_date</span>
+      <span class="s2">"</span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2"> has been a Yoyodyne employee since </span><span class="si">#{</span><span class="n">hire_date</span><span class="p">.</span><span class="nf">year</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">else</span>
+      <span class="s2">"</span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2"> is a proud Yoyodyne employee"</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>We can speculate about the history of this class. It looks like over
+the course of development, three different developers discovered that
+<code class="highlighter-rouge">#hire_date</code> might sometimes be <code class="highlighter-rouge">nil</code>. They each chose to handle this
+fact in a slightly different way. The one who wrote
+<code class="highlighter-rouge">#due_for_tie_pin?</code> added a check that raises an exception if the hire
+date is missing. The developer responsible for
+<code class="highlighter-rouge">#covered_by_pension_plan</code> substituted a (seemingly arbitrary) default
+value for <code class="highlighter-rouge">nil</code>. And the writer of <code class="highlighter-rouge">#bio</code> went with an <code class="highlighter-rouge">if</code> statement
+switching on the presence of <code class="highlighter-rouge">#hire_date</code>.</p>
+
+<p>This class has serious problems with second-guessing itself. And the
+root of all this insecurity is the fact that the <code class="highlighter-rouge">#hire_date</code>
+attribute is unreliable—even though it’s clearly important to the operation of the class!</p>
+
+<p>One of the purposes of a constructor is to establish an object’s
+invariant: a set of properties which should always hold true for that
+object. In this case, it really seems like one of those invariants should be: <em>employee hire date is a <code class="highlighter-rouge">Date</code></em>.</p>
+
+<p>But the constructor, whose job it is to stand guard against initial
+values which are not compatible with the class invariant, has fallen
+asleep on the job. As a result, every other method dealing with hire
+dates is burdened with the additional responsibility of checking
+whether the value is present.</p>
+
+<p>This is an example of a class which needs to set some
+boundaries. Since there is no obvious “right” way to handle a missing
+hire date, it probably needs to simply insist on having a valid hire
+date, thereby forcing the cause of these spurious <code class="highlighter-rouge">nil</code> values to be
+discovered and sorted out. To do this, it should guard its own
+integrity by checking the value wherever it is set, either in the
+constructor or elsewhere:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'date'</span>
+
+<span class="k">class</span> <span class="nc">Employee</span>
+  <span class="kp">attr_accessor</span> <span class="ss">:name</span>
+  <span class="kp">attr_reader</span> <span class="ss">:hire_date</span>  
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">hire_date</span><span class="p">)</span>
+    <span class="vi">@name</span>          <span class="o">=</span> <span class="nb">name</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">hire_date</span> <span class="o">=</span> <span class="n">hire_date</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">hire_date</span><span class="o">=</span><span class="p">(</span><span class="n">new_hire_date</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="no">TypeError</span><span class="p">,</span> <span class="s2">"Invalid hire date"</span> <span class="k">unless</span> <span class="n">new_hire_date</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Date</span><span class="p">)</span>
+    <span class="vi">@hire_date</span> <span class="o">=</span> <span class="n">new_hire_date</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">due_for_tie_pin?</span>
+    <span class="p">((</span><span class="no">Date</span><span class="p">.</span><span class="nf">today</span> <span class="o">-</span> <span class="n">hire_date</span><span class="p">)</span> <span class="o">/</span> <span class="mi">365</span><span class="p">).</span><span class="nf">to_i</span> <span class="o">&gt;=</span> <span class="mi">10</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">covered_by_pension_plan?</span>
+    <span class="n">hire_date</span><span class="p">.</span><span class="nf">year</span> <span class="o">&lt;</span> <span class="mi">2000</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">bio</span>
+    <span class="s2">"</span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2"> has been a Yoyodyne employee since </span><span class="si">#{</span><span class="n">hire_date</span><span class="p">.</span><span class="nf">year</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>In this version, the <code class="highlighter-rouge">hire_date</code> attribute is protected by type check
+in the setter method. Since the constructor now delegates to this
+setter method to initialize the attribute, it is no longer possible to
+construct new <code class="highlighter-rouge">Employee</code> objects without a valid hire date. Now that
+the “borders” of the object are guarded, all the other methods can
+focus on telling their own stories, without being distracted by
+a potentially missing <code class="highlighter-rouge">hire_date</code>.</p>
+
+<h3 id="be-assertive">Be assertive</h3>
+
+<p>In the last section we saw how assertions in a class’ constructor or
+setter methods can help keep the other methods focused. But
+uncertainty and convoluted code can come from sources
+other than input parameters.</p>
+
+<p>Let’s say you’re working on some budget management software. The next
+user story requires the application to pull in transaction data from a
+third-party electronic banking API. According to the meager
+documentation you can find, you need to use the
+<code class="highlighter-rouge">Bank#read_transactions</code> method in order to load bank
+transactions. The first thing you decide to do is to stash the loaded
+transactions into a local data store.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Account</span>
+  <span class="k">def</span> <span class="nf">refresh_transactions</span>
+    <span class="n">transactions</span> <span class="o">=</span> <span class="n">bank</span><span class="p">.</span><span class="nf">read_transactions</span><span class="p">(</span><span class="n">account_number</span><span class="p">)</span>
+    <span class="c1"># ... now what?</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Unfortunately the documentation doesn’t say what the
+<code class="highlighter-rouge">#read_transactions</code> method returns. An <code class="highlighter-rouge">Array</code> seems likely. But what
+if there are no transactions found? What if the account is not found?
+Will it raise an exception, or perhaps return <code class="highlighter-rouge">nil</code>? Given enough time
+you might be able to work it out by reading the API library’s source
+code, but it’s pretty convoluted and you might still miss some edge
+cases.</p>
+
+<p>You decide to make an assumption… but as insurance, you document your assumption with an assertion.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Account</span>
+  <span class="k">def</span> <span class="nf">refresh_transactions</span>
+    <span class="n">transactions</span> <span class="o">=</span> <span class="n">bank</span><span class="p">.</span><span class="nf">read_transactions</span><span class="p">(</span><span class="n">account_number</span><span class="p">)</span>
+    <span class="n">transactions</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Array</span><span class="p">)</span> <span class="n">or</span> <span class="k">raise</span> <span class="no">TypeError</span><span class="p">,</span> <span class="s2">"transactions is not an Array"</span>
+    <span class="n">transactions</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">transaction</span><span class="o">|</span>
+      <span class="c1"># ...</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>You manually test the code against a test account and it doesn’t blow
+up, so it seems your suspicion was correct. Next, you move on to
+pulling amount information out of the individual transactions.</p>
+
+<p>You ask your teammate, who has had some experience with this API, what
+format transactions are in. She says she thinks they are hashes with
+string keys. You decide to tentatively try looking at the “amount”
+key.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">transactions</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">transaction</span><span class="o">|</span>
+  <span class="n">amount</span> <span class="o">=</span> <span class="n">transaction</span><span class="p">[</span><span class="s2">"amount"</span><span class="p">]</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>You look at this for a few seconds, and realize that if there is no
+“amount” key, you’ll just get a <code class="highlighter-rouge">nil</code> back. Then you’d have to check
+for the presence of <code class="highlighter-rouge">nil</code> everywhere the amount is used. You’d prefer
+to document your assumption more explicitly. So instead, you make an
+assertion by using the <code class="highlighter-rouge">Hash#fetch</code> method:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">transactions</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">transaction</span><span class="o">|</span>
+  <span class="n">amount</span> <span class="o">=</span> <span class="n">transaction</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="s2">"amount"</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">Hash#fetch</code> will raise a <code class="highlighter-rouge">KeyError</code> if the given key is not found,
+signaling that one of your assumptions about the <code class="highlighter-rouge">Bank API</code> was
+incorrect.</p>
+
+<p>You make another trial run and you don’t get any exceptions, so you
+proceed onward. Before you can store the value locally, you want to
+make sure the transaction amount is in a format that your local
+transaction store can understand. Nobody in the office seems to know
+what format the amounts come in as. You know that many financial
+system store dollar amounts as an integer number of cents, so you
+decide to proceed with the assumption that it’s the same with this
+system. In order to once again document your assumption, you make
+another assertion:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">transactions</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">transaction</span><span class="o">|</span>
+  <span class="n">amount</span> <span class="o">=</span> <span class="n">transaction</span><span class="p">[</span><span class="s2">"amount"</span><span class="p">]</span>
+  <span class="n">amount</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Integer</span><span class="p">)</span> <span class="n">or</span> <span class="k">raise</span> <span class="no">TypeError</span><span class="p">,</span> <span class="s2">"amount not an Integer"</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>You put the code through it’s paces and… BOOM. You get an error.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>TypeError: amount not an Integer
+</code></pre>
+</div>
+
+<p>You decide to drop into the debugger on the next round, and take a
+look at the transaction values coming back from the API. You see this:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">[</span>
+ <span class="p">{</span><span class="s2">"amount"</span> <span class="o">=&gt;</span> <span class="s2">"1.23"</span><span class="p">},</span>
+ <span class="p">{</span><span class="s2">"amount"</span> <span class="o">=&gt;</span> <span class="s2">"4.75"</span><span class="p">},</span>
+ <span class="p">{</span><span class="s2">"amount"</span> <span class="o">=&gt;</span> <span class="s2">"8.97"</span><span class="p">}</span>
+<span class="p">]</span>
+</code></pre>
+</div>
+
+<p>Well that’s… interesting. The amounts are reported as decimal strings.</p>
+
+<p>You decide to convert them to integers, since that’s what
+your internal <code class="highlighter-rouge">Transaction</code> class uses.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">transactions</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">transaction</span><span class="o">|</span>
+  <span class="n">amount</span> <span class="o">=</span> <span class="n">transaction</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="s2">"amount"</span><span class="p">)</span>
+  <span class="n">amount_cents</span> <span class="o">=</span> <span class="p">(</span><span class="n">amount</span><span class="p">.</span><span class="nf">to_f</span> <span class="o">*</span> <span class="mi">100</span><span class="p">).</span><span class="nf">to_i</span>
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Once again, you find yourself questioning this code as soon as you
+write it. You remember something about <code class="highlighter-rouge">#to_f</code> being really forgiving
+in how it parses numbers. A little experimentation proves this to be
+true.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="s2">"1.23"</span><span class="p">.</span><span class="nf">to_f</span>                     <span class="c1"># =&gt; 1.23</span>
+<span class="s2">"$1.23"</span><span class="p">.</span><span class="nf">to_f</span>                    <span class="c1"># =&gt; 0.0</span>
+<span class="s2">"a hojillion"</span><span class="p">.</span><span class="nf">to_f</span>              <span class="c1"># =&gt; 0.0</span>
+</code></pre>
+</div>
+
+<p>Only having a small sample of demonstration values to go on, you’re
+not confident that the amounts this API might return will always be in
+a format that <code class="highlighter-rouge">#to_f</code> understands. What about negative numbers? Will
+they be formatted as “-4.56”? Or as “(4.56)”? Having an unrecognized
+amount format silently converted to zero could lead to nasty bugs down
+the road.</p>
+
+<p>Yet again, you want a way to state in no uncertain terms what kind of
+values the code is prepared to deal with. This time, you use
+Kernel#Float to assert that the amount is in a format Ruby can parse
+unambiguously as a floating point number:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">transactions</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">transaction</span><span class="o">|</span>
+  <span class="n">amount</span> <span class="o">=</span> <span class="n">transaction</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="s2">"amount"</span><span class="p">)</span>
+  <span class="n">amount_cents</span> <span class="o">=</span> <span class="p">(</span><span class="no">Float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">).</span><span class="nf">to_i</span>
+  <span class="n">cache_transaction</span><span class="p">(</span><span class="ss">:amount</span> <span class="o">=&gt;</span> <span class="n">amount_cents</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">Kernel#Float</code> is much stricter than <code class="highlighter-rouge">String#to_f</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Float</span><span class="p">(</span><span class="s2">"$1.23"</span><span class="p">)</span>
+<span class="c1"># ~&gt; -:1:in `Float': invalid value for Float(): "$1.23" (ArgumentError)</span>
+<span class="c1"># ~&gt;    from -:1:in `&lt;main&gt;'</span>
+</code></pre>
+</div>
+
+<p>The final code is chock full of assertions:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Account</span>
+  <span class="k">def</span> <span class="nf">refresh_transactions</span>
+    <span class="n">transactions</span> <span class="o">=</span> <span class="n">bank</span><span class="p">.</span><span class="nf">read_transactions</span><span class="p">(</span><span class="n">account_number</span><span class="p">)</span>
+    <span class="n">transactions</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Array</span><span class="p">)</span> <span class="n">or</span> <span class="k">raise</span> <span class="no">TypeError</span><span class="p">,</span> <span class="s2">"transactions is not an Array"</span>
+    <span class="n">transactions</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">transaction</span><span class="o">|</span>
+      <span class="n">amount</span> <span class="o">=</span> <span class="n">transaction</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="s2">"amount"</span><span class="p">)</span>
+      <span class="n">amount_cents</span> <span class="o">=</span> <span class="p">(</span><span class="no">Float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">).</span><span class="nf">to_i</span>
+      <span class="n">cache_transaction</span><span class="p">(</span><span class="ss">:amount</span> <span class="o">=&gt;</span> <span class="n">amount_cents</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This code clearly states what it expects. It communicates a great deal
+of information about your understanding of the external API at the
+time you wrote it. It explicitly establishes the parameters within
+which it can operate confidently; as soon as any of its expectations
+are violated it fails quickly, with a meaningful exception message.</p>
+
+<p>Unfortunately, as a result it is really telling two stories: one about
+refreshing transactions (remember, that’s nominally what this method is
+about) and one about the format of an external data source. This is
+quickly mended, however:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Account</span>
+  <span class="k">def</span> <span class="nf">refresh_transactions</span>
+    <span class="n">fetch_transactions</span> <span class="k">do</span> <span class="o">|</span><span class="n">transaction_attributes</span><span class="o">|</span>
+      <span class="n">cache_transaction</span><span class="p">(</span><span class="n">transaction_attributes</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Yields a hash of cleaned-up transaction attributes for each transaction</span>
+  <span class="k">def</span> <span class="nf">fetch_transactions</span>
+    <span class="n">transactions</span> <span class="o">=</span> <span class="n">bank</span><span class="p">.</span><span class="nf">read_transactions</span><span class="p">(</span><span class="n">account_number</span><span class="p">)</span>
+    <span class="n">transactions</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Array</span><span class="p">)</span> <span class="n">or</span> <span class="k">raise</span> <span class="no">TypeError</span><span class="p">,</span> <span class="s2">"transactions is not an Array"</span>
+    <span class="n">transactions</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">transaction</span><span class="o">|</span>
+      <span class="n">amount</span> <span class="o">=</span> <span class="n">transaction</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="s2">"amount"</span><span class="p">)</span>
+      <span class="n">amount_cents</span> <span class="o">=</span> <span class="p">(</span><span class="no">Float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">).</span><span class="nf">to_i</span>
+      <span class="k">yield</span><span class="p">(</span><span class="ss">:amount</span> <span class="o">=&gt;</span> <span class="n">amount_cents</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>By failing early rather than allowing misunderstood inputs to
+contaminate the system, it reduces the need for type-checking and
+coercion in other methods. And not only does this code document your
+assumptions now, it also sets up an early-warning system should the
+third-party API ever change unexpectedly in the future.</p>
+
+<h3 id="represent-special-cases-with-objects">Represent special cases with objects</h3>
+
+<p>The most common causes of code that tells a confusing story are
+special cases. Let’s look at an example of a special case, in the
+context of our budgeting application.</p>
+
+<p>You’ve implemented transaction import and it’s working great. Except
+for one little problem: users have been reporting bugs about the
+reported balances being off. And not just the balances; in fact, all
+of the reports seem to have incorrect numbers for some accounts.</p>
+
+<p>You do some investigation into the system logs, and eventually
+discover the culprit. It turns out that some banks, when they receive
+a authorization for a credit card charge, immediately report it as a
+pending transaction in the transaction list. The data looks something
+like this:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="s2">"amount"</span> <span class="o">=&gt;</span> <span class="s2">"55.08"</span><span class="p">,</span> <span class="s2">"type"</span> <span class="o">=&gt;</span> <span class="s2">"pending"</span><span class="p">,</span> <span class="s2">"id"</span> <span class="o">=&gt;</span> <span class="s2">"98765"</span><span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Then, when the charge is completed or “captured”, another transaction
+is recorded:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="s2">"amount"</span> <span class="o">=&gt;</span> <span class="s2">"55.08"</span><span class="p">,</span> <span class="s2">"type"</span> <span class="o">=&gt;</span> <span class="s2">"charge"</span><span class="p">,</span> <span class="s2">"id"</span> <span class="o">=&gt;</span> <span class="s2">"98765"</span><span class="p">}</span>
+</code></pre>
+</div>
+
+<blockquote>
+  <p><strong>Aside:</strong> if you’ve ever written code to deal with actual banking APIs,
+you’ve probably figured out by now that I have not. I’m making this up for the
+sake of example. I expect real banking APIs are just as idiosyncratic, though,
+in their own ways.</p>
+</blockquote>
+
+<p>The result of these “double entries” is that your calculations get
+thrown off. Your application has routines for summing transactions,
+averaging them, breaking them down by month and quarter, and many
+more. And every one of these calculations uses the amount field to
+arrive at its results.</p>
+
+<p>You briefly consider simply throwing out pending transactions. But
+after a quick consultation with your team you realize this would only
+introduce more problems. There is sanity-checking code in place which
+checks that the bank servers and the local cache have the same
+transaction count and contain the same transaction IDs. And not only
+that, you might actually want to use the pending transaction
+information for upcoming features.</p>
+
+<p>Your second option is to handle the special case… <em>specially</em>,
+everywhere that the amount field is referenced. For example:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">account_balance</span>
+  <span class="n">cached_transactions</span><span class="p">.</span><span class="nf">reduce</span><span class="p">(</span><span class="n">starting_balance</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">balance</span><span class="p">,</span> <span class="n">transaction</span><span class="o">|</span>
+    <span class="k">if</span> <span class="n">transaction</span><span class="p">.</span><span class="nf">type</span> <span class="o">==</span> <span class="s2">"pending"</span>
+      <span class="n">balance</span>
+    <span class="k">else</span>
+      <span class="n">balance</span> <span class="o">+</span> <span class="n">transaction</span><span class="p">.</span><span class="nf">amount</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>You’ll have to carefully audit the code base, adding conditionals to
+every use of amount. Not only that, you’ll have to make sure anyone
+else who works on this code understands the special case.</p>
+
+<p>That doesn’t seem like a very attractive option. Thankfully, there is
+a third way. And the code above actually gives you the hint you needed
+to discover it.</p>
+
+<p>Let’s look at that conditional again:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="n">transaction</span><span class="p">.</span><span class="nf">type</span> <span class="o">==</span> <span class="s2">"pending"</span>
+</code></pre>
+</div>
+
+<p>This code is branching on the type of a value. This is a huge clue. In
+an object-oriented language, anytime we branch on an object’s type,
+we’re doing work that the language could be doing for us.</p>
+
+<p>You realize that this special case calls for a special type of object
+to represent it.</p>
+
+<p>You decide to try this approach out. You find the code where
+transaction objects are being instantiated:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># Note: we expect that transaction attributes have already been</span>
+<span class="c1"># converted to use Symbol keys at this point.</span>
+<span class="k">def</span> <span class="nf">cache_transaction</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">cached_transactions</span> <span class="o">&lt;&lt;</span> <span class="no">Transaction</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>You change it to instantiate a different kind of object for pending
+transactions. Because you want to quickly spike this approach, you use
+an <code class="highlighter-rouge">OpenStruct</code> to create a rough-and-ready ad-hoc object:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">cache_transaction</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">transaction</span> <span class="o">=</span> 
+    <span class="k">case</span> <span class="n">attributes</span><span class="p">[</span><span class="ss">:type</span><span class="p">]</span>
+    <span class="k">when</span> <span class="s2">"pending"</span>
+      <span class="n">pending_attributes</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="ss">:amount</span>         <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="ss">:pending_amount</span> <span class="o">=&gt;</span> <span class="n">attributes</span><span class="p">[</span><span class="ss">:amount</span><span class="p">]</span>
+      <span class="p">}</span>
+      <span class="no">OpenStruct</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">attributes</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">pending_attributes</span><span class="p">))</span>
+    <span class="k">else</span>
+      <span class="no">Transaction</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="n">cached_transactions</span> <span class="o">&lt;&lt;</span> <span class="n">transaction</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This switches on type as well, but it only does it once. After that,
+the transaction can be used as-is in all of your existing algorithms.</p>
+
+<p>You run some tests, and discover this fixes the problem! You consider
+simply leaving the code as it is, since it’s working now. But on
+reflection you decide that the concept of a pending transaction would
+be best represented by a proper class. That way you have a place to
+put documentation about this special case, as well as any more special
+logic you realize you need down the road.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># A pending credit-card transaction</span>
+<span class="k">class</span> <span class="nc">PendingTransaction</span>
+  <span class="kp">attr_reader</span> <span class="ss">:id</span><span class="p">,</span> <span class="ss">:pending_amount</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="vi">@id</span>             <span class="o">=</span> <span class="n">attributes</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="ss">:id</span><span class="p">)</span>
+    <span class="vi">@pending_amount</span> <span class="o">=</span> <span class="n">attributes</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="ss">:amount</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">amount</span>
+    <span class="c1"># Pending transactions duplicate finished transactions, thus</span>
+    <span class="c1"># throwing off calculations. For the purpose of calculations and</span>
+    <span class="c1"># reports, a pending transaction always has a zero amount. The</span>
+    <span class="c1"># real amount is available from #pending_amount.</span>
+    <span class="mi">0</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>You then rewrite <code class="highlighter-rouge">#cached_transactions</code> to use this new class.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">cache_transaction</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="n">transaction</span> <span class="o">=</span> 
+    <span class="k">case</span> <span class="n">attributes</span><span class="p">[</span><span class="ss">:type</span><span class="p">]</span>
+    <span class="k">when</span> <span class="s2">"pending"</span>
+      <span class="no">PendingTransaction</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="no">Transaction</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="n">cached_transactions</span> <span class="o">&lt;&lt;</span> <span class="n">transaction</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This code solves the immediate problem of a special type of
+transaction, without duplicating logic for that special case all
+throughout the codebase. But not only that, it is <em>exemplary</em>: it sets
+a good example for code that follows. When, inevitably, another
+special case transaction type turns up, whoever is tasked with dealing
+with it will see this class and be guided towards representing the new
+case as a distinct type of object.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Ruby is a language which values expressiveness over just about
+everything else. It is optimized to help us programmers say exactly
+what we mean, without any extraneous fluff, to both the computer and
+to future readers of our code. This is what makes it so much fun to
+code in.</p>
+
+<p>When we allow our methods to become cluttered up with ifs and maybes
+and provisos and digressions, we let go of that expressiveness. We
+start to lose the clear, confident narrative voice. We force the
+future maintainers of the code to navigate through a twisty path full
+of logical forks in the road in order to understand the purpose of a
+method. Reading and updating the code stops being fun.</p>
+
+<p>My challenge to you is this: when you are writing a new method, keep a
+clear idea in mind of the story you are trying to tell. When detours
+and diversions start to show up along the way, figure out what you
+need to do to restore the narrative, and do it. You might get rid of
+repetitive data integrity checks by introducing preconditions in the
+initializer of a method. Maybe you can surround an external API in
+assertions that document your beliefs about it, rather than trying to
+handle anything it throws at you. Or perhaps you can eliminate a
+family of often-repeated conditionals by representing a special case
+as a class in its own right.</p>
+
+<p>However you do it, keep your focus on telling a straightforward
+tale. Not only will the future readers of your code thank you for it,
+but I think you’ll find that it makes your code more robust and easier
+to maintain as well.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

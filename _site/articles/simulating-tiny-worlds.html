@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Simulating tiny worlds for fun and profit</title>
+  <meta name="description" content="As programmers we are very comfortable with the idea of usingsoftware to solve concrete problems. However, it is easy tounderestimate the role that code can ...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/simulating-tiny-worlds">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Simulating tiny worlds for fun and profit</h1>
+    <p class="post-meta"><time datetime="2013-06-04T00:00:00-04:00" itemprop="datePublished">Jun 4, 2013</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>As programmers we are very comfortable with the idea of using
+software to solve concrete problems. However, it is easy to
+underestimate the role that code can play in problem-solving itself, and that blindspot can hinder our creativity in a number of ways.</p>
+
+<p>In this article, I will walk you through some fun examples that demonstrate how code can be used as an exploratory thinking tool, and then reflect upon how that kind of workflow might be applied to everyday programming tasks.</p>
+
+<h2 id="setting-the-stage">Setting the stage</h2>
+
+<p>The source of my motivation for writing on this topic is the <a href="http://education.mit.edu/starlogo/">StarLogo</a> programming environment and Mitchel Resnick’s excellent book “Turtles, Termites, and Traffic Jams”, both of which illustrate the potential for software to be used as a mind-expanding thinking tool.</p>
+
+<p>As the title of the book implies, StarLogo is an environment that facilitates simplistic modeling of scenarios that occur in the natural world. The purpose of the tool is not to create environments that closely emulate reality, but instead, to encourage exploration and discovery in simple, tightly constrained microcosms. Apart from being an intellectual curiosity, this sort of toolset provides a powerful way to intuitively experience deep concepts that range from self-organization and emergent behavior to massive parallelism.</p>
+
+<p>In the spirit of exploration, I won’t attempt to make a case for those claims by way of a top-down explanation. Instead, we’ll now walk through a few scenarios that are easily implemented using StarLogo-style modeling. The examples I’ve chosen are based on ideas from StarLogo and Resnick’s book, but I have ported them to JRuby to allow you to explore the concepts without having to familiarize yourself with a new environment first. The engine I built is called <a href="https://github.com/sandal/terrarium">Terrarium</a>, and it is very much a rough prototype, but it should still be good enough to introduce you to these ideas with minimal friction.</p>
+
+<h2 id="scenario-i-forest-fires">Scenario I: Forest fires</h2>
+
+<p>The environment in the StarLogo model consists of a two-dimensional grid of “patches”, which are in some ways similar to cellular automata models such as Conway’s Game of Life.</p>
+
+<p>Using only patch color to represent state, we could apply the following ruleset to simulate a rough sketch of a forest fire:</p>
+
+<ol>
+  <li>
+    <p>Start by building a forest. For the sake of simplicity, we can begin with an empty grid and then randomly paint some of its patches green.</p>
+  </li>
+  <li>
+    <p>To ignite our fire, we can pick a random patch in the grid and paint it red.</p>
+  </li>
+  <li>
+    <p>Each green patch then needs to repeatedly check to see if any of its neighbors are red, and if so, it becomes red itself, spreading the fire.</p>
+  </li>
+</ol>
+
+<p>Applying these three trivial rules results in the following behavior:</p>
+
+<p><img src="http://i.imgur.com/MtAbXPF.gif" alt="" /></p>
+
+<p>Although this animation should be fairly straightforward to understand, it is worth pointing out one small detail about the geometry of a StarLogo-style world: rather than being an infinite grid like Conway’s Game of Life, it is a torus, where the left side is connected to the right, and the top is connected to the bottom. This explains why the fire (which starts at the bottom of the screen) quickly overflows onto the top of the screen in this animation.</p>
+
+<p>The code that was used to generate this visualization is shown below, and is nearly a direct translation of the rules shown above:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Terrarium</span><span class="o">::</span><span class="no">Scenario</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+  <span class="c1"># Rule 1: Build the forest</span>
+  <span class="n">patches</span> <span class="k">do</span>
+    <span class="n">with_probability</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span> <span class="p">{</span> <span class="n">set_color</span> <span class="ss">:green</span> <span class="p">}</span> 
+  <span class="k">end</span>
+
+  <span class="c1"># Rule 2. Start the fire</span>
+  <span class="n">random_patch</span> <span class="p">{</span> <span class="n">set_color</span> <span class="ss">:red</span> <span class="p">}</span>
+
+  <span class="c1"># Rule 3. Spread the fire</span>
+  <span class="n">patches!</span> <span class="k">do</span>
+    <span class="k">if</span> <span class="n">color</span> <span class="o">==</span> <span class="ss">:green</span> <span class="o">&amp;&amp;</span> <span class="n">neighbors</span><span class="p">.</span><span class="nf">any?</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">color</span> <span class="o">==</span> <span class="ss">:red</span> <span class="p">}</span>
+      <span class="n">set_color</span> <span class="ss">:red</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>It is here where you can catch the first glimpse of what I meant by “code as a thinking tool”. With Terrarium as our engine and StarLogo-style data modeling, we don’t need to think at all about the structure or inner workings of our program, but instead can immediately turn our ideas into code. This takes what would cost us hours in upfront modeling and reduces it to minutes of effort.</p>
+
+<p>Being able to work at this very high level of abstraction allows us to try variations and experiments as soon as we think of them. A simple idea to try out with this model is to see how the fire spreads at various levels of tree density. You will find that at 50% (which is what is shown above), the fire will pretty much always spread across the forest, but at 30%, the opposite is true. Is there a critical tipping point between those two bounds? If so, why is it there? These are the kinds of thoughts that arise when you can focus on ideas rather than code.</p>
+
+<h2 id="scenario-ii-infectious-disease">Scenario II: Infectious disease</h2>
+
+<p>As you may have guessed from the name of the language, StarLogo also implements the <em>turtle graphics</em> model found in the Logo programming language. Both languages were developed by same research group at MIT, and so if you are familiar with Logo turtles, you will find that StarLogo’s creatures move around the world in a similar way to their classical ancestors.</p>
+
+<p>However, that is where the similarities end. While the average Logo turtle lives a solitary life, StarLogo’s creatures can be commanded en-masse, in groups of hundreds or thousands. Where the Logo turtle is mostly used for drawing lines (albeit in some very clever ways), the StarLogo creature is capable of having much more complex interactions with its world, including the other creatures in it.</p>
+
+<p>Take for example the problem of modeling the spread of a contagious disease through a population of creatures. If we allow ourselves to paper over any inconsistencies with reality by using a bit of imagination, the following rules are sufficient for emulating this scenario:</p>
+
+<ol>
+  <li>Arrange a group of healthy creatures into a crowd</li>
+  <li>Infect some of the creatures with the disease</li>
+  <li>Allow the creatures to slowly move about their world</li>
+  <li>The disease will spread from sick to healthy creatures whenever they come into contact with each other.</li>
+  <li>After a set period of “sick time”, the creature will either die or recover, based on probability. (Recovered creatures can be re-infected if they come into contact with sick creatures, dead creatures simply disappear.)</li>
+</ol>
+
+<p>When applied to a population of 200 StarLogo creatures, these rules produce a pattern similar to what is shown in the following animation:</p>
+
+<p><img src="http://i.imgur.com/dZ6czuf.gif" alt="" /></p>
+
+<p>Here we see the disease quickly spreading from a few infected individuals to the majority of the population. However, the rate of infection then dampens due to the following factors:</p>
+
+<ul>
+  <li>
+    <p>As the creatures wander around, they become less densely packed together, which reduces the frequency at which they transmit disease to one another.</p>
+  </li>
+  <li>
+    <p>If a creature eventually dies from an infection, that stops it from continuing to spread the disease, because it gets removed from the world upon its death.</p>
+  </li>
+  <li>
+    <p>If the creature recovers, it can be reinfected, but by then the creatures have already spread out enough to prevent rapid chain reactions from occuring.</p>
+  </li>
+</ul>
+
+<p>All of these conditions are effected by a number of variables, including population size, population density, duration of sick time, number of initially infected creatures, speed of movement of the creatures, and the probability of death vs. recovery in the infected population. In addition to this, the whole system is subject to some degree of fluctuation due to the randomness in both the movement and initial layout of the population.</p>
+
+<p>Taking a purely analytical approach towards thinking through the relationships between all of these variables would be a challenging task to say the least. However, it does not take much specialized knowledge at all to model this problem using StarLogo-style creatures. In fact, the code below is all you need to implement this scenario. Try reading it one rule at a time while looking at the animation, and you should be able to piece together the main concepts even if you’ve never heard of StarLogo before reading this article:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Terrarium</span><span class="o">::</span><span class="no">Scenario</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+  <span class="n">healthy_color</span> <span class="o">=</span> <span class="ss">:cyan</span>
+  <span class="n">sick_color</span>    <span class="o">=</span> <span class="ss">:yellow</span>
+
+  <span class="n">initial_population</span> <span class="o">=</span> <span class="mi">200</span>
+  <span class="n">crowd_range</span>        <span class="o">=</span> <span class="mi">5</span><span class="p">.</span><span class="nf">.</span><span class="mi">15</span>
+  <span class="n">sick_time</span>          <span class="o">=</span> <span class="mi">5</span>
+  <span class="n">infection_density</span>  <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mo">02</span>
+  <span class="n">movement_speed</span>     <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">2</span>
+  
+  <span class="n">create_creatures</span><span class="p">(</span><span class="n">initial_population</span><span class="p">)</span>
+  
+  <span class="c1"># rule 1: arrange a group of healthy creatures into a crowd</span>
+  <span class="n">creatures</span> <span class="k">do</span> 
+    <span class="n">lt</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="mi">359</span><span class="p">)</span>
+    <span class="n">fd</span> <span class="nb">rand</span><span class="p">(</span><span class="n">crowd_range</span><span class="p">)</span>
+
+    <span class="n">data</span><span class="p">[</span><span class="ss">:sick_time</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">set_color</span> <span class="n">healthy_color</span>
+  <span class="k">end</span>
+
+  <span class="c1"># rule 2: infect some creatures</span>
+  <span class="n">creatures</span> <span class="k">do</span>
+    <span class="n">with_probability</span><span class="p">(</span><span class="n">infection_density</span><span class="p">)</span> <span class="k">do</span>
+      <span class="n">set_color</span> <span class="n">sick_color</span>
+      
+      <span class="n">data</span><span class="p">[</span><span class="ss">:sick_time</span><span class="p">]</span> <span class="o">=</span> <span class="n">sick_time</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># rule 3: allow the creatures to move about randomly</span>
+  <span class="n">creatures!</span> <span class="k">do</span>
+    <span class="n">lt</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="nf">.</span><span class="mi">40</span><span class="p">)</span>
+    <span class="n">rt</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="nf">.</span><span class="mi">40</span><span class="p">)</span>
+
+    <span class="n">fd</span> <span class="n">movement_speed</span>
+  <span class="k">end</span>
+
+  <span class="c1"># rule 4: spread disease on contact</span>
+  <span class="n">creatures!</span> <span class="k">do</span>
+    <span class="k">next</span> <span class="k">unless</span> <span class="n">color</span> <span class="o">==</span> <span class="n">healthy_color</span>
+
+    <span class="k">if</span> <span class="n">nearby_creatures</span><span class="p">.</span><span class="nf">any?</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">color</span> <span class="o">==</span> <span class="n">sick_color</span> <span class="p">}</span>
+      <span class="n">set_color</span> <span class="n">sick_color</span>
+      
+      <span class="n">data</span><span class="p">[</span><span class="ss">:sick_time</span><span class="p">]</span> <span class="o">=</span> <span class="n">sick_time</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># rule 5: recover or die based on probability </span>
+  <span class="n">creatures!</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">do</span>
+    <span class="k">next</span> <span class="k">unless</span> <span class="n">color</span> <span class="o">==</span> <span class="n">sick_color</span>
+
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="ss">:sick_time</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+      <span class="n">data</span><span class="p">[</span><span class="ss">:sick_time</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span> 
+    <span class="k">else</span>
+      <span class="n">coinflip</span> <span class="p">?</span> <span class="n">set_color</span><span class="p">(</span><span class="n">healthy_color</span><span class="p">)</span> <span class="p">:</span> <span class="n">destroy</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Because it’s the live interactions in this system that are complex and not its rules, you cannot easily predict the patterns that will emerge from this program by simply reading its source code. However, by repeatedly running the program and testing various assumptions you have about the system, you can rapidly gain an intuitive sense for the patterns that arise. In that sense, exploratory programming environments can have an effect similar to that of plotting a mathematical formula: although they can’t give you a precise answer to your question, they can very quickly communicate the main points of a story.</p>
+
+<h2 id="scenario-iii-rabbits-in-a-cabbage-patch">Scenario III: Rabbits in a cabbage patch</h2>
+
+<p>As you may have already guessed, StarLogo’s data model doesn’t just give you creatures and patches, but it also supports interactions between the two. Because both the creatures and patches can encapsulate arbitrarily complex data, and because StarLogo provides a solid API for various kinds of common tasks, the richness of behavior that can be expressed through these interactions is mind boggling.</p>
+
+<p>The full StarLogo environment can tackle problems like ant foraging behavior with ease, a problem that I labored with for weeks and spent two issues of Practicing Ruby on (<a href="https://practicingruby.com/articles/92">Issue 5.8</a> and <a href="https://practicingruby.com/articles/93">Issue 5.9</a>). However, the features I’ve ported from StarLogo into the Terrarium project are somewhat limited, so we’ll tackle a more basic scenario that will still give you a sense of how creatures and patches can interact with one another.</p>
+
+<p>We’ll now take a stab at implementing a simple ecosystem in which hungry rabbits wander around doing what rabbits tend to do: eating, procreating, and dying. This is the sort of predator/prey modeling problem that you might find on a school math test, but we’ll approach it informally rather than brushing up on our differential equations.</p>
+
+<p>Here are the rules that will get our ecosystem up and running:</p>
+
+<ol>
+  <li>Create a cabbage patch by randomly coloring some patches green</li>
+  <li>On each iteration of the simulation, give each patch a small chance to sprout cabbage, facilitating regrowth.</li>
+  <li>Arrange a crowd of rabbits in the cabbage patch.</li>
+  <li>Allow the rabbits to wander randomly around the cabbage patch</li>
+  <li>Rabbits eat any cabbage they encounter. This sets the patch color back to black, and increases the energy of the rabbits.</li>
+  <li>Rabbits gradually lose energy over time. If their energy is fully depleted, they die.</li>
+  <li>Rabbits also breed (asexually!) when they have enough energy. The parent’s energy is reduced, and then it produces an exact clone of itself at its current location.</li>
+</ol>
+
+<p>Once set into action, these constaints give rise to the dynamic system you see in the animation below. To make sense of what’s going on, ignore the rabbits and focus on the oscillating growing and shrinking of the cabbage patch:</p>
+
+<p><img src="http://i.imgur.com/3iese1f.gif" alt="" /></p>
+
+<p>What you’re seeing happen here is a basic cycle that tends to proceed in the following fashion:</p>
+
+<ul>
+  <li>
+    <p>Whenever the rabbits have plenty of cabbage to eat, they breed, and their population numbers rise.</p>
+  </li>
+  <li>
+    <p>As the rabbit population rises, the cabbage gets eaten more rapidly, reducing the amount of total food available to the rabbits in the cabbage patch.</p>
+  </li>
+  <li>
+    <p>As food sources dwindle, rabbits tend to stop breeding and some also die of starvation, causing their population levels to drop.</p>
+  </li>
+  <li>
+    <p>A smaller rabbit population leads to slower cabbage consumption, which results in rapid regrowth and plenty of cabbage for the rabbits to eat.</p>
+  </li>
+  <li>
+    <p>This in turn leads the rabbits to stop dying from starvation and start breeding again, starting the cycle all over again.</p>
+  </li>
+</ul>
+
+<p>The fact that we’ve reproduced this cycle is not a particularly profound result: you could have guessed it without ever bothering to create a simulation. However, if you treat the basic problem as a starting point and then continue your explorations from there, many more surprising results can be found.</p>
+
+<p>In my casual experiments I found that the system is surprisingly tolerant to singular catastrophic events (such as killing off 90% of the rabbits or the cabbage), because the two populations naturally force each other into balance. However, very small changes to the rate of cabbage regrowth, or to the amount of energy the rabbits gain from eating the cabbage can have disasterous effects that lead to extinction. I found these patterns interesting, because they were opposite to my intuition.</p>
+
+<p>Perhaps a more significant point though is that I doubt I would have even thought to try out those ideas if I were working with a formal equation rather than a dynamic and lively visualization. Because I’m not a visually-oriented learner, this really surprised me!</p>
+
+<p>The full source code for this scenario is shown below, and you’re should skim it at least, but you don’t need to get bogged down in the details unless you plan to play around with StarLogo or my Terrarium engine after you’re done reading this article. If you’re feeling a bit tired by now, you can skip right past it to the next section without losing too much.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Terrarium</span><span class="o">::</span><span class="no">Scenario</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+  <span class="n">cabbage_density</span>    <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">5</span> 
+  <span class="n">regrowth_rate</span>      <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mo">02</span>
+  <span class="n">initial_population</span> <span class="o">=</span> <span class="mi">200</span>
+  <span class="n">initial_energy</span>     <span class="o">=</span> <span class="mi">8</span>
+  <span class="n">food_energy</span>        <span class="o">=</span> <span class="mi">5</span>
+  <span class="n">hatch_threshold</span>    <span class="o">=</span> <span class="mi">10</span>
+  <span class="n">hatched_energy</span>     <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">25</span>
+
+  <span class="n">cabbage_color</span> <span class="o">=</span> <span class="ss">:green</span>
+  <span class="n">rabbit_color</span>  <span class="o">=</span> <span class="ss">:white</span>
+  <span class="n">soil_color</span>    <span class="o">=</span> <span class="ss">:black</span>
+
+  <span class="c1"># rule 1: create cabbage patch</span>
+  <span class="n">patches</span> <span class="k">do</span> 
+    <span class="n">set_color</span> <span class="n">soil_color</span>
+    <span class="n">with_probability</span><span class="p">(</span><span class="n">cabbage_density</span><span class="p">)</span> <span class="p">{</span> <span class="n">set_color</span><span class="p">(</span><span class="n">cabbage_color</span><span class="p">)</span> <span class="p">}</span> 
+  <span class="k">end</span>
+
+  <span class="c1"># rule 2: cabbage regrowth</span>
+  <span class="n">patches!</span> <span class="k">do</span>
+    <span class="n">with_probability</span><span class="p">(</span><span class="n">regrowth_rate</span><span class="p">)</span> <span class="p">{</span> <span class="n">set_color</span><span class="p">(</span><span class="n">cabbage_color</span><span class="p">)</span> <span class="p">}</span> 
+  <span class="k">end</span>
+
+  <span class="n">create_creatures</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+
+  <span class="c1"># rule 3: arrange a crowd of rabbits</span>
+  <span class="n">creatures</span> <span class="k">do</span> 
+    <span class="n">lt</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="mi">359</span><span class="p">)</span>
+    <span class="n">fd</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">.</span><span class="nf">.</span><span class="mi">25</span><span class="p">)</span>
+
+    <span class="n">data</span><span class="p">[</span><span class="ss">:energy</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_energy</span>
+
+    <span class="n">set_color</span> <span class="n">rabbit_color</span>
+  <span class="k">end</span>
+
+  <span class="c1"># rule 4: let the rabbits wander</span>
+  <span class="n">creatures!</span> <span class="p">{</span> <span class="n">rt</span><span class="p">(</span><span class="nb">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="nf">.</span><span class="o">.</span><span class="mi">40</span><span class="p">));</span> <span class="n">lt</span><span class="p">(</span><span class="nb">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="nf">.</span><span class="mi">40</span><span class="p">));</span> <span class="n">fd</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">}</span>
+  
+  <span class="c1"># rule 5: rabbits eat any cabbage they encounter, gaining energy</span>
+  <span class="n">creatures!</span> <span class="k">do</span> 
+    <span class="n">update_patch</span> <span class="k">do</span> <span class="o">|</span><span class="n">patch</span><span class="o">|</span> 
+      <span class="k">if</span> <span class="n">patch</span><span class="p">.</span><span class="nf">color</span> <span class="o">==</span> <span class="n">cabbage_color</span>
+        <span class="n">patch</span><span class="p">.</span><span class="nf">set_color</span> <span class="n">soil_color</span>
+        <span class="n">data</span><span class="p">[</span><span class="ss">:energy</span><span class="p">]</span> <span class="o">+=</span> <span class="n">food_energy</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+  
+  <span class="c1"># rule 6: the rabbits are always losing energy</span>
+  <span class="n">creatures!</span> <span class="p">{</span> <span class="n">data</span><span class="p">[</span><span class="ss">:energy</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span> <span class="p">}</span>
+
+  <span class="c1"># rule 7: when the rabbits run out of energy, they die</span>
+  <span class="n">creatures!</span> <span class="p">{</span> <span class="n">destroy</span> <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="ss">:energy</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="p">}</span>
+
+  <span class="c1"># rule 8: when rabbits have enough energy, they clone themselves</span>
+  <span class="c1">#         (but it costs them some energy)</span>
+  <span class="n">creatures!</span> <span class="k">do</span> 
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="ss">:energy</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">hatch_threshold</span>
+      <span class="n">data</span><span class="p">[</span><span class="ss">:energy</span><span class="p">]</span> <span class="o">*=</span> <span class="n">hatched_energy</span>
+
+      <span class="n">hatch</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<h2 id="exploratory-programming-as-a-first-class-paradigm">Exploratory programming as a first-class paradigm?</h2>
+
+<p>Even though we’ve managed to pack a lot of interesting behavior into a small amount of code, the examples I’ve shown here barely scratch the surface of StarLogo and capabilities. While my Terrarium engine is nothing more than a poor man’s implementation of a few of StarLogo’s features, the full StarLogo language is elegantly designed and carefully thought out.</p>
+
+<p>But the goal of this article was not to introduce you to a shiny piece of technological infrastucture, it was meant to get you thinking about a different kind of workflow than what we tend to use day to day.  Even through the smudged window I’ve had you look through, it should be clear to see that the style of programming used in StarLogo has several powerful benefits:</p>
+
+<ol>
+  <li>Thoughts can be expressed directly</li>
+  <li>Feedback is given continuously</li>
+  <li>Failure comes at a very low cost</li>
+  <li>The problem domain is well constrained</li>
+  <li>Objects can be directly acted upon</li>
+</ol>
+
+<p>While most of the tools I use when I’m programming have at least some of these positive traits, it’s rare to experience the effect of all of them simultaneously. However, a few positive examples do come 
+to mind. In particular, the various web browser development tools (like Firebug or the tools that ship with Chrome) support this kind of workflow.</p>
+
+<p>When it comes to frontend web development tools, I’ve always been amazed at how much it is possible to incrementally evolve a design by tweaking various page elements until you’re happy with them. I think that much of the effectiveness of this technique is due to the benefits listed above. Here is a specific example to illustrate that point:</p>
+
+<ol>
+  <li>
+    <p>If you want to change a font size of a given block of text, it’s as easy as clicking that text and editing a single attribute.</p>
+  </li>
+  <li>
+    <p>You see the results immediately on your screen.</p>
+  </li>
+  <li>
+    <p>If you don’t like the results, you can easily revert your changes. And if you made a mistake when you were editing things, it should be immediately obvious based on what does (or doesn’t) get displayed on the screen.</p>
+  </li>
+  <li>
+    <p>Although the environment is very sophisticated, the scope is constrained enough where the available actions are fairly clear at any given point in time.</p>
+  </li>
+  <li>
+    <p>Finally, because you are often looking at things within the scope of a single element that you are working with directly, you can use extremely localized thinking without harmful consequences.</p>
+  </li>
+</ol>
+
+<p>Unfortunately, I can’t easily come up with similar examples when it comes to backend web frameworks. If you narrow the scope, similar workflows can be applied to very simple HTTP services running on Sinatra, but once you need anything more complex than that it becomes much too broad of a problem to solve.</p>
+
+<p>To be fair, Rails has some elements baked into it that facilitate a certain amount of exploratory programming (the console, scaffolding, etc.). However, these features have always felt to me as if they were not taken nearly far enough, and that there is still room for a much higher level toolkit, even if it would only be useful for rapid prototyping.</p>
+
+<p>In an ideal world, I would love to be able to describe a useful full-stack feature in a web application in a dozen lines or less, but I’ve never seen anything that gets me even close to that level of abstraction. Of course, web architecture is sufficiently obtuse to make this a genuinely hard problem to solve, so I’m not surprised that there isn’t an obvious solution out there just yet.</p>
+
+<p>But web programming (particularly general-purpose web programming) is really at a lower level than where this paradigm really could shine. It seems to me that there is nearly infinite possibility for what one might call “domain-specific development environments”. For example, could we build programmable tools for book publishers that sit somewhere between a WYSIWYG editor and DocBook XML? Could we build drop-in management panels for business metrics that can be programmed at a high enough level that an analyst could use them with minimal help from their programming team? Is there hope that we can put these kinds of high-powered but easy-to-use tools into the hands of musicians, artists, teachers, and charity volunteers?</p>
+
+<p>Perhaps the best use of a general purpose programming language it to build domain-specific environments that help cross a bridge from low-level infrastructure to high-level ideas. But because this is all just a pie-in-the-sky dream that may never end up becoming a reality, I will let you be the judge! Please share your thoughts in the comments below.</p>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Event loops demystified</title>
+  <meta name="description" content="This issue of Practicing Ruby was contributed by Magnus Holm (@judofyr), a Ruby programmer  from Norway. Magnus works on various open source projects (includ...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/event-loops-demystified">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Event loops demystified</h1>
+    <p class="post-meta"><time datetime="2012-09-04T00:00:00-04:00" itemprop="datePublished">Sep 4, 2012</time> • Magnus Holm</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><em>This issue of Practicing Ruby was contributed by Magnus Holm (<a href="http://twitter.com/judofyr">@judofyr</a>), 
+a Ruby programmer  from Norway. Magnus works on various open source 
+projects (including the <a href="https://github.com/camping">Camping</a> web framework),
+and writes articles over at <a href="http://timelessrepo.com">the timeless repository</a>.</em></p>
+
+<p>Working with network I/O in Ruby is so easy:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'socket'</span>
+
+<span class="c1"># Start a server on port 9234</span>
+<span class="n">server</span> <span class="o">=</span> <span class="no">TCPServer</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s1">'0.0.0.0'</span><span class="p">,</span> <span class="mi">9234</span><span class="p">)</span>
+
+<span class="c1"># Wait for incoming connections</span>
+<span class="k">while</span> <span class="n">io</span> <span class="o">=</span> <span class="n">server</span><span class="p">.</span><span class="nf">accept</span>
+  <span class="n">io</span> <span class="o">&lt;&lt;</span> <span class="s2">"HTTP/1.1 200 OK</span><span class="se">\r\n\r\n</span><span class="s2">Hello world!"</span>
+  <span class="n">io</span><span class="p">.</span><span class="nf">close</span>
+<span class="k">end</span>
+
+<span class="c1"># Visit http://localhost:9234/ in your browser.</span>
+</code></pre>
+</div>
+
+<p>Boom, a server is up and running! Working in Ruby has some disadvantages, though: we
+can handle only one connection at a time. We can also have only one <em>server</em>
+running at a time. There’s no understatement in saying that these constraints
+can be quite limiting.</p>
+
+<p>There are several ways to improve this situation, but lately we’ve seen an
+influx of event-driven solutions. <a href="http://nodejs.org">Node.js</a> is just an event-driven I/O-library
+built on top of JavaScript. <a href="http://rubyeventmachine.com">EventMachine</a> has been a solid solution in the Ruby
+world for several years. Python has <a href="http://twistedmatrix.com">Twisted</a>, and Perl has so many that they even
+have <a href="http://metacpan.org/module/AnyEvent">an abstraction around them</a>.</p>
+
+<p>Although these solutions might seem like silver bullets, there are subtle details that
+you’ll have to think about. You can accomplish a lot by following simple rules
+(“don’t block the thread”), but I always prefer to know precisely what I’m
+dealing with. Besides, if doing regular I/O is so simple, why does
+event-driven I/O have to be looked at as black magic?</p>
+
+<p>To show that they are nothing to be afraid of, we are going to implement an 
+I/O event loop in this article. Yep, that’s right; we’ll capture the core 
+part of EventMachine/Node.js/Twisted in about 150 lines of Ruby. It won’t 
+be performant, it won’t be test-driven, and it won’t be solid, but it will 
+use the same concepts as in all of these great projects. We will start 
+by looking at a minimal chat server example and then discuss 
+how to build the infrastructure that supports it.</p>
+
+<h2 id="obligatory-chat-server-example">Obligatory chat server example</h2>
+
+<p>Because chat servers seem to be the event-driven equivalent of a
+“hello world” program, we will keep with that tradition here. The
+following example shows a trivial <code class="highlighter-rouge">ChatServer</code> object that uses
+the <code class="highlighter-rouge">IOLoop</code> that we’ll discuss in this article:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ChatServer</span>
+  <span class="k">def</span> <span class="nf">initialize</span>
+    <span class="vi">@clients</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="vi">@client_id</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">&lt;&lt;</span><span class="p">(</span><span class="n">server</span><span class="p">)</span>
+    <span class="n">server</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="ss">:accept</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">stream</span><span class="o">|</span>
+      <span class="n">add_client</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">add_client</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="p">(</span><span class="vi">@client_id</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="nb">send</span><span class="p">(</span><span class="s2">"User #</span><span class="si">#{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> joined</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="n">stream</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="ss">:data</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">chunk</span><span class="o">|</span>
+      <span class="nb">send</span><span class="p">(</span><span class="s2">"User #</span><span class="si">#{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> said: </span><span class="si">#{</span><span class="n">chunk</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">stream</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="ss">:close</span><span class="p">)</span> <span class="k">do</span>
+      <span class="vi">@clients</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+      <span class="nb">send</span><span class="p">(</span><span class="s2">"User #</span><span class="si">#{</span><span class="nb">id</span><span class="si">}</span><span class="s2"> left"</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="vi">@clients</span> <span class="o">&lt;&lt;</span> <span class="n">stream</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="vi">@clients</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">stream</span><span class="o">|</span>
+      <span class="n">stream</span> <span class="o">&lt;&lt;</span> <span class="n">msg</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># usage</span>
+
+<span class="n">io</span>     <span class="o">=</span> <span class="no">IOLoop</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">server</span> <span class="o">=</span> <span class="no">ChatServer</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="n">server</span> <span class="o">&lt;&lt;</span> <span class="n">io</span><span class="p">.</span><span class="nf">listen</span><span class="p">(</span><span class="s1">'0.0.0.0'</span><span class="p">,</span> <span class="mi">1234</span><span class="p">)</span>
+
+<span class="n">io</span><span class="p">.</span><span class="nf">start</span>
+</code></pre>
+</div>
+
+<p>To play around with this server, run <a href="https://gist.githubusercontent.com/practicingruby/3612925/raw/315e7bfc5de7a029606b3885d71953acb84f112e/ChatServer.rb">this script</a> and then open up
+a couple of telnet sessions to it. You should be able to produce something like the
+following with a bit of experimentation:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code># from User #1's console:
+$ telnet 127.0.0.1 1234
+
+User #2 joined
+User #2 said: Hi
+Hi
+User #1 said: Hi
+User #2 said: Bye
+User #2 left
+
+# from User #2's console (quits after saying Bye)
+$ telnet 127.0.0.1 1234
+
+User #1 said: Hi
+Bye
+User #2 said: Bye
+</code></pre>
+</div>
+
+<p>If you don’t have the time to try out this code right now,
+don’t worry: as long as you understand the basic idea behind it, you’ll be fine.
+This chat server is here to serve as a practical example to help you 
+understand <a href="https://gist.githubusercontent.com/practicingruby/3612925/raw/315e7bfc5de7a029606b3885d71953acb84f112e/ChatServer.rb">the code we’ll be discussing</a> throughout this article.</p>
+
+<p>Now that we have a place to start from, let’s build our event system.</p>
+
+<h2 id="event-handling">Event handling</h2>
+
+<p>First of all we need, obviously, events! With no further ado:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">EventEmitter</span>
+  <span class="k">def</span> <span class="nf">_callbacks</span>
+    <span class="vi">@_callbacks</span> <span class="o">||=</span> <span class="no">Hash</span><span class="p">.</span><span class="nf">new</span> <span class="p">{</span> <span class="o">|</span><span class="n">h</span><span class="p">,</span> <span class="n">k</span><span class="o">|</span> <span class="n">h</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="n">type</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">blk</span><span class="p">)</span>
+    <span class="n">_callbacks</span><span class="p">[</span><span class="n">type</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">blk</span>
+    <span class="nb">self</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="n">type</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">_callbacks</span><span class="p">[</span><span class="n">type</span><span class="p">].</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">blk</span><span class="o">|</span>
+      <span class="n">blk</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">HTTPServer</span>
+  <span class="kp">include</span> <span class="no">EventEmitter</span>
+<span class="k">end</span>
+
+<span class="n">server</span> <span class="o">=</span> <span class="no">HTTPServer</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">server</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="ss">:request</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">req</span><span class="p">,</span> <span class="n">res</span><span class="o">|</span>
+  <span class="n">res</span><span class="p">.</span><span class="nf">respond</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s1">'Content-Type'</span> <span class="o">=&gt;</span> <span class="s1">'text/html'</span><span class="p">)</span>
+  <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="s2">"Hello world!"</span>
+  <span class="n">res</span><span class="p">.</span><span class="nf">close</span>
+<span class="k">end</span>
+
+<span class="c1"># When a new request comes in, the server will run:</span>
+<span class="c1">#   server.emit(:request, req, res)</span>
+
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">EventEmitter</code> is a module that we can include in classes that can send and
+receive events. In one sense, this is the most important part of our event
+loop: it defines how we use and reason about events in the system. Modifying it
+later will require changes all over the place. Although this particular
+implementation is a bit more simple than what you’d expect from a real 
+library, it covers the fundamental ideas that are common to all
+event-based systems.</p>
+
+<h2 id="the-io-loop">The IO loop</h2>
+
+<p>Next, we need something to fire up these events. As you will see in
+the following code, the general flow of an event loop is simple:
+detect new events, run their associated callbacks, and then repeat
+the whole process again.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">IOLoop</span>
+  <span class="c1"># List of streams that this IO loop will handle.</span>
+  <span class="kp">attr_reader</span> <span class="ss">:streams</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span>
+    <span class="vi">@streams</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">end</span>
+  
+  <span class="c1"># Low-level API for adding a stream.</span>
+  <span class="k">def</span> <span class="nf">&lt;&lt;</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+    <span class="vi">@streams</span> <span class="o">&lt;&lt;</span> <span class="n">stream</span>
+    <span class="n">stream</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="ss">:close</span><span class="p">)</span> <span class="k">do</span>
+      <span class="vi">@streams</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Some useful helpers:</span>
+  <span class="k">def</span> <span class="nf">io</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
+    <span class="n">stream</span> <span class="o">=</span> <span class="no">Stream</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
+    <span class="nb">self</span> <span class="o">&lt;&lt;</span> <span class="n">stream</span>
+    <span class="n">stream</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">io</span> <span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+    <span class="n">io</span> <span class="no">TCPSocket</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">listen</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+    <span class="n">server</span> <span class="o">=</span> <span class="no">Server</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">TCPServer</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+    <span class="nb">self</span> <span class="o">&lt;&lt;</span> <span class="n">server</span>
+    <span class="n">server</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="ss">:accept</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">stream</span><span class="o">|</span>
+      <span class="nb">self</span> <span class="o">&lt;&lt;</span> <span class="n">stream</span>
+    <span class="k">end</span>
+    <span class="n">server</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Start the loop by calling #tick over and over again.</span>
+  <span class="k">def</span> <span class="nf">start</span>
+    <span class="vi">@running</span> <span class="o">=</span> <span class="kp">true</span>
+    <span class="n">tick</span> <span class="k">while</span> <span class="vi">@running</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Stop/pause the event loop after the current tick.</span>
+  <span class="k">def</span> <span class="nf">stop</span>
+    <span class="vi">@running</span> <span class="o">=</span> <span class="kp">false</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">tick</span>
+    <span class="vi">@streams</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">stream</span><span class="o">|</span>
+      <span class="n">stream</span><span class="p">.</span><span class="nf">handle_read</span>  <span class="k">if</span> <span class="n">stream</span><span class="p">.</span><span class="nf">readable?</span>
+      <span class="n">stream</span><span class="p">.</span><span class="nf">handle_write</span> <span class="k">if</span> <span class="n">stream</span><span class="p">.</span><span class="nf">writable?</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Notice here that <code class="highlighter-rouge">IOLoop#start</code> blocks everything until <code class="highlighter-rouge">IOLoop#stop</code> is called.
+Everything after <code class="highlighter-rouge">IOLoop#start</code> will happen in callbacks, which means that the
+control flow can be surprising. For example, consider the following code:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">l</span> <span class="o">=</span> <span class="no">IOLoop</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="n">ruby</span> <span class="o">=</span> <span class="n">i</span><span class="p">.</span><span class="nf">connect</span><span class="p">(</span><span class="s1">'ruby-lang.org'</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>  <span class="c1"># 1</span>
+<span class="n">ruby</span> <span class="o">&lt;&lt;</span> <span class="s2">"GET / HTTP/1.0</span><span class="se">\r\n\r\n</span><span class="s2">"</span>       <span class="c1"># 2</span>
+
+<span class="c1"># Print output</span>
+<span class="n">ruby</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="ss">:data</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">chunk</span><span class="o">|</span>
+  <span class="nb">puts</span> <span class="n">chunk</span>   <span class="c1"># 3</span>
+<span class="k">end</span>
+
+<span class="c1"># Stop IO loop when we're done</span>
+<span class="n">ruby</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="ss">:close</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">l</span><span class="p">.</span><span class="nf">stop</span>       <span class="c1"># 4</span>
+<span class="k">end</span>
+
+<span class="n">l</span><span class="p">.</span><span class="nf">start</span>        <span class="c1"># 5</span>
+</code></pre>
+</div>
+
+<p>You might think that you’re writing data in step 2, but the
+<code class="highlighter-rouge">&lt;&lt;</code> method actually just stores the data in a local buffer.
+It’s not until the event loop has started (in step 5) that the data
+actually gets sent. The <code class="highlighter-rouge">IOLoop#start</code> method triggers <code class="highlighter-rouge">#tick</code> to be run in a loop, which
+delegates to <code class="highlighter-rouge">Stream#handle_read</code> and <code class="highlighter-rouge">Stream#handle_write</code>. These methods 
+are responsible for doing any necessary I/O operations and then triggering
+events such as <code class="highlighter-rouge">:data</code> and <code class="highlighter-rouge">:close</code>, which you can see being used in steps 3 and 4. We’ll take a look at how <code class="highlighter-rouge">Stream</code> is implemented later, but for now 
+the main thing to take away from this example is that event-driven code 
+cannot be read in top-down fashion as if it were procedural code.</p>
+
+<p>Studying the implementation of <code class="highlighter-rouge">IOLoop</code> should also reveal why it’s 
+so terrible to block inside a callback. For example, take a look at this 
+call graph:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code># indentation means that a method/block is called
+# deindentation means that the method/block returned
+
+tick (10 streams are readable)
+  stream1.handle_read
+    stream1.emit(:data)
+      your callback
+
+  stream2.handle_read
+    stream2.emit(:data)
+      your callback
+        you have a "sleep 5" inside here
+
+  stream3.handle_read
+    stream3.emit(:data)
+      your callback
+  ...
+</code></pre>
+</div>
+
+<p>By blocking inside the second callback, the I/O loop has to wait 5 seconds 
+before it’s able to call the rest of the callbacks. This wait is
+obviously a bad thing, and it is important
+to avoid such a situation when possible. Of course, nonblocking
+callbacks are not enough—the event loop also needs to make use of nonblocking
+I/O. Let’s go over that a bit more now.</p>
+
+<h2 id="io-events">IO events</h2>
+
+<p>At the most basic level, there are only two events for an <code class="highlighter-rouge">IO</code> object:</p>
+
+<ol>
+  <li>Readable: The <code class="highlighter-rouge">IO</code> is readable; data is waiting for us.</li>
+  <li>Writable: The <code class="highlighter-rouge">IO</code> is writable; we can write data.</li>
+</ol>
+
+<p>These might sound a little confusing: how can a client know that the server
+will send us data? It can’t. Readable doesn’t mean “the server will send us
+data”; it means “the server has already sent us data.” In that case, the data
+is handled by the kernel in your OS. Whenever you read from an <code class="highlighter-rouge">IO</code> object, you’re
+actually just copying bytes from the kernel. If the receiver does not read 
+from <code class="highlighter-rouge">IO</code>, the kernel’s buffer will become full and the sender’s <code class="highlighter-rouge">IO</code> will 
+no longer be writable. The sender will then have to wait until the 
+receiver can catch up and free up the kernel’s buffer. This situation is
+what makes nonblocking <code class="highlighter-rouge">IO</code> operations tricky to work with.</p>
+
+<p>Because these low-level operations can be tedious to handle manually, the 
+goal of an I/O loop is to trigger some more usable events for application
+programmers:</p>
+
+<ol>
+  <li>Data: A chunk of data was sent to us.</li>
+  <li>Close: The IO was closed.</li>
+  <li>Drain: We’ve sent all buffered outgoing data.</li>
+  <li>Accept: A new connection was opened (only for servers).</li>
+</ol>
+
+<p>All of this functionality can be built on top of Ruby’s <code class="highlighter-rouge">IO</code> objects with
+a bit of effort.</p>
+
+<h2 id="working-with-the-ruby-io-object">Working with the Ruby IO object</h2>
+
+<p>There are various ways to read from an <code class="highlighter-rouge">IO</code> object in Ruby:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">read</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">readpartial</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">read_nonblock</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">io.read</code> reads until the <code class="highlighter-rouge">IO</code> is closed (e.g., end of file, server closes the
+connection, etc.)</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">io.read(12)</code> reads until it has received exactly 12 bytes.</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">io.readpartial(12)</code> waits until the <code class="highlighter-rouge">IO</code> becomes readable, then it reads <em>at
+most</em> 12 bytes. So if a server sends only 6 bytes, <code class="highlighter-rouge">readpartial</code> will return
+those 6 bytes. If you had used <code class="highlighter-rouge">read(12)</code>, it would wait until 6 more bytes were
+sent.</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">io.read_nonblock(12)</code> will read at most 12 bytes if the IO is readable. It
+raises <code class="highlighter-rouge">IO::WaitReadable</code> if the <code class="highlighter-rouge">IO</code> is not readable.</p>
+  </li>
+</ul>
+
+<p>For writing, there are two methods:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">length</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+<span class="n">length</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">write_nonblock</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">io.write</code> writes the whole string to the <code class="highlighter-rouge">IO</code>, waiting until the <code class="highlighter-rouge">IO</code> becomes
+writable if necessary. It returns the number of bytes written (which should
+always be equal to the number of bytes in the original string).</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">io.write_nonblock</code> writes as many bytes as possible until the <code class="highlighter-rouge">IO</code> becomes
+nonwritable, returning the number of bytes written. It raises <code class="highlighter-rouge">IO::WaitWritable</code>
+if the <code class="highlighter-rouge">IO</code> is not writable.</p>
+  </li>
+</ul>
+
+<p>The challenge when both reading and writing in a nonblocking fashion is knowing 
+when it is possible to do so and when it is necessary to wait.</p>
+
+<h2 id="getting-real-with-ioselect">Getting real with IO.select</h2>
+
+<p>We need some mechanism for knowing when we can read or write to our
+streams, but I’m not going to implement <code class="highlighter-rouge">Stream#readable?</code> or <code class="highlighter-rouge">#writable?</code>. It’s 
+a terrible solution to loop over every stream object in Ruby and check whether it’s
+readable/writable over and over again. This is really just not a job for Ruby;
+it’s too far away from the kernel.</p>
+
+<p>Luckily, the kernel exposes ways to efficiently detect readable and writable
+I/O streams. The simplest cross-platform method is called select(2) 
+and is available in Ruby as <code class="highlighter-rouge">IO.select</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>IO.select(read_array [, write_array [, error_array [, timeout]]])
+
+Calls select(2) system call. It monitors supplied arrays of IO objects and waits
+until one or more IO objects are ready for reading, ready for writing, or have
+errors. It returns an array of those IO objects that need attention. It returns 
+nil if the optional timeout (in seconds) was supplied and has elapsed.
+</code></pre>
+</div>
+
+<p>With this knowledge, we can write a much better <code class="highlighter-rouge">#tick</code> method:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">IOLoop</span>
+  <span class="k">def</span> <span class="nf">tick</span>
+    <span class="n">r</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="no">IO</span><span class="p">.</span><span class="nf">select</span><span class="p">(</span><span class="vi">@streams</span><span class="p">,</span> <span class="vi">@streams</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">stream</span><span class="o">|</span>
+      <span class="n">stream</span><span class="p">.</span><span class="nf">handle_read</span>
+    <span class="k">end</span>
+  
+    <span class="n">w</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">stream</span><span class="o">|</span>
+      <span class="n">stream</span><span class="p">.</span><span class="nf">handle_write</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">IO.select</code> will block until some of our streams become readable or writable
+and then return those streams. From there, it is up to those streams to do 
+the actual data processing work.</p>
+
+<h2 id="handling-streaming-input-and-output">Handling streaming input and output</h2>
+
+<p>Now that we’ve used the <code class="highlighter-rouge">Stream</code> object in various examples, you may 
+already have an idea of what its responsibilities are. But let’s first take a look at how it is implemented:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Stream</span>
+  <span class="c1"># We want to bind/emit events.</span>
+  <span class="kp">include</span> <span class="no">EventEmitter</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
+    <span class="vi">@io</span> <span class="o">=</span> <span class="n">io</span>
+    <span class="c1"># Store outgoing data in this String.</span>
+    <span class="vi">@writebuffer</span> <span class="o">=</span> <span class="s2">""</span>
+  <span class="k">end</span>
+
+  <span class="c1"># This tells IO.select what IO to use.</span>
+  <span class="k">def</span> <span class="nf">to_io</span><span class="p">;</span> <span class="vi">@io</span> <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">&lt;&lt;</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+    <span class="c1"># Append to buffer; #handle_write is doing the actual writing.</span>
+    <span class="vi">@writebuffer</span> <span class="o">&lt;&lt;</span> <span class="n">chunk</span>
+  <span class="k">end</span>
+  
+  <span class="k">def</span> <span class="nf">handle_read</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="vi">@io</span><span class="p">.</span><span class="nf">read_nonblock</span><span class="p">(</span><span class="mi">4096</span><span class="p">)</span>
+    <span class="n">emit</span><span class="p">(</span><span class="ss">:data</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span>
+  <span class="k">rescue</span> <span class="no">IO</span><span class="o">::</span><span class="no">WaitReadable</span>
+    <span class="c1"># Oops, turned out the IO wasn't actually readable.</span>
+  <span class="k">rescue</span> <span class="no">EOFError</span><span class="p">,</span> <span class="no">Errno</span><span class="o">::</span><span class="no">ECONNRESET</span>
+    <span class="c1"># IO was closed</span>
+    <span class="n">emit</span><span class="p">(</span><span class="ss">:close</span><span class="p">)</span>
+  <span class="k">end</span>
+  
+  <span class="k">def</span> <span class="nf">handle_write</span>
+    <span class="k">return</span> <span class="k">if</span> <span class="vi">@writebuffer</span><span class="p">.</span><span class="nf">empty?</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="vi">@io</span><span class="p">.</span><span class="nf">write_nonblock</span><span class="p">(</span><span class="vi">@writebuffer</span><span class="p">)</span>
+    <span class="c1"># Remove the data that was successfully written.</span>
+    <span class="vi">@writebuffer</span><span class="p">.</span><span class="nf">slice!</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+    <span class="c1"># Emit "drain" event if there's nothing more to write.</span>
+    <span class="n">emit</span><span class="p">(</span><span class="ss">:drain</span><span class="p">)</span> <span class="k">if</span> <span class="vi">@writebuffer</span><span class="p">.</span><span class="nf">empty?</span>
+  <span class="k">rescue</span> <span class="no">IO</span><span class="o">::</span><span class="no">WaitWritable</span>
+  <span class="k">rescue</span> <span class="no">EOFError</span><span class="p">,</span> <span class="no">Errno</span><span class="o">::</span><span class="no">ECONNRESET</span>
+    <span class="n">emit</span><span class="p">(</span><span class="ss">:close</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">Stream</code> is nothing more than a wrapper around a Ruby <code class="highlighter-rouge">IO</code> object that
+abstracts away all the low-level details of reading and writing that were
+discussed throughout this article. The <code class="highlighter-rouge">Server</code> object we make use of 
+in <code class="highlighter-rouge">IOLoop#listen</code> is implemented in a similar fashion but is focused
+on accepting incoming connections instead:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Server</span>
+  <span class="kp">include</span> <span class="no">EventEmitter</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
+    <span class="vi">@io</span> <span class="o">=</span> <span class="n">io</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">to_io</span><span class="p">;</span> <span class="vi">@io</span> <span class="k">end</span>
+  
+  <span class="k">def</span> <span class="nf">handle_read</span>
+    <span class="n">sock</span> <span class="o">=</span> <span class="vi">@io</span><span class="p">.</span><span class="nf">accept_nonblock</span>
+    <span class="n">emit</span><span class="p">(</span><span class="ss">:accept</span><span class="p">,</span> <span class="no">Stream</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">sock</span><span class="p">))</span>
+  <span class="k">rescue</span> <span class="no">IO</span><span class="o">::</span><span class="no">WaitReadable</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">handle_write</span>
+    <span class="c1"># do nothing</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Now that you’ve studied how these low-level objects work, you should
+be able to revisit the full <a href="https://gist.githubusercontent.com/practicingruby/3612925/raw/315e7bfc5de7a029606b3885d71953acb84f112e/ChatServer.rb">source code for the Chat Server
+example</a> and understand exactly how it works. If you
+can do that, you know how to build an evented I/O loop from scratch.</p>
+
+<h3 id="conclusions">Conclusions</h3>
+
+<p>Although the basic ideas behind event-driven I/O systems are easy to understand, 
+there are many low-level details that complicate things. This article discussed some of these ideas, but there are many others that would need
+to be considered if we were trying to build a real event library. Among
+other things, we would need to consider the following problems:</p>
+
+<ul>
+  <li>
+    <p>Because our event loop does not implement timers, it is difficult to do
+a number of important things. Even something as simple as keeping a 
+connection open for a set period of time can be painful without built-in
+support for timers, so any serious event library must support them. It’s
+worth pointing out that <code class="highlighter-rouge">IO#select</code> does accept a timeout parameter, and
+it would be possible to make use of it fairly easily within this codebase.</p>
+  </li>
+  <li>
+    <p>The event loop shown in this article is susceptible to <a href="http://en.wikipedia.org/wiki/Back_pressure#Back_pressure_in_information_technology">back pressure</a>,
+which occurs when data continues to be buffered infinitely even if it
+has not been accepted for processing yet. Because our event loop 
+provides no mechanism for signaling that its buffers are full, incoming
+data will accumulate and have a similar effect to a memory leak until
+the connection is closed or the data is accepted.</p>
+  </li>
+  <li>
+    <p>The performance of select(2) is linear, which means that handling 
+10,000 streams will take 10,000x as long as handling a single stream. 
+Alternative solutions do exist at the kernel, but many are not 
+cross-platform and are not exposed to Ruby by default. If you have 
+high performance needs, you may want to look into the <a href="https://github.com/tarcieri/nio4r">nio4r</a> 
+project, which attempts to solve this problem in a clean way by 
+wrapping the libev library.</p>
+  </li>
+</ul>
+
+<p>The challenges involved in getting the details right in event loops
+are the real reason why tools like EventMachine and Node.js exist. These systems
+allow application programmers to gain the benefits of event-driven I/O without
+having to worry about too many subtle details. Still, knowing how they work under the hood
+should help you make better use of these tools, and should also take away some
+of the feeling that they are a kind of deep voodoo that you’ll never
+comprehend. Event-driven I/O is perfectly understandable; it is just a bit 
+messy.</p>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

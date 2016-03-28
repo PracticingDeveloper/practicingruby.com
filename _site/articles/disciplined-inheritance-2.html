@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Criteria for disciplined inheritance, Part 2</title>
+  <meta name="description" content="In Issue 3.7, I started to explore the criteria laid out by Sakkinen’sDisciplined Inheritance, a language-agnostic paper published more than two decades ago ...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/disciplined-inheritance-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Criteria for disciplined inheritance, Part 2</h1>
+    <p class="post-meta"><time datetime="2012-02-21T00:00:00-05:00" itemprop="datePublished">Feb 21, 2012</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>In <a href="http://practicingruby.com/articles/24">Issue 3.7</a>, I started to explore the criteria laid out by Sakkinen’s
+<a href="http://scholar.google.com/scholar?cluster=5893037045851782349&amp;hl=en&amp;as_sdt=0,7&amp;sciodt=0,7">Disciplined Inheritance</a>, 
+a language-agnostic paper published more than two decades ago that is surprisingly 
+relevant to the modern Ruby programmer. In this issue, we continue where Issue 3.7 
+left off: on the question of how to maintain complete compatibility between
+parent and child objects in inheritance-based domain models. Or, to put it another way,
+this article explores how to reuse code safely within a system—
+without it becoming a maintenance nightmare.</p>
+
+<p>After taking a closer look at what Sakkinen exposed regarding this topic, I came to
+realize that the ideas he presented were strikingly similar to the <a href="http://en.wikipedia.org/wiki/Liskov_Substitution_Principle">Liskov Substitution
+Principle</a>. In fact,
+the extremely dynamic nature of Ruby makes 
+establishing <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.39.1223">a behavioral notion of subtyping</a> (Liskov and Wing 1993)
+a prerequisite for developing disciplined inheritance practices. 
+As a result, this article refers to Liskov’s work more than Sakkinen’s, 
+even though both papers have extremely interesting things to say on this topic.</p>
+
+<h3 id="defining-a-behavioral-subtype">Defining a behavioral subtype</h3>
+
+<p>Both Sakkinen and Liskov describe the essence of the inheritance relationship as 
+the ability of a child object to serve as a drop-in replacement wherever
+its parent object can be used. I’ve greatly simplified the concept by
+stating it in such a general fashion, but this is the thread that ties
+their independent works together.</p>
+
+<p>Liskov goes a step farther than Sakkinen by defining two kinds of 
+behavioral subtypes: children that extend the behavior specified by their 
+parents, and children that constrain the behavior specified by their parents. 
+These concepts are not mutually exclusive, but because each brings up
+its own set of challenges, it is convenient to separate them in this
+fashion.</p>
+
+<p>Both Sakkinen and Liskov emphasize that the abstract concept of subtyping 
+is  much more about the observable behavior of objects than it is about
+what exactly is going on under the hood. This concept is a natural way of thinking
+for Rubyists, and it is worth keeping in mind as you read through the rest
+of this article. In particular, when we talk about the type of an object,
+we are focusing on what that object <em>does</em>, not what it <em>is</em>.</p>
+
+<p>Although the concept of a behavioral subtype sounds like a direct analogue for
+what we commonly refer to as “duck typing” in Ruby, the former is about
+the full contract of an object rather than how it acts under certain
+circumstances. I go into more detail about the differences between
+these concepts toward the end of this article,
+but before we can discuss them meaningfully, we need to take a look
+at Liskov’s two types of behavioral subtyping and how they can
+be implemented.</p>
+
+<h3 id="behavioral-subtypes-as-extensions">Behavioral subtypes as extensions</h3>
+
+<p>Whether you realize it or not, odds are good that you are already familiar with using behavioral subtypes as extensions. Whenever we inherit from <code class="highlighter-rouge">ActiveRecord::Base</code> or mix <code class="highlighter-rouge">Enumerable</code> into one of our objects, we’re making use of this concept. In essence, the purpose of an extension is to bolt new behavior on top of an existing type to form a new subtype.</p>
+
+<p>To ensure that our child objects maintain the substitution principle, we need to make sure that any new behavior and modifications introduced by extensions follow a few simple rules. In particular, all new functionality must be either completely transparent to the parent object or defined in terms of the parent object’s functionality. Changing the signature of a method provided by the parent object would be considered an incompatible change, as would directly modifying instance variables referenced by the parent object. These strict rules may seem like overkill, but they are the only way to guarantee that your extended subtypes will be drop-in replacements for their supertypes.</p>
+
+<p>In practice, obeying these rules is not as hard as it seems. For example, suppose we wanted to extend <code class="highlighter-rouge">Prawn::Document</code> so that it implements some helpers for article typesetting:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Prawn</span><span class="o">::</span><span class="no">Article</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="s2">"test.pdf"</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">h1</span> <span class="s2">"Criteria for Disciplined Inheritance"</span>
+ 
+  <span class="n">para</span> <span class="sx">%{
+    This is an example of building a Prawn-based article
+    generator through the use of a behavioral subtype as
+    an extension. It's about as wonderful and self-referential
+    as you might expect.
+  }</span>
+
+  <span class="n">h2</span> <span class="s2">"Benefits of behavioral subtyping"</span>
+
+  <span class="n">para</span> <span class="sx">%{
+    The benefits of behavioral subtyping cannot be directly
+    known without experiencing them for yourself.
+  }</span>
+
+  <span class="n">para</span> <span class="sx">%{
+    But if you REALLY get stuck, try asking Barbara Liskov.
+  }</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The most simple way to implement this sort of domain language would be to create a subclass of <code class="highlighter-rouge">Prawn::Document</code>, as shown in the following example:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Prawn</span>
+  <span class="k">class</span> <span class="nc">Article</span> <span class="o">&lt;</span> <span class="no">Document</span>
+    <span class="kp">include</span> <span class="no">Measurements</span>
+
+    <span class="k">def</span> <span class="nf">h1</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+      <span class="n">text</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="ss">:size</span> <span class="o">=&gt;</span> <span class="mi">24</span><span class="p">)</span>
+      <span class="n">move_down</span> <span class="n">in2pt</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">h2</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+      <span class="n">move_down</span> <span class="n">in2pt</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">text</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="ss">:size</span> <span class="o">=&gt;</span> <span class="mi">16</span><span class="p">)</span>
+      <span class="n">move_down</span> <span class="n">in2pt</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">para</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+      <span class="n">text</span><span class="p">(</span><span class="n">contents</span><span class="p">.</span><span class="nf">gsub</span><span class="p">(</span><span class="sr">/\s+/</span><span class="p">,</span> <span class="s2">" "</span><span class="p">))</span>
+      <span class="n">move_down</span> <span class="n">in2pt</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>As far as Liskov is concerned, <code class="highlighter-rouge">Prawn::Article</code> is a perfectly legitimate extension because instances of it are drop-in substitutes for <code class="highlighter-rouge">Prawn::Document</code> objects. In fact, this sort of extension is trivial to prove to be a behavioral subtype because it is defined purely in terms of public methods that are provided by its parents (<code class="highlighter-rouge">Prawn::Document</code> and <code class="highlighter-rouge">Prawn::Measurements</code>). Because the functionality added is so straightforward, the use of subclassing here might just be the right tool for the job.</p>
+
+<p>The downside of using subclassing is that even minor alterations to program requirements can cause encapsulation-related issues to become a real concern. For example, if we decide that we want to add a pair of instance variables that control the fonts used for headers and paragraphs, it would be hard to guarantee that these variables wouldn’t clash with the data contained within <code class="highlighter-rouge">Prawn::Document</code> objects. We can assume that calls to public methods provided by the parent object are safe, but we cannot say the same about referencing instance variables, so a delegation-based model starts to look more appealing.</p>
+
+<p>Suppose we wanted to support the following API, but through the use of delegation rather than subclassing:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Prawn</span><span class="o">::</span><span class="no">Article</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="s2">"test.pdf"</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">header_font</span>    <span class="s2">"Courier"</span>
+  <span class="n">paragraph_font</span> <span class="s2">"Helvetica"</span>
+
+  <span class="n">h1</span> <span class="s2">"Criteria for Disciplined Inheritance"</span>
+ 
+  <span class="n">para</span> <span class="sx">%{
+    This is an example of building a Prawn-based article
+    generator through the use of a behavioral subtype as
+    an extension. It's about as wonderful and self-referential
+    as you might expect.
+  }</span>
+
+  <span class="n">h2</span> <span class="s2">"Benefits of behavioral subtyping"</span>
+
+  <span class="n">para</span> <span class="sx">%{
+    The benefits of behavioral subtyping cannot be directly
+    known without experiencing them for yourself.
+  }</span>
+
+  <span class="n">para</span> <span class="sx">%{
+    But if you REALLY get stuck, try asking Barbara Liskov.
+  }</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Using a <code class="highlighter-rouge">method_missing</code> hook and a bit of manual delegation for the <code class="highlighter-rouge">Prawn::Article.generate</code> class method, it is fairly easy to implement this DSL:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Prawn</span>
+  <span class="k">class</span> <span class="nc">Article</span>
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">generate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+      <span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">pdf</span><span class="o">|</span>
+        <span class="kp">new</span><span class="p">(</span><span class="n">pdf</span><span class="p">).</span><span class="nf">instance_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+      <span class="nb">self</span><span class="p">.</span><span class="nf">document</span> <span class="o">=</span> <span class="n">document</span>      
+      <span class="n">document</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Prawn</span><span class="o">::</span><span class="no">Measurements</span><span class="p">)</span>
+
+      <span class="c1"># set defaults so that @paragraph_font and @header_font are never nil.</span>
+      <span class="n">paragraph_font</span> <span class="s2">"Times-Roman"</span>
+      <span class="n">header_font</span>    <span class="s2">"Times-Roman"</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">h1</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+      <span class="n">font</span><span class="p">(</span><span class="n">header_font</span><span class="p">)</span> <span class="k">do</span>
+        <span class="n">text</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="ss">:size</span> <span class="o">=&gt;</span> <span class="mi">24</span><span class="p">)</span>
+        <span class="n">move_down</span> <span class="n">in2pt</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">h2</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+      <span class="n">font</span><span class="p">(</span><span class="n">header_font</span><span class="p">)</span> <span class="k">do</span>
+        <span class="n">move_down</span> <span class="n">in2pt</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">text</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="ss">:size</span> <span class="o">=&gt;</span> <span class="mi">16</span><span class="p">)</span>
+        <span class="n">move_down</span> <span class="n">in2pt</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">para</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+      <span class="n">font</span><span class="p">(</span><span class="n">paragraph_font</span><span class="p">)</span> <span class="k">do</span>
+        <span class="n">text</span><span class="p">(</span><span class="n">contents</span><span class="p">.</span><span class="nf">gsub</span><span class="p">(</span><span class="sr">/\s+/</span><span class="p">,</span> <span class="s2">" "</span><span class="p">))</span>
+        <span class="n">move_down</span> <span class="n">in2pt</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">paragraph_font</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
+      <span class="k">return</span> <span class="vi">@paragraph_font</span> <span class="o">=</span> <span class="n">font</span> <span class="k">if</span> <span class="n">font</span>
+
+      <span class="vi">@paragraph_font</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">header_font</span><span class="p">(</span><span class="n">font</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
+      <span class="k">return</span> <span class="vi">@header_font</span> <span class="o">=</span> <span class="n">font</span> <span class="k">if</span> <span class="n">font</span>
+
+      <span class="vi">@header_font</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+      <span class="n">document</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="kp">private</span>
+
+    <span class="kp">attr_accessor</span> <span class="ss">:document</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Taking this approach involves writing more code and adds some complexity. However, that is a small price to pay for the peace of mind that comes with cleanly separating the data contained within the <code class="highlighter-rouge">Prawn::Article</code> and <code class="highlighter-rouge">Prawn::Document</code> objects. This design also makes it harder for <code class="highlighter-rouge">Prawn::Article</code> to have name clashes with <code class="highlighter-rouge">Prawn::Document</code>’s private methods and forces any private method calls to <code class="highlighter-rouge">Prawn::Document</code> to be done explicitly. Because transparent delegation exposes the full contract of the parent object, it is still necessary for the child object to maintain full compatibility with those methods in the same manner that a class-inheritance-based model would. Nonetheless, this pattern provides a safer way to implement subtypes because it avoids incidental clashes, which could otherwise occur easily.</p>
+
+<p>Although the examples we’ve looked at so far—combined with your own experiences—should give you a good sense of how to extend code via behavioral subtypes, there are some common pitfalls I have glossed over in order to keep things simple. I’ll get back to those before the end of the article, but for now let’s turn our attention to the other kind of subtypes Liskov describes in her paper. She refers to them as <em>constrained subtypes</em>, but I call them <em>restriction subtypes</em> as an easy-to-remember mirror image of the <em>extension subtype</em> concept.</p>
+
+<h3 id="behavioral-subtypes-as-restrictions">Behavioral subtypes as restrictions</h3>
+
+<p>Just as subtypes can be used to extend the behavior of a supertype, they can also be used to restrict generic behaviors by providing more specific implementations of them. The example Liskov uses in her paper illustrates how a stack structure can be viewed as a restriction on the more general concept of a bag.</p>
+
+<p>In its most simple form, a bag is essentially nothing more than a set that can contain duplicates. Items can be added and removed from a bag, and it is possible to determine whether the bag contains a given item. However, much like with a set, order is not guaranteed. The following code, which is somewhat of a contrived example, implements a <code class="highlighter-rouge">Bag</code> object similar to the one described in Liskov’s paper:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">ContainerFullError</span>  <span class="o">=</span> <span class="no">Class</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">StandardError</span><span class="p">)</span>
+<span class="no">ContainerEmptyError</span> <span class="o">=</span> <span class="no">Class</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">StandardError</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Bag</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">items</span>  <span class="o">=</span> <span class="p">[]</span> 
+    <span class="nb">self</span><span class="p">.</span><span class="nf">limit</span> <span class="o">=</span> <span class="n">limit</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="no">ContainerFullError</span> <span class="k">unless</span> <span class="n">data</span><span class="p">.</span><span class="nf">length</span> <span class="o">&lt;</span> <span class="n">limit</span>
+
+    <span class="n">data</span><span class="p">.</span><span class="nf">shuffle!</span>
+    <span class="n">data</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">pop</span>
+    <span class="k">raise</span> <span class="no">ContainerEmptyError</span> <span class="k">if</span> <span class="n">data</span><span class="p">.</span><span class="nf">empty?</span>
+
+    <span class="n">data</span><span class="p">.</span><span class="nf">shuffle!</span>
+    <span class="n">data</span><span class="p">.</span><span class="nf">pop</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">include?</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="kp">attr_accessor</span> <span class="ss">:items</span><span class="p">,</span> <span class="ss">:limit</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The challenge in determining whether a <code class="highlighter-rouge">Stack</code> object can meaningfully be considered a subtype of this sort of structure is that we need to find a way to describe the functionality of a bag so that it is general enough to allow for interesting subtypes to exist but specific enough to allow the <code class="highlighter-rouge">Bag</code> object to be used on its own in a predictable way. Because Ruby lacks the design-by-contract features that Liskov depends on in her paper, we need to describe this specification verbally rather than relying on our tools to enforce them for us. Something like the following list of rules is roughly similar to what she describes more formally in her work:</p>
+
+<p>1) A bag has <code class="highlighter-rouge">items</code> and a size <code class="highlighter-rouge">limit</code>.</p>
+
+<p>2) A bag has a <code class="highlighter-rouge">push</code> operation, which adds a new object to the bag’s <code class="highlighter-rouge">items</code>.</p>
+
+<ul>
+  <li>
+    <p>If the current number of <code class="highlighter-rouge">items</code> is less than the <code class="highlighter-rouge">limit</code>, the new object is added to the bag’s <code class="highlighter-rouge">items</code>.</p>
+  </li>
+  <li>
+    <p>Otherwise, a <code class="highlighter-rouge">ContainerFullError</code> is raised.</p>
+  </li>
+</ul>
+
+<p>3) A bag has a <code class="highlighter-rouge">pop</code> operation, which removes an object from the bag’s <code class="highlighter-rouge">items</code> and returns it as a result.</p>
+
+<ul>
+  <li>
+    <p>If the bag has no <code class="highlighter-rouge">items</code>, a <code class="highlighter-rouge">ContainerEmptyError</code> is raised.</p>
+  </li>
+  <li>
+    <p>Otherwise, one object is removed from the bag’s <code class="highlighter-rouge">items</code> and returned.</p>
+  </li>
+</ul>
+
+<p>4) A bag has an <code class="highlighter-rouge">include?</code> operation, which indicates whether the provided object is one of bag’s <code class="highlighter-rouge">items</code>.</p>
+
+<ul>
+  <li>
+    <p>If the bag’s <code class="highlighter-rouge">items</code> contains the provided object, <code class="highlighter-rouge">true</code> is returned.</p>
+  </li>
+  <li>
+    <p>Otherwise, <code class="highlighter-rouge">false</code> is returned.</p>
+  </li>
+</ul>
+
+<p>With these rules in mind, we can see that the following <code class="highlighter-rouge">Stack</code> object satisfies the definition of a bag while simultaneously introducing a predictable ordering to <code class="highlighter-rouge">items</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">ContainerFullError</span>  <span class="o">=</span> <span class="no">Class</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">StandardError</span><span class="p">)</span>
+<span class="no">ContainerEmptyError</span> <span class="o">=</span> <span class="no">Class</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">StandardError</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Stack</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">items</span>  <span class="o">=</span> <span class="p">[]</span> 
+    <span class="nb">self</span><span class="p">.</span><span class="nf">limit</span> <span class="o">=</span> <span class="n">limit</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="no">ContainerFullError</span> <span class="k">unless</span> <span class="n">data</span><span class="p">.</span><span class="nf">length</span> <span class="o">&lt;</span> <span class="n">limit</span>
+
+    <span class="n">data</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">pop</span>
+    <span class="k">raise</span> <span class="no">ContainerEmptyError</span> <span class="k">if</span> <span class="n">data</span><span class="p">.</span><span class="nf">empty?</span>
+
+    <span class="n">data</span><span class="p">.</span><span class="nf">pop</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">include?</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="kp">attr_accessor</span> <span class="ss">:items</span><span class="p">,</span> <span class="ss">:limit</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>With this example code in mind, we can specify the behavior of a stack in the following way:</p>
+
+<p>1) A stack is a bag.</p>
+
+<p>2) A stack’s <code class="highlighter-rouge">pop</code> operation follows a last-in, first-out (LIFO) order.</p>
+
+<p>Because the ordering requirements of a stack don’t conflict with the defining characteristics of a bag, a stack can be substituted for a bag without any issues. The key thing to keep in mind here is that restriction subtypes can create additional constraints on top of what was specified by their supertypes but cannot loosen the constraints put upon them by their ancestors in any way. For example, based on the way we defined bag objects, we would not be able to return <code class="highlighter-rouge">nil</code> instead of raising <code class="highlighter-rouge">ContainerEmptyError</code> when <code class="highlighter-rouge">pop</code> is called on an empty stack, even if that seems like a fairly innocuous change.</p>
+
+<p>Once again, maintaining this sort of discipline may seem on the surface to be more trouble than it is worth. However, these kinds of assumptions are baked into useful patterns such as the <a href="http://en.wikipedia.org/wiki/Template_method_pattern">template method pattern</a> and are also key to designing type hierarchies for all sorts of data structures. A good example of these concepts in action can be found in the way Ruby organizes its numeric types. The class hierarchy is shown here, but be sure to check out Ruby’s documentation if you want to get a sense of how exactly these classes hang together.</p>
+
+<p>&lt;img src=”http://i.imgur.com/ObKrf.jpg” width=800/&gt;</p>
+
+<p>Whether you are designing extension subtypes or restriction subtypes, it is unfortunately easier to get things wrong than it is to get them right, due to all the subtle issues that need to be considered. For that reason, we’ll now take a look at a few examples of flawed behavioral subtypes and how to go about fixing them.</p>
+
+<h3 id="examples-of-flawed-behavioral-subtypes">Examples of flawed behavioral subtypes</h3>
+
+<p>To test your understanding of behavior subtype compatibility while simultaneously exposing some common pitfalls, I provide the following three flawed examples for you to study. As you read through them, try to figure out what the subtype compatibility problem is and how you might go about solving it.</p>
+
+<p>1) Suppose we want to add an equality operator to the bag structure. A sample operator is provided here for the <code class="highlighter-rouge">Bag</code> object, which conforms to the following newly specified
+feature: “Two bags are considered equal if they have equivalent items and size limits”. What problems will we encounter in implementing a bag-compatible equality operator for the <code class="highlighter-rouge">Stack</code> object?</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Bag</span>
+  <span class="c1"># other code similar to before</span>
+
+  <span class="k">def</span> <span class="nf">==</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">data</span><span class="p">.</span><span class="nf">sort</span><span class="p">,</span> <span class="n">limit</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="n">other</span><span class="p">.</span><span class="nf">sort</span><span class="p">,</span> <span class="n">other</span><span class="p">.</span><span class="nf">limit</span><span class="p">]</span>
+  <span class="k">end</span>
+
+  <span class="kp">protected</span> 
+  
+  <span class="c1"># NOTE: Implementing == is one of the few legitimate uses of </span>
+  <span class="c1"># protected methods / attributes</span>
+  <span class="kp">attr_accessor</span> <span class="ss">:data</span><span class="p">,</span> <span class="ss">:limit</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>2) Suppose we have two mutable objects, a <code class="highlighter-rouge">Rectangle</code> and a <code class="highlighter-rouge">Square</code>, and we wish to implement <code class="highlighter-rouge">Square</code> as a restriction of <code class="highlighter-rouge">Rectangle</code>. Given the following implementation of a <code class="highlighter-rouge">Rectangle</code> object, what problems will be encountered in defining a <code class="highlighter-rouge">Square</code> object?</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Rectangle</span>
+  <span class="k">def</span> <span class="nf">area</span>
+    <span class="n">width</span> <span class="o">*</span> <span class="n">height</span>
+  <span class="k">end</span>
+
+  <span class="kp">attr_accessor</span> <span class="ss">:width</span><span class="p">,</span> <span class="ss">:height</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>3) Suppose we have a <code class="highlighter-rouge">PersistentSet</code> object that delegates all method calls to the <code class="highlighter-rouge">Set</code> object provided by Ruby’s standard library, as shown in the following code. Why is this not a compatible subtype, even though it does not explicitly modify the behavior of any of <code class="highlighter-rouge">Set</code>’s operations?</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"set"</span>
+<span class="nb">require</span> <span class="s2">"pstore"</span>
+
+<span class="k">class</span> <span class="nc">PersistentSet</span> 
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">store</span> <span class="o">=</span> <span class="no">PStore</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">store</span><span class="p">.</span><span class="nf">transaction</span> <span class="p">{</span> <span class="n">store</span><span class="p">[</span><span class="ss">:data</span><span class="p">]</span> <span class="o">||=</span> <span class="no">Set</span><span class="p">.</span><span class="nf">new</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+    <span class="n">store</span><span class="p">.</span><span class="nf">transaction</span> <span class="k">do</span> 
+      <span class="n">store</span><span class="p">[</span><span class="ss">:data</span><span class="p">].</span><span class="nf">send</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="kp">attr_accessor</span> <span class="ss">:store</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>To avoid spoiling the fun of finding and fixing the defects with these examples yourself, I’ve hidden my explanation of the <a href="https://gist.github.com/15b50f918c88bccd6eac">problems</a> and <a href="https://gist.github.com/3f53d4094759c0508e19">solutions</a> on a pair of gists. Please spend some time on this exercise before reading the spoilers, as you’ll learn a lot more that way!</p>
+
+<p>A huge hint is that the first problem is based on an issue discussed in <a href="http://www.cs.cmu.edu/~wing/publications/LiskovWing94.pdf">Liskov’s paper</a> and the second and third problems are discussed in an <a href="http://www.objectmentor.com/resources/articles/lsp.pdf">article about LSP</a> by Bob Martin. However, please note that their solutions are not exactly the most natural fit for Ruby, so there is still room for some creativity here.</p>
+
+<h3 id="behavioral-subtyping-versus-duck-typing">Behavioral subtyping versus duck typing</h3>
+
+<p>Between this article and the topics discussed in <a href="http://practicingruby.com/articles/24">Issue 3.7</a>, this two-part series offers a fairly comprehensive view of disciplined inheritance practices for the Ruby programmer. However, as I hinted toward the beginning of this article, there is the somewhat looser concept of duck typing that deserves a mention if we really want to see the whole picture.</p>
+
+<p>What duck typing and behavioral subtypes have in common is that both concepts rely on what an object can do rather than what exactly it is. They differ in that behavioral subtypes seem to be more about the behavior of an entire object and duck typing is about how a given object behaves within a certain context. Duck typing can be a good deal more flexible than behavioral subtyping in that sense, because typically it involves an object implementing a meaningful response to a single message rather than an entire suite of behaviors. You can find a ton of examples of duck typing in use in Ruby, but perhaps the easiest to spot is the ubiquitous use of the <code class="highlighter-rouge">to_s</code> method.</p>
+
+<p>By implementing a <code class="highlighter-rouge">to_s</code> method in our objects, we are able to indicate to Ruby that our object has a meaningful string representation, which can then be used in a wide range of contexts. Among other things, the <code class="highlighter-rouge">to_s</code> method is automatically called by irb when an <code class="highlighter-rouge">inspect</code> method is not also provided, called by the <code class="highlighter-rouge">Kernel#puts</code> method on whatever object you pass to it, and called automatically on the result of any expression executed via string interpolation. Implementing a meaningful <code class="highlighter-rouge">to_s</code> method is not exactly a form of behavioral subtyping but is still a very useful form of code sharing. <a href="http://blog.rubybestpractices.com/posts/gregory/046-issue-14-duck-typing.html">Issue 1.14</a> and <a href="http://blog.rubybestpractices.com/posts/gregory/047-issue-15-duck-typing-2.html">Issue 1.15</a> cover duck typing in great detail, but this single example is enough to point out the merits of this technique and how much simpler it is than the topics discussed in this article.</p>
+
+<h3 id="reflections">Reflections</h3>
+
+<p>A true challenge for any practicing Rubyist is finding a balance between the free-wheeling culture of Ruby development and the more rigorous approaches of our predecessors. Disciplined inheritance techniques will make our lives easier, and knowing what a behavioral subtype is and how to design one will surely come in handy on any moderately complex project. However, we should keep our eyes trained on how these issues relate to maintainability, understandability, and changeability rather than obsessing about how they can lead us to mathematically pure designs.</p>
+
+<p>I think there is room for another article on the practical applications of these ideas, in which I might talk about applying some design-by-contract concepts to Ruby programs or how to develop shared unit tests that make it easier to test for compatibility when implementing subtypes. But I don’t plan to work on that article immediately, so for now we can sort out those issues via comments on this article. If you have any suggestions for how to tie these ideas back to real problems, or questions on how to apply them to the things you’ve been working on, please share your thoughts.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

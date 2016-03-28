@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Duck Typing in Practice, Part 1</title>
+  <meta name="description" content="Type systems are a fundamental part of every programming language. In fact, the way a language designer approaches typing goes a long way towards outlining t...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/duck-typing-in-practice-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Duck Typing in Practice, Part 1</h1>
+    <p class="post-meta"><time datetime="2010-12-28T00:00:00-05:00" itemprop="datePublished">Dec 28, 2010</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Type systems are a fundamental part of every programming language. In fact, the way a language designer approaches typing goes a long way towards outlining the way that thoughts are expressed in that language.</p>
+
+<p>Statically typed languages like C++ and Java make us tend to think of objects as abstract data structures that fit within a neatly defined hierarchy. In these languages, there isn’t a major distinction between an object’s class and its type, as the two concepts are tied together directly at the implementation level. But the marriage of class and type found in these languages is not a universal law shared by all object oriented programming languages.</p>
+
+<p>By contrast, Ruby’s dynamic nature facilitates a style of type system known as duck typing. In particular, duck typing breaks the strong association between an object’s class and its type by defining types based on what an object can do rather than what class it was born from. This subtle shift in semantics changes virtually everything about how you need to think about designing object oriented systems, making it a great topic for Practicing Ruby to cover.</p>
+
+<p>While duck typing is possible in many other languages, Ruby is designed from the ground up to support this style of objected oriented design. In this issue, we will cover some of the options that are available to us for doing Ruby-style type checking.</p>
+
+<h3 id="type-checking-techniques">Type Checking Techniques</h3>
+
+<p>There are three common ways to do type checking in Ruby, two of which involve
+duck typing, and one that does not. Here’s an example of the approach 
+that does <em>not</em> involve duck typing.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+  <span class="k">case</span> <span class="n">source</span>
+  <span class="k">when</span> <span class="no">String</span>
+    <span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+  <span class="k">when</span> <span class="no">IO</span>
+    <span class="n">source</span><span class="p">.</span><span class="nf">read</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>If you’ve been working with Ruby for a while, you’ve probably written code that
+did type checking in this fashion. Ruby’s case statement is powerful, and
+makes this sort of logic easy to write. Our <code class="highlighter-rouge">read_data()</code> function works as
+expected in the following common scenarios:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">filename</span> <span class="o">=</span> <span class="s2">"foo.txt"</span>
+<span class="n">read_data</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="c1">#=&gt; reads the contents of foo.txt by calling </span>
+                    <span class="c1">#   File.read()</span>
+
+
+<span class="n">input</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="s2">"foo.txt"</span><span class="p">)</span>
+<span class="n">read_data</span><span class="p">(</span><span class="n">input</span><span class="p">)</span> <span class="c1">#=&gt; reads the contents of foo.txt via </span>
+                 <span class="c1">#   the passed in file handle</span>
+</code></pre>
+</div>
+
+<p>But things begin to fall apart a bit when we decide we’d like <code class="highlighter-rouge">read_data()</code> to
+work with a <code class="highlighter-rouge">Tempfile</code>, or with a <code class="highlighter-rouge">StringIO</code> object, or perhaps with a mock
+object we’ve defined in our tests. We have baked into our logic the assumption that the input is always either a descendent of <code class="highlighter-rouge">String</code> or a descendent of <code class="highlighter-rouge">IO</code>. The purpose of duck typing is to remove these restrictions by focusing only on the messages that are being passed back and forth between objects rather than what class they belong to. The code below demonstrates one way you can do that.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">source</span><span class="p">.</span><span class="nf">read</span> <span class="k">if</span> <span class="n">source</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:read</span><span class="p">)</span>
+  <span class="k">return</span> <span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="n">source</span><span class="p">.</span><span class="nf">to_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">source</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:to_str</span><span class="p">)</span>
+  <span class="k">raise</span> <span class="no">ArgumentError</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>With this modification, our method expects far less of its input. The passed in
+object simply needs to implement either a meaningful <code class="highlighter-rouge">read()</code> or <code class="highlighter-rouge">to_str()</code>
+method. In addition to being backwards compatible with our non-duck-typed code,
+this new approach gives us access to many useful standin objects, including: <code class="highlighter-rouge">StringIO</code>, <code class="highlighter-rouge">Tempfile</code>, mock objects for testing, and any user defined objects that are either IO-like or String-like but not a descendent of either.</p>
+
+<p>However, the following contrived example illustrates a final corner case that calls for a bit of extreme duck typing to resolve. Try to spot the problem before reading about how to solve it.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FileProxy</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tempfile</span><span class="p">)</span>
+    <span class="vi">@tempfile</span> <span class="o">=</span> <span class="n">tempfile</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+    <span class="vi">@tempfile</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This code implements a proxy which forwards all of its messages to the wrapped <code class="highlighter-rouge">tempfile</code> object. However, like many hastily coded proxy objects in Ruby, it does not properly forward <code class="highlighter-rouge">respond_to?()</code> calls to the object it wraps. The irb session below illustrates the resulting false negative in our test.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># Populate our tempfile through the proxy</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">proxy</span> <span class="o">=</span> <span class="no">FileProxy</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">Tempfile</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"foo.txt"</span><span class="p">))</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;FileProxy:0x39461c @tempfile=#&lt;File:/var/f..foo.txt.7910.3&gt;&gt;</span>
+<span class="o">&gt;&gt;</span> <span class="n">proxy</span> <span class="o">&lt;&lt;</span> <span class="s2">"foo bar baz"</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;File:/var/folders/sJ/sJo0IkPYFWCY3t5uH+gi0++++TQ/-Tmp-/foo.txt.7910.3&gt;</span>
+<span class="o">&gt;&gt;</span> <span class="n">proxy</span><span class="p">.</span><span class="nf">rewind</span>
+<span class="o">=&gt;</span> <span class="mi">0</span>
+
+<span class="c1"># Unsuccessfully test for presence of read() method</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">proxy</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:read</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="kp">false</span>
+
+<span class="c1"># But read() works as expected!</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">proxy</span><span class="p">.</span><span class="nf">read</span>
+<span class="o">=&gt;</span> <span class="s2">"foo bar baz"</span>
+</code></pre>
+</div>
+
+<p>This issue will cause <code class="highlighter-rouge">read_data()</code> to raise an <code class="highlighter-rouge">ArgumentError</code> when passed a <code class="highlighter-rouge">FileProxy</code>. In this case, the best solution is to fix <code class="highlighter-rouge">respond_to?()</code> so that it works as expected, but since you may often encounter libraries with bad behaviors like this, it’s worth knowing what the duck typing fundamentalist would do in this situation.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+  <span class="k">begin</span> 
+    <span class="k">return</span> <span class="n">source</span><span class="p">.</span><span class="nf">read</span> 
+  <span class="k">rescue</span> <span class="no">NoMethodError</span>
+    <span class="c1"># do nothing, just catch the specific error you'd expect if</span>
+    <span class="c1"># read() was not present.</span>
+  <span class="k">end</span>
+
+  <span class="k">begin</span>
+    <span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="n">source</span><span class="p">.</span><span class="nf">to_str</span><span class="p">)</span>
+  <span class="k">rescue</span> <span class="no">NoMethodError</span>
+    <span class="k">raise</span> <span class="no">ArgumentError</span> <span class="c1"># now we've run out of valid cases, so let's</span>
+                        <span class="c1"># raise a meaningful error</span>
+   <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>With this final version, we preserve all the benefits of the previous duck
+typing example, but we can work with objects that have dishonest <code class="highlighter-rouge">respond_to?()</code>
+methods. Unfortunately, the cost for such flexibility includes code that is less
+pleasant to read and is almost certainly going to run slower than either of our
+previous implementations. Using the exception system for control flow isn’t cheap, 
+even if this is the most ‘pure’ form of type checking we can do.</p>
+
+<p>While we’ve talked about the benefits and drawbacks of each of these approaches, I haven’t given any direct advice on whether one way of doing type checking is better than the others, simply because there is no simple answer to that question.</p>
+
+<p>I will paint a clearer picture in the next article by showing several
+realistic examples of why duck typing can come in handy. Until then, I will
+leave you with a few things to think about.</p>
+
+<h3 id="questions--study-topics">Questions / Study Topics</h3>
+
+<ul>
+  <li>
+    <p>Is explicit class checking ever absolutely necessary? Are their situations in which even if other options are available, checking the class of an object is still the best thing to do?</p>
+  </li>
+  <li>
+    <p>Name something weird that can happen when you write your contracts on the messages your objects respond to rather than what class of object they are.</p>
+  </li>
+  <li>
+    <p>Try to identify some feature of Ruby that relies on duck typing either for its basic functionality or as an extension point meant to be customized by application programmers.</p>
+  </li>
+  <li>
+    <p>Share a bit of code which does explicit class comparison that you think would be very difficult to convert to a duck-typing style.</p>
+  </li>
+  <li>
+    <p>Share a bit of code (either your own or from a OSS project you like) that you feel uses duck typing effectively.</p>
+  </li>
+</ul>
+
+<p>Feel free to leave a comment below if any of the above topics interest you.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> This article has also been published on the Ruby Best Practices blog. There <a href="http://blog.rubybestpractices.com/posts/gregory/046-issue-14-duck-typing.html#disqus_thread">may be additional commentary</a> 
+over there worth taking a look at.</p>
+</blockquote>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

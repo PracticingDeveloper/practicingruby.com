@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Ruby&#39;s method lookup path, Part 2</title>
+  <meta name="description" content="In Issue #1 we discussed Ruby’s lookuppath and proved by example that class inheritance is only a small part of the picture. To recap, Ruby methods are looke...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/method-lookup-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Ruby's method lookup path, Part 2</h1>
+    <p class="post-meta"><time datetime="2010-11-11T00:00:00-05:00" itemprop="datePublished">Nov 11, 2010</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>In <a href="http://practicingruby.com/articles/29">Issue #1</a> we discussed Ruby’s lookup
+path and proved by example that class inheritance is only a small part of the 
+picture. To recap, Ruby methods are looked up in the following order:</p>
+
+<ol>
+  <li>Methods defined in the object’s singleton class (i.e. the object itself)</li>
+  <li>Modules mixed into the singleton class in reverse order of inclusion</li>
+  <li>Methods defined by the object’s class</li>
+  <li>Modules included into the object’s class in reverse order of inclusion</li>
+  <li>Methods defined by the object’s superclass, i.e. inherited methods</li>
+</ol>
+
+<p>The example we looked at in the previous issue just showed the mechanics of how the above process plays out, it didn’t really hint at practical use cases. Today, we’ll look at a scenario for each of these options and discuss some of the up and downs that come along with them. Rather than presenting the examples in method lookup order, I’ll try to start with the most common ones and work my way out to the more special purpose ones.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> In a comment on issue #1, <a href="http://twitter.com/jeg2">@JEG2</a> correctly pointed out that this roadmap doesn’t account for what happens after the whole class hierarchy is walked. Once <code class="highlighter-rouge">BasicObject</code> is reached, Ruby starts from the bottom again calling the <code class="highlighter-rouge">method_missing</code> hook, which is essentially an implicit step 6. I left this detail out for the sake of simplicity, but it’s very important to at least be aware of.</p>
+</blockquote>
+
+<h3 id="when-to-use-ordinary-class-definitions">When to use ordinary class definitions</h3>
+
+<p>The following code implements a simple timer that can write out a timestamp to a file and read it back later to determine elapsed time. Study it and consider its design.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Timer</span>
+  <span class="nc">MissingTimestampError</span> <span class="o">=</span> <span class="no">Class</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">StandardError</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">dir</span><span class="o">=</span><span class="no">Turbine</span><span class="o">::</span><span class="no">Application</span><span class="p">.</span><span class="nf">config_dir</span><span class="p">)</span>
+    <span class="vi">@file</span> <span class="o">=</span> <span class="s2">"</span><span class="si">#{</span><span class="n">dir</span><span class="si">}</span><span class="s2">/timestamp"</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">write_timestamp</span>
+    <span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="vi">@file</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span> <span class="o">&lt;&lt;</span> <span class="no">Time</span><span class="p">.</span><span class="nf">now</span><span class="p">.</span><span class="nf">utc</span><span class="p">.</span><span class="nf">to_s</span> <span class="p">}</span>
+  <span class="k">end</span>
+  
+  <span class="k">def</span> <span class="nf">timestamp</span>
+    <span class="k">raise</span> <span class="no">MissingTimestampError</span> <span class="k">unless</span> <span class="n">running?</span>
+    <span class="no">Time</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="vi">@file</span><span class="p">)).</span><span class="nf">localtime</span>
+  <span class="k">end</span>
+  
+  <span class="k">def</span> <span class="nf">elapsed_time</span>
+    <span class="p">(</span><span class="no">Time</span><span class="p">.</span><span class="nf">now</span><span class="p">.</span><span class="nf">utc</span> <span class="o">-</span> <span class="n">timestamp</span><span class="p">.</span><span class="nf">utc</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="o">.</span><span class="mi">0</span> <span class="o">/</span> <span class="mi">60</span><span class="o">.</span><span class="mi">0</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">clear_timestamp</span>
+    <span class="no">FileUtils</span><span class="p">.</span><span class="nf">rm_f</span><span class="p">(</span><span class="vi">@file</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">running?</span>
+    <span class="no">File</span><span class="p">.</span><span class="nf">exist?</span><span class="p">(</span><span class="vi">@file</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span> 
+</code></pre>
+</div>
+
+<p>When deciding if just a plain old class definition will do, I often ask myself several questions.</p>
+
+<ul>
+  <li>Is it likely is that I’ll need to customize this code later for another purpose?</li>
+  <li>Is this code meant to be interacted with and extended by third party code?</li>
+  <li>Are there any common behaviors in this code I’d want to extract and use elsewhere?</li>
+</ul>
+
+<p>Because this <code class="highlighter-rouge">Timer</code> class definition comes from a real project of mine, I can tell you that the answer to all of the above questions in the context this code is intended to be used is a simple ‘no’. What this indicates to me is that while extension might be necessary at some point down the line, there is no immediate need to design for extensibility, and so we go with the most simple option that could possibly work.</p>
+
+<p>Another indicator that a plain class definition might be appropriate here is the fact that most of the functionality in this class is centered around manipulating a particular bit of state, the <i>timestamp</i> file. The problem we are trying to solve is quite a narrow one, and a single-minded class definition reflects that.</p>
+
+<p>The downside to designing code this way is that it does make third-party modification harder. If for example, you wanted to add some behavior around the <code class="highlighter-rouge">timestamp()</code> method, you have three options, none of them great:</p>
+
+<ul>
+  <li>
+    <p>You can create a subclass of <code class="highlighter-rouge">Timer</code>, but your new class won’t be used by the application that defined <code class="highlighter-rouge">Timer</code> without modification.</p>
+  </li>
+  <li>
+    <p>You can create an instance of <code class="highlighter-rouge">Timer</code> and then add per-object behavior, but this has the same problem as subclassing.</p>
+  </li>
+  <li>
+    <p>You can use <code class="highlighter-rouge">alias_method</code> to create a monkeypatch to <code class="highlighter-rouge">Timer</code>, which will inject your code into the original application, but runs risks of naming clashes and other nasty things.</p>
+  </li>
+</ul>
+
+<p>While it ultimately depends on how the calling code uses this <code class="highlighter-rouge">Timer</code> class, and what features are provided for making extensions, it’s not going to be trivial to modify systems built in this fashion. But because we already determined this was a narrow bit of functionality designed to be used internally within a larger application, it isn’t a problem that it isn’t super extendable.</p>
+
+<p>Many of the rules that apply to defining your own classes also apply to inheritance based designs, so let’s investigate that now.</p>
+
+<h3 id="when-inheritance-makes-sense">When Inheritance Makes Sense</h3>
+
+<p>For those working with Rails, you already encounter class inheritance on a daily basis, through the ActiveRecord ORM. Despite the terrible choice of name, <code class="highlighter-rouge">ActiveRecord::Base</code> is a reasonable example of when class inheritance is a decent option.</p>
+
+<p>Consider the typical ActiveRecord model, which is often extremely simple:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span> 
+  <span class="n">has_many</span> <span class="ss">:comments</span>
+
+  <span class="n">validates_presence_of</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:email</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>While it’s true that in most interesting applications, models do become more complex, implementing intricate business logic, the amount of functionality added by the user is dwarfed by what ActiveRecord provides.</p>
+
+<p>One key thing to notice about a subclass of <code class="highlighter-rouge">ActiveRecord::Base</code> is that by design, there is really no incentive to manage your own state. All state manipulation is passed upwards to the parent class to handle, which typically involves using a pre-configured database connection also managed by the parent class to persist whatever state is required.</p>
+
+<p>Inheritance makes sense in situations where complex state manipulations are handled by the parent class. This is especially true if the parent class provides a boat-load of functionality which dwarfs the customization needs of the child class. Since both things are true about a typical ActiveRecord model, the design is certainly a reasonable choice.</p>
+
+<p>However, before you start modeling your own projects after this pattern, you should take a look at the great pains that go into designing an extensible parent class. It’s outside the scope of this article, but I’d recommend reading what <a href="http://is.gd/gW558 ">Yehuda Katz has to say about ActiveModel</a>, which provides the bulk of ActiveRecord’s functionality under the hood.</p>
+
+<p>Before we move on to other topics, I’d like to offer another example outside of the Rails world, just to help further illuminate the pattern.</p>
+
+<p>The PDF generation library <a href="http://prawn.majesticseacreature.com">Prawn</a> provides a class that’s designed to be inherited from, <code class="highlighter-rouge">Prawn::Document</code>. I made use of this functionality recently to build a small typesetting library for formatting technical articles. While I won’t go into much detail here, you can check out the <a href="http://github.com/madriska/jambalaya">implementation and example code</a>.</p>
+
+<p>What you’ll find in <a href="https://github.com/madriska/jambalaya/blob/master/lib/jambalaya.rb">lib/jambalaya.rb</a> is that except for a custom factory method for generating the document, Jambalaya introduces no new state, relying on calls to <code class="highlighter-rouge">Prawn::Document</code> to do all the heavy lifting. You can also see that <a href="https://github.com/madriska/jambalaya/blob/master/example/rbp_ch1.rb">examples/rbp_ch1.rb</a> gives the illusion of a new special purpose DSL, but that in truth, almost all the work is being done by Prawn under the hood.</p>
+
+<p>Unfortunately, the disadvantages of class inheritance become clear the farther away you get from these scenarios in which the subclass truly is analogous to its parent class. You get only one parent class, and chaining to it is a commitment that you must be willing to respect all the way up the hierarchy. For the scenarios we’ve shown, the benefits outweigh the drawbacks, but for many others, they do not.</p>
+
+<p>In Issue #1, I asked the question of which techniques are special cases, and which are meant to be used commonly. While not rare by any means, inheritance falls closer to being a special case than it does to being the first tool you should reach for. If this comes as a surprise to you, it’s about time for us to talk about modules.</p>
+
+<h3 id="mixing-modules-into-a-class">Mixing modules into a class</h3>
+
+<p>If you want to see the power of mixins, you need to look no farther than Ruby’s
+<code class="highlighter-rouge">Enumerable</code> module. Rather than relying on a common base class to provide
+iterators for collections, Ruby mixes in the <code class="highlighter-rouge">Enumerable</code> module into its core structures, 
+including <code class="highlighter-rouge">Array</code> and <code class="highlighter-rouge">Hash</code>. This is where a whole host of useful methods come from, 
+including <code class="highlighter-rouge">map</code>, <code class="highlighter-rouge">select</code>, and <code class="highlighter-rouge">inject</code>.</p>
+
+<p>The beauty of this design is that it imposes a much lighter contract than the rigid is-a relationship enforced by class inheritance. Instead, mixins focuses on what you can do with an object rather than what that object is. It makes perfect sense to say both <code class="highlighter-rouge">Hash</code> and <code class="highlighter-rouge">Array</code> objects have elements that can be enumerated over. As far as Ruby is concerned, the same can be true about any object which defines an <code class="highlighter-rouge">each()</code> method.</p>
+
+<p>Let’s take a look at a custom Ruby class which implements each and mixes in
+<code class="highlighter-rouge">Enumerable</code>. It is a simple file-backed numerical queue, from the same project 
+our <code class="highlighter-rouge">Timer</code> came from.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Queue</span> 
+  <span class="kp">include</span> <span class="no">Enumerable</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="vi">@file</span> <span class="o">=</span> <span class="n">file</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">entries</span>
+    <span class="k">return</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">empty?</span>
+
+    <span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="vi">@file</span><span class="p">).</span><span class="nf">split</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">).</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">to_f</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">each</span>
+    <span class="n">entries</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="k">yield</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="c1"># additional unrelated methods omitted</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The data file this queue wraps looked something similar to the data shown below.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>125.75
+100.25
+300.50
+700
+</code></pre>
+</div>
+
+<p>Given a properly formatted input file, it’s possible to interact with the <code class="highlighter-rouge">Queue</code> like any other <code class="highlighter-rouge">Enumerable</code> object.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">queue</span> <span class="o">=</span> <span class="no">Queue</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"queue.txt"</span><span class="p">)</span>
+<span class="nb">p</span> <span class="n">queue</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span> <span class="s2">"Amount: </span><span class="si">#{</span><span class="n">x</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+<span class="nb">p</span> <span class="n">queue</span><span class="p">.</span><span class="nf">inject</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>If you go ahead and try this yourself, you’ll find that it will work identically if you simply replace the first line with an array, as shown below.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">queue</span> <span class="o">=</span> <span class="p">[</span><span class="mi">125</span><span class="o">.</span><span class="mi">75</span><span class="p">,</span> <span class="mi">100</span><span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="mi">300</span><span class="o">.</span><span class="mi">50</span><span class="p">,</span> <span class="mi">700</span><span class="p">]</span>
+<span class="nb">p</span> <span class="n">queue</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span> <span class="s2">"Amount: </span><span class="si">#{</span><span class="n">x</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+<span class="nb">p</span> <span class="n">queue</span><span class="p">.</span><span class="nf">inject</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>This simple example hints at the real beauty of <code class="highlighter-rouge">Enumerable</code> in particular, and the mixin technique in general. In reality, my <code class="highlighter-rouge">Queue</code> object and Ruby’s <code class="highlighter-rouge">Array</code> class have very little in common. But in the context of how you can iterate over the two objects, they can share a matching interface for the things they do have in common.</p>
+
+<p>This is where modules shine. They allow some of the benefits of inheritance in that they allow implementation sharing, but without the requirement of organizing things into a rigid class hierarchy. Things get even more interesting when you remember to tie your understanding of how modules work back to the way Ruby looks up methods.</p>
+
+<h3 id="exploiting-the-lookup-order-of-mixins">Exploiting the lookup order of mixins</h3>
+
+<p>Methods are looked up in mixins in reverse order of their inclusion, giving the last module you mixed in a priority spot in the lookup path. A pleasant effect that arises naturally from this rule is that it provides an elegant technique for monkey patching that does not rely on method aliasing. Let’s look at a patch that uses method aliasing, and how it could be written differently.</p>
+
+<p>Below is the code that Rubygems uses to patch <code class="highlighter-rouge">require</code> to add in gem loading functionality. Since <code class="highlighter-rouge">require</code> is just a method in Ruby, and not a keyword, the patch is relatively straightforward in pure Ruby.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Kernel</span>
+  <span class="k">alias</span> <span class="n">gem_original_require</span> <span class="nb">require</span>
+
+  <span class="k">def</span> <span class="nf">require</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="c1"># :doc:</span>
+    <span class="n">gem_original_require</span> <span class="n">path</span>
+  <span class="k">rescue</span> <span class="no">LoadError</span> <span class="o">=&gt;</span> <span class="n">load_error</span>
+    <span class="k">if</span> <span class="n">load_error</span><span class="p">.</span><span class="nf">message</span><span class="p">.</span><span class="nf">end_with?</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+      <span class="k">if</span> <span class="no">Gem</span><span class="p">.</span><span class="nf">try_activate</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">gem_original_require</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="k">raise</span> <span class="n">load_error</span>
+  <span class="k">end</span>
+<span class="k">end</span> 
+</code></pre>
+</div>
+
+<p>At the time this code was written, using method aliasing was the standard way of changing the behavior of an existing method. Aliases are used to make a copy of an existing method before modifying it, which allows customized code to delegate to the original method. This permits re-using the parts of the original method that are needed while (hopefully) preventing issues with backwards compatibility. The general approach works well, but it increases the chances that the copied methods will clash with each other as the chain gets longer, and also adds a number of superfluous methods to objects that are really just implementation details.</p>
+
+<p>Taking advantage of Ruby’s method lookup order in modules, we can get around the issues with aliasing by writing a patch similar to the one shown below.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">GemCustomRequire</span>
+  <span class="k">def</span> <span class="nf">require</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="c1"># :doc:</span>
+    <span class="k">super</span>
+  <span class="k">rescue</span> <span class="no">LoadError</span> <span class="o">=&gt;</span> <span class="n">load_error</span>
+    <span class="k">if</span> <span class="n">load_error</span><span class="p">.</span><span class="nf">message</span><span class="p">.</span><span class="nf">end_with?</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+      <span class="k">if</span> <span class="no">Gem</span><span class="p">.</span><span class="nf">try_activate</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">super</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="k">raise</span> <span class="n">load_error</span>
+  <span class="k">end</span>   
+<span class="k">end</span> 
+
+<span class="k">class</span> <span class="nc">Object</span>
+  <span class="kp">include</span> <span class="no">GemCustomRequire</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Because the original <code class="highlighter-rouge">require()</code> method is defined within the <code class="highlighter-rouge">Kernel</code> module and not on <code class="highlighter-rouge">Object</code> itself, we can include our <code class="highlighter-rouge">GemCustomRequire</code> module and then use <code class="highlighter-rouge">super</code> to call the original require. The result is code that looks more natural and ordinary, reducing the amount of magic you need to know in order to understand it. It also completely avoids the possible issue of copied methods clashing with one another.</p>
+
+<p>This ability to do safe monkeypatching that modules affords us has been picking up steam within popular Ruby projects. Rails 3 was in a large extent designed to afford this sort of modularity, for the express purpose of making it easier for third party plugins to hook into the system in a more graceful way than method aliasing. Other projects that require a high degree of extensibility are quickly following in its footsteps, which is a good thing.</p>
+
+<p>While you’re less likely to run into this question in application code than you are in library or framework code, knowing what mixins can gain you in terms of extensibility can really come in handy. There are tons of other good things to say about modules, but we’ll need to save those for another day.</p>
+
+<h3 id="per-object-behavior">Per Object Behavior</h3>
+
+<p>I was originally going to go into detail about mixing modules into individual objects as well as defining singleton methods. However, I think that can be a topic all of it’s own, and I want to give it a proper treatment rather than tacking it on to the end of an already lengthy newsletter.</p>
+
+<p>I promise we’ll revisit it soon, but for those who absolutely want to explore potential uses of these techniques right away, I offer two small challenges.</p>
+
+<p>1) Rather than using a framework for testing stubs, experiment with something like the code below next time you’re writing tests.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="n">obj</span>
+  <span class="k">def</span> <span class="nf">my_stubbed_method</span>
+
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>2) Rather than re-opening a class to add some extra behavior, experiment with mixing modules into individual objects to get the extra features you need.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MathHelpers</span>
+  <span class="k">def</span> <span class="nf">sum</span>
+    <span class="n">inject</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">average</span>
+    <span class="n">sum</span><span class="p">.</span><span class="nf">to_f</span> <span class="o">/</span> <span class="n">length</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">array</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">MathHelpers</span><span class="p">)</span>
+<span class="nb">p</span> <span class="n">array</span><span class="p">.</span><span class="nf">average</span>
+</code></pre>
+</div>
+
+<p>If you try these ideas out, you’ll almost certainly find uses for them in other
+contexts, too.</p>
+
+<h3 id="reflections">Reflections</h3>
+
+<p>Hopefully you’ve learned something new about Ruby’s method lookup rules, or at least been given some new things to think about and explore. If you’ve come from a background in which inheritance has been your only tool, you will likely have to retrain yourself a bit to make full use of what Ruby has to offer.</p>
+
+<p>Whenever you compare one of these options to the other, consider your context
+and how much the advantages and disadvantages of each technique affect your
+particular situation. The correct approach always depends on that context, and
+if in doubt, experiment and see what works best.</p>
+
+<p>More discussion on this topic is welcome in the comments section below. While I wrote this article a while ago, I am happy to jump back into the topic as long as folks have interesting ideas and questions to share.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> This article has also been published on the Ruby Best Practices blog. There <a href="http://blog.rubybestpractices.com/posts/gregory/031-issue-2-method-lookup.html#disqus_thread">may be additional commentary</a> 
+over there worth taking a look at.</p>
+</blockquote>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

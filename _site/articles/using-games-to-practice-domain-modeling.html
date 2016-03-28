@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Using games to practice domain modeling</title>
+  <meta name="description" content="As programmers, it is literally our job to make domain models understandable to computers. While this can be some of the most creative work we do, it also te...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/using-games-to-practice-domain-modeling">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Using games to practice domain modeling</h1>
+    <p class="post-meta"><time datetime="2012-02-28T00:00:00-05:00" itemprop="datePublished">Feb 28, 2012</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>As programmers, it is literally our job to make <a href="http://en.wikipedia.org/wiki/Domain_model">domain models</a> understandable to computers. While this can be some of the most creative work we do, it also tends to be the most challenging. The inherent difficulty of designing and implementing conceptual models leads many to develop their problem solving skills through a painful process of trial and error rather than some form of deliberate practice. However, that is a path paved with sorrows, and we can do better.</p>
+
+<p>Defining problem spaces and navigating within them does get easier as you become more experienced. But if you only work with complex domain models while you are knee deep in production code, you’ll find that many useful modeling patterns will blend in with application-specific details and quickly fade into the background without being noticed. Instead, what is needed is a testbed for exploring these ideas that is complex enough to mirror some of the problems you’re likely to encounter in your daily work, but inconsequential enough to ensure that your practical needs for working code won’t get in the way of exploring new ideas.</p>
+
+<p>While there are a number of ways to create a good learning environment for studying domain modeling, my favorite approach is to try to clone bits of functionality from various games I play when I’m not coding. In this article, I’ll walk you through an example of this technique by demonstrating how to model a simplified version of the <a href="http://www.minecraftwiki.net/wiki/Crafting">Minecraft crafting system</a>.</p>
+
+<h3 id="defining-the-problem-space">Defining the problem space</h3>
+
+<blockquote>
+  <p><strong>NOTE:</strong> Those who haven’t played Minecraft before may want to spend a few minutes watching this video <a href="http://www.youtube.com/watch?v=AKktiCsCPWE">tutorial about crafting</a> or skimming <a href="http://www.minecraftwiki.net/wiki/Crafting">the game’s wiki page</a> on the topic before continuing. However, because I only focus on a few very basic ideas about the system for this exercise, you don’t need to be a Minecraft player in order to enjoy this article.</p>
+</blockquote>
+
+<p>The crafting table is a key component in Minecraft because it provides the player with a way to turn natural resources into useful tools, weapons, and construction materials. Stripped down to its bare essence, the function of the crafting table is essentially to convert various input items laid out in a 3x3 grid into some quantity of a different type of item. For example, a single block of wood can be converted into four wooden planks, a pair of wooden planks can be combined to produce four sticks, and a stick combined with a piece of coal will produce four torches. Virtually all objects in the Minecraft world can be built in this fashion, as long as the player has the necessary materials and knows the rules about how to combine them together.</p>
+
+<p>Because positioning of input items within the crafting table’s grid is significant, players need to make use of recipes to learn how various input items can be combined to produce new objects. To make recipes easier for the player to memorize, the game allows for a bit of flexibility in the way things are arranged, as long as the basic structure of the layout is preserved. In particular, the input items for recipes can be horizontally and vertically shifted as long as they remain within the 3x3 grid, and the system also knows how to match mirror images as well. However, after accounting for these variants, there is a direct mapping from the inputs to the outputs in the crafting system.</p>
+
+<p>As of 2012-02-27, Minecraft supports 174 crafting recipes. This is a small enough number where even a naïve data model would likely be fast enough to not cause any usability problems, even if you consider the fact that most of those recipes can be shifted around in various ways. But in the interest of showing off some neat Ruby data modeling tricks, I’ve decided to try to implement this model in an efficient way. In doing so, I found out that inputs can be checked for corresponding outputs in constant time, and that there are some useful constraints that make it so that only a few variants need to be checked in most cases in order to find a match for the player’s input items.</p>
+
+<p>My <a href="https://github.com/elm-city-craftworks/crafting_table">finished model</a> ended up consisting of three parts: A <code class="highlighter-rouge">Recipe</code> object responsible for codifying the layout of input items and generating variants based on that layout, a <code class="highlighter-rouge">Cookbook</code> object which maps recipes to their outputs, and an <code class="highlighter-rouge">Importer</code> object which generates a cookbook object from CSV formatted recipe data. In the following sections, I will take a look at each of these objects and point out any interesting details about them.</p>
+
+<h3 id="modeling-recipes">Modeling recipes</h3>
+
+<blockquote>
+  <p><strong>NOTE:</strong> To keep my implementation code easy to follow, I have simplified the recipe model somewhat so that it does not consider mirror images of recipes to be equivalent. Implementing that sort of behavior could be a fun exercise for the reader, and would make this model a closer match to what Minecraft actually implements.</p>
+</blockquote>
+
+<p>The challenge involved in modeling Minecraft recipes is that you need to treat horizontal and vertically shifted item sets as being equivalent to one other. Or in other words, as long as the shape of an item set is preserved, there is a bit of flexibility about where you can place items on the table. For example, all of the recipes below are considered to be equivalent to one another:</p>
+
+<p><img src="http://i.imgur.com/HSop9.png" alt="" /></p>
+
+<p>A naïve approach to the problem will lead you to checking up to 25 variants for each recipe, only to find out that most of them are invalid mutations of the original item set that place at least one item outside of the 3x3 grid. Some simple checks can be put in place to throw out invalid variants, but it is better to never generate them at all.</p>
+
+<blockquote>
+  <p><strong>UPDATE 2012-03-01</strong>: Based on a suggestion by <a href="http://community.mendicantuniversity.org/people/semmons99">Shane Emmons</a>, I worked on a better approach to this problem after this article was published. The basic idea is that rather than generating recipe variants, you instead normalize the recipes into a single common layout on demand. Check out the <a href="https://github.com/elm-city-craftworks/crafting_table/blob/607a4d8fc958c2e746b899c43b5cbb01301b3c6b/lib/crafting_table/recipe.rb">updated code here</a>. The solution described below is still interesting though, so feel free to read on anyway!</p>
+</blockquote>
+
+<p>The approach I ended up taking is to compute margins surrounding each item that indicate how they can be shifted. As each new item gets added to the recipe, its margins and the margins of the current item set are intersected to obtain a new set of boundaries. The following diagram demonstrates the process of adding three items (B, C, A) to the grid sequentially, with each newly added item reducing the number of equivalent recipes that can be generated:</p>
+
+<p><img src="http://i.imgur.com/SEen2.png" alt="" /></p>
+
+<p>This process is very efficient because it involves simple numerical computations at insert time, rather than processing the whole item set at once. With that in mind, my implementation of <code class="highlighter-rouge">Recipe#[]=</code> updates the margins for the item set right away whenever a new item is added:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">recipe</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"B"</span>
+<span class="nb">p</span> <span class="n">recipe</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:margins</span><span class="p">)</span> <span class="c1">#=&gt; {:top=&gt;2, :left=&gt;0, :right=&gt;2, :bottom=&gt;0}</span>
+
+<span class="n">recipe</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"C"</span>
+<span class="nb">p</span> <span class="n">recipe</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:margins</span><span class="p">)</span> <span class="c1">#=&gt; {:top=&gt;2, :left=&gt;0, :right=&gt;1, :bottom=&gt;0} </span>
+
+<span class="n">recipe</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"A"</span>
+<span class="nb">p</span> <span class="n">recipe</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:margins</span><span class="p">)</span> <span class="c1">#=&gt; {:top=&gt;1, :left=&gt;0, :right=&gt;1, :bottom=&gt;0} </span>
+</code></pre>
+</div>
+
+<p>The following code shows how <code class="highlighter-rouge">Recipe#[]=</code> is implemented. In particular, it demonstrates that item set margins are directly updated on insert, but variant layouts are not generated until later.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">CraftingTable</span>
+  <span class="k">class</span> <span class="nc">Recipe</span>
+    <span class="nc">TABLE_WIDTH</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="no">TABLE_HEIGHT</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span>
+      <span class="nb">self</span><span class="p">.</span><span class="nf">ingredients</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="nb">self</span><span class="p">.</span><span class="nf">margins</span>     <span class="o">=</span> <span class="p">{</span> <span class="ss">:top</span>    <span class="o">=&gt;</span> <span class="no">Float</span><span class="o">::</span><span class="no">INFINITY</span><span class="p">,</span> 
+                           <span class="ss">:left</span>   <span class="o">=&gt;</span> <span class="no">Float</span><span class="o">::</span><span class="no">INFINITY</span><span class="p">,</span> 
+                           <span class="ss">:right</span>  <span class="o">=&gt;</span> <span class="no">Float</span><span class="o">::</span><span class="no">INFINITY</span><span class="p">,</span>
+                           <span class="ss">:bottom</span> <span class="o">=&gt;</span> <span class="no">Float</span><span class="o">::</span><span class="no">INFINITY</span> <span class="p">}</span>
+
+      <span class="nb">self</span><span class="p">.</span><span class="nf">variants</span> <span class="o">=</span> <span class="no">Set</span><span class="p">.</span><span class="nf">new</span>
+      <span class="nb">self</span><span class="p">.</span><span class="nf">variants_need_updating</span> <span class="o">=</span> <span class="kp">false</span>
+    <span class="k">end</span>
+
+    <span class="c1"># ... various unrelated details omitted ...</span>
+
+    <span class="k">def</span> <span class="nf">[]=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">ingredient_type</span><span class="p">)</span>
+      <span class="k">raise</span> <span class="no">ArgumentError</span> <span class="k">unless</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="o">.</span><span class="no">TABLE_WIDTH</span><span class="p">).</span><span class="nf">include?</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+      <span class="k">raise</span> <span class="no">ArgumentError</span> <span class="k">unless</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="o">.</span><span class="no">TABLE_HEIGHT</span><span class="p">).</span><span class="nf">include?</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+      <span class="c1"># storing positions as vectors makes variant computations easier</span>
+      <span class="n">ingredients</span><span class="p">[</span><span class="no">Vector</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ingredient_type</span>
+
+      <span class="n">update_margins</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+
+      <span class="nb">self</span><span class="p">.</span><span class="nf">variants_need_updating</span> <span class="o">=</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="kp">private</span>
+
+    <span class="kp">attr_accessor</span> <span class="ss">:margins</span><span class="p">,</span> <span class="ss">:ingredients</span><span class="p">,</span> <span class="ss">:variants_need_updating</span>
+
+    <span class="k">def</span> <span class="nf">update_margins</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+      <span class="n">margins</span><span class="p">[</span><span class="ss">:left</span><span class="p">]</span>   <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span>                <span class="n">margins</span><span class="p">[</span><span class="ss">:left</span><span class="p">]</span>  <span class="p">].</span><span class="nf">min</span>
+      <span class="n">margins</span><span class="p">[</span><span class="ss">:right</span><span class="p">]</span>  <span class="o">=</span> <span class="p">[</span><span class="no">TABLE_WIDTH</span><span class="o">-</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="n">margins</span><span class="p">[</span><span class="ss">:right</span><span class="p">]</span> <span class="p">].</span><span class="nf">min</span>
+      <span class="n">margins</span><span class="p">[</span><span class="ss">:bottom</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span><span class="p">,</span>                <span class="n">margins</span><span class="p">[</span><span class="ss">:bottom</span><span class="p">]].</span><span class="nf">min</span>
+      <span class="n">margins</span><span class="p">[</span><span class="ss">:top</span><span class="p">]</span>    <span class="o">=</span> <span class="p">[</span><span class="no">TABLE_HEIGHT</span><span class="o">-</span><span class="n">y</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">margins</span><span class="p">[</span><span class="ss">:top</span><span class="p">]</span>   <span class="p">].</span><span class="nf">min</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>I deferred the process of generating variants simply because doing so at insert time would cause many unnecessary intermediate computations to be done for multi-item recipes. While such a small number of possible variations pretty much guarantees there won’t be performance issues whether or not lazy evaluation is used, I wanted to use this situation as a chance to think through how I would model variant generation if efficiency was a real concern. In production code, premature optimization is the root of all evil, but when you’re in deliberate practice mode it can be quite fun.</p>
+
+<p>I ultimately decided to generate the variants on demand when two <code class="highlighter-rouge">Recipe</code> objects are compared to one another. As you can see from the following code, my implementation of <code class="highlighter-rouge">Recipe#==</code> causes both recipe objects involved in the test to update their variants if necessary:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">CraftingTable</span>
+  <span class="k">class</span> <span class="nc">Recipe</span>
+    <span class="c1"># ... various unrelated details omitted ...</span>
+
+    <span class="k">def</span> <span class="nf">==</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+      <span class="k">return</span> <span class="kp">false</span> <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span> <span class="o">==</span> <span class="n">other</span><span class="p">.</span><span class="nf">class</span>
+
+      <span class="n">variants</span> <span class="o">==</span> <span class="n">other</span><span class="p">.</span><span class="nf">variants</span>
+    <span class="k">end</span>
+
+    <span class="kp">protected</span>
+
+    <span class="k">def</span> <span class="nf">variants</span>
+      <span class="n">update_variants</span> <span class="k">if</span> <span class="n">variants_need_updating</span>
+
+      <span class="vi">@variants</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>While the high level interface for <code class="highlighter-rouge">Recipe</code> comparison is easy to follow, the way I ended up generating the underlying variant data is a bit messy. The implementation details for <code class="highlighter-rouge">Recipe#update_variants</code> are shown below, but the rough idea here is that I compute a set of <code class="highlighter-rouge">valid_offsets</code> and then use them to do vector addition to translate items to different coordinates within the grid. After performing this transformation, I wrap the variant data in a <code class="highlighter-rouge">Set</code> object so that they can easily be compared in an order-independent fashion. Assuming all this happens successfully, the <code class="highlighter-rouge">variants_need_updating</code> flag gets set to <code class="highlighter-rouge">false</code> to indicate that the variant data is now up to date.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">CraftingTable</span>
+  <span class="k">class</span> <span class="nc">Recipe</span>
+    
+    <span class="c1"># ... various unrelated details omitted ...</span>
+
+    <span class="kp">private</span>
+
+    <span class="kp">attr_accessor</span> <span class="ss">:margins</span><span class="p">,</span> <span class="ss">:ingredients</span><span class="p">,</span> <span class="ss">:variants_need_updating</span>
+    <span class="kp">attr_writer</span>   <span class="ss">:variants</span>
+
+    <span class="k">def</span> <span class="nf">update_variants</span>
+      <span class="k">raise</span> <span class="no">InvalidRecipeError</span> <span class="k">if</span> <span class="n">ingredients</span><span class="p">.</span><span class="nf">empty?</span>
+
+      <span class="n">variant_data</span> <span class="o">=</span> <span class="n">valid_offsets</span><span class="p">.</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span>
+        <span class="n">ingredients</span><span class="p">.</span><span class="nf">each_with_object</span><span class="p">({})</span> <span class="k">do</span> <span class="o">|</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">content</span><span class="p">),</span> <span class="n">variant</span><span class="o">|</span>
+          <span class="n">new_position</span> <span class="o">=</span> <span class="n">position</span> <span class="o">+</span> <span class="no">Vector</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]</span>
+
+          <span class="n">variant</span><span class="p">[</span><span class="n">new_position</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="nb">self</span><span class="p">.</span><span class="nf">variants</span>                  <span class="o">=</span> <span class="no">Set</span><span class="p">[</span><span class="o">*</span><span class="n">variant_data</span><span class="p">]</span>
+      <span class="nb">self</span><span class="p">.</span><span class="nf">variants_need_updating</span>    <span class="o">=</span> <span class="kp">false</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">valid_offsets</span>
+      <span class="n">horizontal</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">margins</span><span class="p">[</span><span class="ss">:left</span><span class="p">].</span><span class="nf">.</span><span class="n">margins</span><span class="p">[</span><span class="ss">:right</span><span class="p">]).</span><span class="nf">to_a</span>
+      <span class="n">vertical</span>   <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">margins</span><span class="p">[</span><span class="ss">:bottom</span><span class="p">].</span><span class="nf">.</span><span class="n">margins</span><span class="p">[</span><span class="ss">:top</span><span class="p">]).</span><span class="nf">to_a</span>
+
+      <span class="n">horizontal</span><span class="p">.</span><span class="nf">product</span><span class="p">(</span><span class="n">vertical</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>An interesting thing to note about this design is that variants are purely implementation details that are not exposed via the public API. While the large amount of code I’ve shelved in private methods seems to indicate that there might be an object to extract here, I like the idea that from the outside perspective, the equivalence relationship between recipes is established without having to do any sort of explicit check to see whether two different layouts share a common variant. To see the true benefits of this kind of information hiding, we can take a look at how it affects the design of the cookbook.</p>
+
+<h3 id="modeling-a-cookbook">Modeling a cookbook</h3>
+
+<p>One of the first things I noticed about this problem domain was that the mapping of inputs to outputs were a natural fit for a hash structure. While it took a while to sort out the details, I eventually was able to put together a <code class="highlighter-rouge">Cookbook</code> object that works in the manner shown below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cookbook</span>     <span class="o">=</span> <span class="no">CraftingTable</span><span class="o">::</span><span class="no">Cookbook</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">torch_recipe</span> <span class="o">=</span> <span class="no">CraftingTable</span><span class="o">::</span><span class="no">Recipe</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="n">torch_recipe</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"coal"</span>
+<span class="n">torch_recipe</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"stick"</span>
+
+<span class="n">cookbook</span><span class="p">[</span><span class="n">torch_recipe</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"torch"</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+
+<span class="c1"># ---</span>
+
+<span class="n">user_recipe</span> <span class="o">=</span> <span class="no">CraftingTable</span><span class="o">::</span><span class="no">Recipe</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">user_recipe</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"coal"</span>
+<span class="n">user_recipe</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"stick"</span>
+
+<span class="nb">p</span> <span class="n">cookbook</span><span class="p">[</span><span class="n">user_recipe</span><span class="p">]</span> <span class="c1">#=&gt; ["torch", 4]</span>
+</code></pre>
+</div>
+
+<p>The final implementation of this object turned out to be incredibly simple, although it required some minor extensions to the <code class="highlighter-rouge">Recipe</code> object in order to work correctly. Take a look at the following class definition to see just how little <code class="highlighter-rouge">CraftingTable::Cookbook</code> is doing under the hood:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">CraftingTable</span>
+
+  <span class="c1"># This is the complete definition of my Cookbook object, with no omissions!</span>
+
+  <span class="k">class</span> <span class="nc">Cookbook</span>
+    <span class="k">def</span> <span class="nf">initialize</span>
+      <span class="nb">self</span><span class="p">.</span><span class="nf">recipes</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">[]</span><span class="p">(</span><span class="n">recipe</span><span class="p">)</span>
+      <span class="n">recipes</span><span class="p">[</span><span class="n">recipe</span><span class="p">]</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">[]=</span><span class="p">(</span><span class="n">recipe</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">recipes</span><span class="p">[</span><span class="n">recipe</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">"A variant of this recipe is already defined!"</span>
+      <span class="k">end</span>
+
+      <span class="n">recipes</span><span class="p">[</span><span class="n">recipe</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+    <span class="k">end</span>
+
+    <span class="kp">private</span>
+
+    <span class="kp">attr_accessor</span> <span class="ss">:recipes</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>On the surface, the class seems to have only two tangible features to it: it severely narrows the interface to the hash it wraps so that it becomes nothing more than a simple key/value store, and it forces single assignment semantics. However, when we look at how the object is actually used, we see that there is an implicit dependency on some deeper, more domain specific logic. Revisiting the usage example from before, you can see that the <code class="highlighter-rouge">Cookbook</code> object treats variants of the same recipes as if they were the same hash key.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># ... unimportant boilerplate omitted</span>
+
+<span class="n">torch_recipe</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"coal"</span>
+<span class="n">torch_recipe</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"stick"</span>
+
+<span class="n">cookbook</span><span class="p">[</span><span class="n">torch_recipe</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"torch"</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+
+<span class="c1"># ---</span>
+
+<span class="n">user_recipe</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"coal"</span>
+<span class="n">user_recipe</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"stick"</span>
+
+<span class="nb">p</span> <span class="n">cookbook</span><span class="p">[</span><span class="n">user_recipe</span><span class="p">]</span> <span class="c1">#=&gt; ["torch", 4]</span>
+</code></pre>
+</div>
+
+<p>If you haven’t already dug into the source to locate where this bit of magic comes from, it has to do with the fact that Ruby provides hooks that allow you to use complex objects as hash keys. In particular, customizing the way that objects are used as hash keys involves overriding the <code class="highlighter-rouge">Object#hash</code> and <code class="highlighter-rouge">Object#eql?</code> methods. If you take a closer look at the <code class="highlighter-rouge">Recipe</code> object, you’ll see it does define both of these methods:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">CraftingTable</span>
+  <span class="c1"># ... various unrelated details omitted ...</span>
+
+  <span class="k">class</span> <span class="nc">Recipe</span>
+    <span class="k">def</span> <span class="nf">==</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+      <span class="k">return</span> <span class="kp">false</span> <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span> <span class="o">==</span> <span class="n">other</span><span class="p">.</span><span class="nf">class</span>
+
+      <span class="n">variants</span> <span class="o">==</span> <span class="n">other</span><span class="p">.</span><span class="nf">variants</span>
+    <span class="k">end</span>
+
+    <span class="c1"># this is the standard idiom, as in most cases == should be the same as eql?</span>
+    <span class="kp">alias_method</span> <span class="ss">:eql?</span><span class="p">,</span> <span class="ss">:==</span>
+
+    <span class="k">def</span> <span class="nf">hash</span>
+      <span class="n">variants</span><span class="p">.</span><span class="nf">hash</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>While I don’t want to get bogged down in the details of how these hooks work, the basic idea is that the <code class="highlighter-rouge">hash</code> method returns a numeric identifier which determines which bucket to store the value in. When a provided key hashes to the same number of an object already in the hash, the <code class="highlighter-rouge">eql?</code> method determines whether the keys are actually equivalent. Because <code class="highlighter-rouge">Recipe#hash</code> simply delegates to <code class="highlighter-rouge">Set#hash</code>, all item sets with the same elements have the same hash value, even if their order differs. Likewise, when <code class="highlighter-rouge">eql?</code> is called, it ends up delegating to <code class="highlighter-rouge">Set#==</code> which has the same semantics. If you trace your way through the usage example, you’ll find that because <code class="highlighter-rouge">torch_recipe</code> and <code class="highlighter-rouge">user_recipe</code> generate the same variants, they also can stand in for one another as hash keys due to these overridden methods.</p>
+
+<p>Without a doubt, this is a <em>clever</em> technique. But I’m still on the fence about whether it is a good approach or not. On the one hand, it makes use of a well defined hook that Ruby provides which seems to be well suited for the problem we’re trying to model. On the other hand, it is not a very explicit way of building an API at all, and requires a non-trivial understanding of low level features of Ruby to fully understand this code. This is a common tension whenever designing Ruby objects: Matz assumes we’re all a lot smarter and a lot more responsible than we might consider ourselves.</p>
+
+<p>I decided to go this route because in learning exercises I like to push my boundaries a bit and see where it takes me. But if this were production code, I would think about going with a slighly less elegant but more explicit approach. For example, I might have made the <code class="highlighter-rouge">Recipe#variants</code> method public and then did something similar to the following code in the <code class="highlighter-rouge">Cookbook#[]</code> method:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">CraftingTable</span>
+  <span class="k">class</span> <span class="nc">Cookbook</span>
+    <span class="k">def</span> <span class="nf">[]</span><span class="p">(</span><span class="n">recipe</span><span class="p">)</span>
+      <span class="n">variant</span> <span class="o">=</span> <span class="n">recipe</span><span class="p">.</span><span class="nf">variants</span><span class="p">.</span><span class="nf">find</span> <span class="p">{</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span> <span class="n">recipes</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="p">}</span>
+
+      <span class="n">recipes</span><span class="p">[</span><span class="n">variant</span><span class="p">]</span>
+    <span class="k">end</span>
+
+    <span class="c1"># ...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>That said, I would love to hear your thoughts on this particular pattern. Sometimes when a technique is rare, it’s hard to tell whether it seems unintuitive because it is actually hard to understand, or if it just feels that way because it isn’t familiar territory.</p>
+
+<h3 id="modeling-a-recipe-importer">Modeling a recipe importer</h3>
+
+<p>With the interesting modeling out of the way, all that remains to talk about is how to get data imported into cookbooks in a way that doesn’t require a lot of tedious assignment statements. For this purpose, I built a simple <code class="highlighter-rouge">Importer</code> object which takes a CSV file as input and builds up a <code class="highlighter-rouge">Cookbook</code> object from it.</p>
+
+<p>The data format consists of multiline records separated by an empty line, as shown below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">torch</span><span class="p">,</span><span class="mi">4</span>
+<span class="o">-</span><span class="p">,</span><span class="o">-</span><span class="p">,</span><span class="o">-</span>
+<span class="o">-</span><span class="p">,</span><span class="n">coal</span><span class="p">,</span><span class="o">-</span>
+<span class="o">-</span><span class="p">,</span><span class="n">stick</span><span class="p">,</span><span class="o">-</span>
+
+<span class="n">crafting_table</span><span class="p">,</span><span class="mi">1</span>
+<span class="o">-</span><span class="p">,</span><span class="o">-</span><span class="p">,</span><span class="o">-</span>
+<span class="n">wooden_plank</span><span class="p">,</span><span class="n">wooden_plank</span><span class="p">,</span><span class="o">-</span>
+<span class="n">wooden_plank</span><span class="p">,</span><span class="n">wooden_plank</span><span class="p">,</span><span class="o">-</span>
+</code></pre>
+</div>
+
+<p>While the data isn’t pretty as a raw CSV file, this format makes it convenient to edit the data via a spreadsheet program, and doing so provides a pretty nice layout of the input grid. Once the file is written up, it ends up getting used in the manner shown below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cookbook</span>      <span class="o">=</span> <span class="no">CraftingTable</span><span class="o">::</span><span class="no">Importer</span><span class="p">.</span><span class="nf">cookbook_from_csv</span><span class="p">(</span><span class="n">recipe_file</span><span class="p">)</span>
+<span class="n">user_recipe_1</span> <span class="o">=</span> <span class="no">CraftingTable</span><span class="o">::</span><span class="no">Recipe</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="n">user_recipe_1</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"stick"</span>
+<span class="n">user_recipe_1</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"coal"</span>
+
+<span class="nb">p</span> <span class="n">cookbook</span><span class="p">[</span><span class="n">user_recipe_1</span><span class="p">]</span> <span class="c1">#=&gt; ["torch", 4]</span>
+
+<span class="n">user_recipe_2</span> <span class="o">=</span> <span class="no">CraftingTable</span><span class="o">::</span><span class="no">Recipe</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="n">user_recipe_2</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"wooden_plank"</span>
+<span class="n">user_recipe_2</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"wooden_plank"</span>
+<span class="n">user_recipe_2</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"wooden_plank"</span>
+<span class="n">user_recipe_2</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"wooden_plank"</span>
+
+<span class="nb">p</span> <span class="n">cookbook</span><span class="p">[</span><span class="n">user_recipe_1</span><span class="p">]</span> <span class="c1">#=&gt; ["crafting_table", 1]</span>
+</code></pre>
+</div>
+
+<p>The implementation of the <code class="highlighter-rouge">Importer</code> object is mostly an uninspired procedural hack, with the only interesting detail of it being that it manually iterates over the CSV data using <code class="highlighter-rouge">CSV.new</code> in combination with a <code class="highlighter-rouge">File</code> object as yet another unnecessary-yet-educational efficiency optimization:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">CraftingTable</span>
+  <span class="no">Importer</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+
+  <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="no">Importer</span>
+    <span class="k">def</span> <span class="nf">cookbook_from_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+      <span class="n">cookbook</span> <span class="o">=</span> <span class="no">Cookbook</span><span class="p">.</span><span class="nf">new</span>
+
+      <span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
+        <span class="n">csv</span> <span class="o">=</span> <span class="no">CSV</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">until</span> <span class="n">f</span><span class="p">.</span><span class="nf">eof?</span>
+          <span class="n">product</span><span class="p">,</span> <span class="n">quantity</span> <span class="o">=</span> <span class="n">csv</span><span class="p">.</span><span class="nf">gets</span>
+
+          <span class="n">grid</span> <span class="o">=</span> <span class="p">[</span><span class="n">csv</span><span class="p">.</span><span class="nf">gets</span><span class="p">,</span> <span class="n">csv</span><span class="p">.</span><span class="nf">gets</span><span class="p">,</span> <span class="n">csv</span><span class="p">.</span><span class="nf">gets</span><span class="p">]</span>
+
+          <span class="n">cookbook</span><span class="p">[</span><span class="n">recipe_from_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">product</span><span class="p">,</span> <span class="n">quantity</span><span class="p">.</span><span class="nf">to_i</span><span class="p">]</span>
+          
+          <span class="n">csv</span><span class="p">.</span><span class="nf">gets</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="n">cookbook</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">recipe_from_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+      <span class="n">recipe</span> <span class="o">=</span> <span class="no">Recipe</span><span class="p">.</span><span class="nf">new</span>
+
+      <span class="n">last_row</span> <span class="o">=</span> <span class="no">Recipe</span><span class="o">::</span><span class="no">TABLE_WIDTH</span>  <span class="o">-</span> <span class="mi">1</span>
+      <span class="n">last_col</span> <span class="o">=</span> <span class="no">Recipe</span><span class="o">::</span><span class="no">TABLE_HEIGHT</span> <span class="o">-</span> <span class="mi">1</span>
+
+      <span class="p">((</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="n">last_row</span><span class="p">).</span><span class="nf">to_a</span><span class="p">).</span><span class="nf">product</span><span class="p">((</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="n">last_col</span><span class="p">).</span><span class="nf">to_a</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">last_col</span> <span class="o">-</span> <span class="n">y</span>
+        
+        <span class="k">next</span> <span class="k">if</span> <span class="n">grid</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">=~</span> <span class="sr">/-/</span>
+
+        <span class="n">recipe</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="n">x</span><span class="p">]</span>
+      <span class="k">end</span>
+
+      <span class="n">recipe</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>This object is boring enough that I originally had planned to not implement it at all, in favor of having a <code class="highlighter-rouge">Cookbook.from_csv</code> method and perhaps a <code class="highlighter-rouge">Recipe.from_grid</code> method. However, I am increasingly growing suspicious of the presence of too many factory methods on objects, and worried that I’d be mixing the concerns of data extraction and data manipulation too much by doing that. In particular, I would have had to figure out a way to avoid directly referencing the “-“ string as an indicator of an empty cell in <code class="highlighter-rouge">Recipe.from_grid</code>, and I didn’t want to focus my energy on that because it felt like a waste of time.</p>
+
+<p>This code represents a small compromise in that it isolates something that doesn’t quite have a natural home so that it can be refactored later into something more elegant. Because this is a bolt-on feature, I felt comfortable making that trade so that I could focus more on the heart of the problem. However, if data import needs became more complex, this code would almost certainly need to be refactored into something more well organized.</p>
+
+<h3 id="reflections">Reflections</h3>
+
+<p>Hopefully this article has given you a strong sense of how deep even seemingly simple game constructs can be if you really think them through. In my experience, this phenomenon is strikingly similar to the kinds of complexity that arise naturally in even moderately complicated business applications. The main difference is that in a practice environment, you don’t need to worry about how much money you’re costing someone else by spending as much time thinking about the problem as you do writing implementation code.</p>
+
+<p>While doing deliberate practice of this variety, it is perfectly acceptable to actively seek out ways to induce analysis paralysis, premature optimization, and extreme over-engineering. In fact, the closer you get to feeling like your solution is completely overkill for the problem at hand, the more likely it is that you’re going to learn something useful from the exercise. Experiencing the tensions that arise from this kind of perfectionism in a low-risk environment can make it a lot easier to take a middle of the road path when dealing with your day to day work.</p>
+
+<p>The thing I like most about this sort of exercise is that it will often lead you to come across patterns or techniques that actually are directly applicable in practical scenarios. Whenever I stumble across a technique which is just as easy to implement as a more commonly used alternative but is more robust in some way, I tend to experiment with introducing those ideas into my production code to see how they work out for me. Sometimes these experiments work and other times they don’t, but they always improve my understanding of why I do things the way I do.</p>
+
+<p>While I remain a firm believer in the idea that deliberate practice should be done only in moderation and that there is no substitute for working on real problems that matter to you, the occasional sitting or two spent on shaking up what you think you know about this craft is well worth the effort. There are lots of different ways to do that, but this is the way that works for me. I’d love to hear what you think of it, and would also like to hear what other ways you’ve tried to hone your problem solving skills.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

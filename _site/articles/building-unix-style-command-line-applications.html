@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Building Unix-style command line applications</title>
+  <meta name="description" content="Ruby is best known as a web development language, but in its early days it wasmainly used on the command line. In this article, we’ll get back to those roots...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/building-unix-style-command-line-applications">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Building Unix-style command line applications</h1>
+    <p class="post-meta"><time datetime="2011-10-18T00:00:00-04:00" itemprop="datePublished">Oct 18, 2011</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Ruby is best known as a web development language, but in its early days it was
+mainly used on the command line. In this article, we’ll get back to those roots by building a partial implementation of the standard Unix command <code class="highlighter-rouge">cat</code>.</p>
+
+<p>The core purpose of the <code class="highlighter-rouge">cat</code> utility is to read in a list of input files, concatenate them, and output the resulting text to the command line. You can also use <code class="highlighter-rouge">cat</code> for a few other useful things, such as adding line numbers and suppressing extraneous whitespace. If we stick to these commonly used features, the core functionality of <code class="highlighter-rouge">cat</code> is something even a novice programmer would be able to implement without too much effort.</p>
+
+<p>The tricky part of building a <code class="highlighter-rouge">cat</code> clone is that it involves more than just
+some basic text manipulation; you also need to know about some 
+stream processing and error handling techniques that are common in Unix
+utilities. The <a href="https://gist.github.com/1293709">acceptance tests</a> 
+that I’ve used to compare the original <code class="highlighter-rouge">cat</code> utility to my Ruby-based <code class="highlighter-rouge">rcat</code> 
+tool reveal some of the extra details that need to be considered when
+building this sort of command line application.</p>
+
+<p>If you are already fairly comfortable with building command line tools, you may
+want to try implementing your own version of <code class="highlighter-rouge">rcat</code> before reading on. But don’t
+worry if you wouldn’t even know where to start: I’ve provided a 
+detailed walkthrough of my solution that will teach you everything 
+that you need to know.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> You’ll need to have the source code for <a href="https://github.com/elm-city-craftworks/rcat">my implementation of rcat</a> easily accessible as you work through the rest of this article. Please either clone the repository now or keep the GitHub file browser open while reading.</p>
+</blockquote>
+
+<h3 id="building-an-executable-script">Building an executable script</h3>
+
+<p>Our first task is to make it possible to run the <code class="highlighter-rouge">rcat</code> script without having to type something like <code class="highlighter-rouge">ruby path/to/rcat</code> each time we run it. This task can be done in three easy steps.</p>
+
+<p><strong>1) Add a shebang line to your script.</strong></p>
+
+<p>If you look at <code class="highlighter-rouge">bin/rcat</code> in my code, you’ll see that it starts with the following line:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1">#!/usr/bin/env ruby</span>
+</code></pre>
+</div>
+
+<p>This line (commonly called a shebang line) tells the shell what interpreter to use to process the rest of the file. Rather than providing a path directly to the Ruby interpreter, I instead use the path to the standard <code class="highlighter-rouge">env</code> utility. This step allows <code class="highlighter-rouge">env</code> to figure out which <code class="highlighter-rouge">ruby</code> executable is present in our current environment and to use that interpreter to process the rest of the file. This approach is preferable because it is <a href="http://en.wikipedia.org/wiki/Shebang_line#Portability">more portable</a> than hard-coding a path to a particular Ruby install. Although Ruby can be installed in any number of places, the somewhat standardized location of <code class="highlighter-rouge">env</code> makes it reasonably dependable.</p>
+
+<p><strong>2) Make your script executable.</strong></p>
+
+<p>Once the shebang line is set up, it’s necessary to update the permissions on the <code class="highlighter-rouge">bin/rcat</code> file. Running the following command from the project root will make <code class="highlighter-rouge">bin/rcat</code> executable:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ chmod +x bin/rcat
+</code></pre>
+</div>
+
+<p>Although the executable has not yet been added to the shell’s lookup path, it is now possible to test it by providing an explicit path to the executable.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ ./bin/rcat data/gettysburg.txt
+Four score and seven years ago, our fathers brought forth on this continent a
+new nation, conceived in Liberty and dedicated to the proposition that all men
+are created equal.
+
+... continued ...
+</code></pre>
+</div>
+
+<p><strong>3) Add your script to the shell’s lookup path.</strong></p>
+
+<p>The final step is to add the executable to the shell’s lookup path so that it can be called as a simple command. In Bash-like shells, the path is updated by modifying the <code class="highlighter-rouge">PATH</code> environment variable, as shown in the following example:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ export PATH=/Users/seacreature/devel/rcat/bin:$PATH
+</code></pre>
+</div>
+
+<p>This command prepends the <code class="highlighter-rouge">bin</code> folder in my rcat project to the existing contents of the <code class="highlighter-rouge">PATH</code>, which makes it possible for the current shell to call the <code class="highlighter-rouge">rcat</code> command without specifying a direct path to the executable, similar to how we call ordinary Unix commands:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ rcat data/gettysburg.txt
+Four score and seven years ago, our fathers brought forth on this continent a
+new nation, conceived in Liberty and dedicated to the proposition that all men
+are created equal.
+
+... continued ...
+</code></pre>
+</div>
+
+<p>To confirm that you’ve followed these steps correctly and that things are working as expected, you can now run the acceptance tests. If you see anything different than the following output, retrace your steps and see whether you’ve made a mistake somewhere. If not, please leave a comment and I’ll try to help you out.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ ruby tests.rb 
+You passed the tests, yay!
+</code></pre>
+</div>
+
+<p>Assuming that you have a working <code class="highlighter-rouge">rcat</code> executable, we can now move on to talk about how the actual program is implemented.</p>
+
+<h3 id="stream-processing-techniques">Stream processing techniques</h3>
+
+<p>We now can turn our focus to the first few acceptance tests from the <em>tests.rb</em> file. The thing that all these use cases have in common is that they involve very simple processing of input and output streams, and nothing more.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cat_output</span>  <span class="o">=</span> <span class="sb">`cat </span><span class="si">#{</span><span class="n">gettysburg_file</span><span class="si">}</span><span class="sb">`</span>
+<span class="n">rcat_output</span> <span class="o">=</span> <span class="sb">`rcat </span><span class="si">#{</span><span class="n">gettysburg_file</span><span class="si">}</span><span class="sb">`</span>
+
+<span class="nb">fail</span> <span class="s2">"Failed 'cat == rcat'"</span> <span class="k">unless</span> <span class="n">cat_output</span> <span class="o">==</span> <span class="n">rcat_output</span>
+
+<span class="c1">############################################################################</span>
+
+<span class="n">cat_output</span>  <span class="o">=</span> <span class="sb">`cat </span><span class="si">#{</span><span class="n">gettysburg_file</span><span class="si">}</span><span class="sb"> </span><span class="si">#{</span><span class="n">spaced_file</span><span class="si">}</span><span class="sb">`</span>
+<span class="n">rcat_output</span> <span class="o">=</span> <span class="sb">`rcat </span><span class="si">#{</span><span class="n">gettysburg_file</span><span class="si">}</span><span class="sb"> </span><span class="si">#{</span><span class="n">spaced_file</span><span class="si">}</span><span class="sb">`</span>
+
+<span class="nb">fail</span> <span class="s2">"Failed 'cat [f1 f2] == rcat [f1 f2]'"</span> <span class="k">unless</span> <span class="n">cat_output</span> <span class="o">==</span> <span class="n">rcat_output</span>
+
+<span class="c1">############################################################################</span>
+
+<span class="n">cat_output</span>  <span class="o">=</span> <span class="sb">`cat &lt; </span><span class="si">#{</span><span class="n">spaced_file</span><span class="si">}</span><span class="sb">`</span>
+<span class="n">rcat_output</span> <span class="o">=</span> <span class="sb">`rcat &lt; </span><span class="si">#{</span><span class="n">spaced_file</span><span class="si">}</span><span class="sb">`</span>
+
+<span class="nb">fail</span> <span class="s2">"Failed 'cat &lt; file == rcat &lt; file"</span> <span class="k">unless</span> <span class="n">cat_output</span> <span class="o">==</span> <span class="n">rcat_output</span>
+</code></pre>
+</div>
+
+<p>If we needed only to pass these three tests, we’d be in luck. Ruby provides a special stream object called <code class="highlighter-rouge">ARGF</code> that combines multiple input files into a single stream or falls back to standard input if no files are provided. Our entire script could look something like this:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">ARGF</span><span class="p">.</span><span class="nf">each_line</span> <span class="p">{</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span> <span class="nb">print</span> <span class="n">line</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>However, the real <code class="highlighter-rouge">cat</code> utility does a lot more than what <code class="highlighter-rouge">ARGF</code> provides,
+so it was necessary to write some custom code to handle stream processing:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RCat</span>
+  <span class="k">class</span> <span class="nc">Application</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+      <span class="vi">@params</span><span class="p">,</span> <span class="vi">@files</span> <span class="o">=</span> <span class="n">parse_options</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+
+      <span class="vi">@display</span>        <span class="o">=</span> <span class="no">RCat</span><span class="o">::</span><span class="no">Display</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="vi">@params</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">run</span>
+      <span class="k">if</span> <span class="vi">@files</span><span class="p">.</span><span class="nf">empty?</span>
+        <span class="vi">@display</span><span class="p">.</span><span class="nf">render</span><span class="p">(</span><span class="no">STDIN</span><span class="p">)</span>
+      <span class="k">else</span>
+        <span class="vi">@files</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">filename</span><span class="o">|</span>
+          <span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="vi">@display</span><span class="p">.</span><span class="nf">render</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="p">}</span>
+        <span class="k">end</span> 
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">parse_options</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+      <span class="c1"># ignore this for now</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The main difference between this code and the <code class="highlighter-rouge">ARGF</code>-based approach is that <code class="highlighter-rouge">RCat::Application#run</code> creates a new stream for each file. This comes in handy later when working on support for empty line suppression and complex line numbering but also complicates the implementation of the <code class="highlighter-rouge">RCat::Display</code> object. In the following example, I’ve stripped away the code that is related to these more complicated features to make it a bit easier for you to see the overall flow of things:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RCat</span>
+  <span class="k">class</span> <span class="nc">Display</span>
+    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+      <span class="n">lines</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="nf">each_line</span>
+      <span class="kp">loop</span> <span class="p">{</span> <span class="n">render_line</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="p">}</span>
+    <span class="k">end</span>
+
+    <span class="kp">private</span>
+
+    <span class="k">def</span> <span class="nf">render_line</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+      <span class="n">current_line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">.</span><span class="nf">next</span> 
+      <span class="nb">print</span> <span class="n">current_line</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The use of <code class="highlighter-rouge">loop</code> instead of an ordinary Ruby iterator might feel a bit strange here, but it works fairly well in combination with <code class="highlighter-rouge">Enumerator#next</code>. The following irb session demonstrates how the two interact with one another:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt;&gt; lines = "a\nb\nc\n".each_line
+=&gt; #&lt;Enumerator: "a\nb\nc\n":each_line&gt;
+&gt;&gt; loop { p lines.next }
+"a\n"
+"b\n"
+"c\n"
+=&gt; nil
+
+&gt;&gt; lines = "a\nb\nc\n".each_line
+=&gt; #&lt;Enumerator: "a\nb\nc\n":each_line&gt;
+&gt;&gt; lines.next
+=&gt; "a\n"
+&gt;&gt; lines.next
+=&gt; "b\n"
+&gt;&gt; lines.next
+=&gt; "c\n"
+
+&gt;&gt; lines.next
+StopIteration: iteration reached an end
+  from (irb):8:in `next'
+  from (irb):8
+  from /Users/seacreature/.rvm/rubies/ruby-1.9.3-rc1/bin/irb:16:in `&lt;main&gt;'
+
+&gt;&gt; loop { raise StopIteration }
+=&gt; nil
+</code></pre>
+</div>
+
+<p>Using this pattern makes it possible for <code class="highlighter-rouge">render_line</code> to actually consume more
+than one line from the input stream at once. If you work through the logic that
+is necessary to get the following test to pass, you might catch a glimpse of the
+benefits of this technique:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cat_output</span>  <span class="o">=</span> <span class="sb">`cat -s </span><span class="si">#{</span><span class="n">spaced_file</span><span class="si">}</span><span class="sb">`</span>
+<span class="n">rcat_output</span> <span class="o">=</span> <span class="sb">`rcat -s </span><span class="si">#{</span><span class="n">spaced_file</span><span class="si">}</span><span class="sb">`</span>
+
+<span class="nb">fail</span> <span class="s2">"Failed 'cat -s == rcat -s'"</span> <span class="k">unless</span> <span class="n">cat_output</span> <span class="o">==</span> <span class="n">rcat_output</span>
+</code></pre>
+</div>
+
+<p>Tracing the executation path for <code class="highlighter-rouge">rcat -s</code> will lead you to this line of code in
+<code class="highlighter-rouge">render_line</code>, which is the whole reason I decided to use this
+<code class="highlighter-rouge">Enumerator</code>-based implementation:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">lines</span><span class="p">.</span><span class="nf">next</span> <span class="k">while</span> <span class="n">lines</span><span class="p">.</span><span class="nf">peek</span><span class="p">.</span><span class="nf">chomp</span><span class="p">.</span><span class="nf">empty?</span>
+</code></pre>
+</div>
+
+<p>This code does an arbitrary amount of line-by-line lookahead until either a nonblank line is found or the end of the file is reached. It does so in a purely stateless and memory-efficient manner and is perhaps the most interesting line of code in this entire project. The downside of this approach is that it requires the entire <code class="highlighter-rouge">RCat::Display</code> object to be designed from the ground up to work with <code class="highlighter-rouge">Enumerator</code> objects. However, I struggled to come up with an alternative implementation that didn’t involve some sort of complicated state machine/buffering mechanism that would be equally cumbersome to work with.</p>
+
+<p>As tempting as it is to continue discussing the pros and cons of the different
+ways of solving this particular problem, it’s probably best for us to get back on
+track and look at some more basic problems that arise when working on
+command-line applications. I will now turn to the <code class="highlighter-rouge">parse_options</code> method that I asked you 
+to treat as a black box in our earlier examples.</p>
+
+<h3 id="options-parsing">Options parsing</h3>
+
+<p>Ruby provides two standard libraries for options parsing: <code class="highlighter-rouge">GetoptLong</code> and <code class="highlighter-rouge">OptionParser</code>. Though both are fairly complex tools, <code class="highlighter-rouge">OptionParser</code> looks and feels a lot more like ordinary Ruby code while simultaneously managing to be much more powerful. The implementation of <code class="highlighter-rouge">RCat::Application#parse_options</code> makes it clear what a good job <code class="highlighter-rouge">OptionParser</code> does when it comes to making easy things easy:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RCat</span>
+  <span class="k">class</span> <span class="nc">Application</span>
+    <span class="c1"># other code omitted</span>
+
+    <span class="k">def</span> <span class="nf">parse_options</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+      <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="n">parser</span> <span class="o">=</span> <span class="no">OptionParser</span><span class="p">.</span><span class="nf">new</span> 
+
+      <span class="n">parser</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="s2">"-n"</span><span class="p">)</span> <span class="p">{</span> <span class="n">params</span><span class="p">[</span><span class="ss">:line_numbering_style</span><span class="p">]</span> <span class="o">||=</span> <span class="ss">:all_lines</span>         <span class="p">}</span>
+      <span class="n">parser</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="s2">"-b"</span><span class="p">)</span> <span class="p">{</span> <span class="n">params</span><span class="p">[</span><span class="ss">:line_numbering_style</span><span class="p">]</span>   <span class="o">=</span> <span class="ss">:significant_lines</span> <span class="p">}</span>
+      <span class="n">parser</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="s2">"-s"</span><span class="p">)</span> <span class="p">{</span> <span class="n">params</span><span class="p">[</span><span class="ss">:squeeze_extra_newlines</span><span class="p">]</span> <span class="o">=</span> <span class="kp">true</span>               <span class="p">}</span>
+      
+      <span class="n">files</span> <span class="o">=</span> <span class="n">parser</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+
+      <span class="p">[</span><span class="n">params</span><span class="p">,</span> <span class="n">files</span><span class="p">]</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The job of <code class="highlighter-rouge">OptionParser#parse</code> is to take an arguments array and match it against the callbacks defined via the <code class="highlighter-rouge">OptionParser#on</code> method. Whenever a flag is matched, the associated block for that flag is executed. Finally, any unmatched arguments are returned. In the case of <code class="highlighter-rouge">rcat</code>, the unmatched arguments consist of the list of files we want to concatenate and display. The following example demonstrates what’s going on in <code class="highlighter-rouge">RCat::Application</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"optparse"</span>
+
+<span class="nb">puts</span> <span class="s2">"ARGV is </span><span class="si">#{</span><span class="no">ARGV</span><span class="p">.</span><span class="nf">inspect</span><span class="si">}</span><span class="s2">"</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="no">OptionParser</span><span class="p">.</span><span class="nf">new</span> 
+
+<span class="n">parser</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="s2">"-n"</span><span class="p">)</span> <span class="p">{</span> <span class="n">params</span><span class="p">[</span><span class="ss">:line_numbering_style</span><span class="p">]</span> <span class="o">||=</span> <span class="ss">:all_lines</span>         <span class="p">}</span>
+<span class="n">parser</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="s2">"-b"</span><span class="p">)</span> <span class="p">{</span> <span class="n">params</span><span class="p">[</span><span class="ss">:line_numbering_style</span><span class="p">]</span>   <span class="o">=</span> <span class="ss">:significant_lines</span> <span class="p">}</span>
+<span class="n">parser</span><span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="s2">"-s"</span><span class="p">)</span> <span class="p">{</span> <span class="n">params</span><span class="p">[</span><span class="ss">:squeeze_extra_newlines</span><span class="p">]</span> <span class="o">=</span> <span class="kp">true</span>               <span class="p">}</span>
+
+<span class="n">files</span> <span class="o">=</span> <span class="n">parser</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="no">ARGV</span><span class="p">)</span>
+
+<span class="nb">puts</span> <span class="s2">"params are </span><span class="si">#{</span><span class="n">params</span><span class="p">.</span><span class="nf">inspect</span><span class="si">}</span><span class="s2">"</span>
+<span class="nb">puts</span> <span class="s2">"files are </span><span class="si">#{</span><span class="n">files</span><span class="p">.</span><span class="nf">inspect</span><span class="si">}</span><span class="s2">"</span>
+</code></pre>
+</div>
+
+<p>Try running this script with various options and see what you end up with. You should get something similar to the output shown here:</p>
+
+<p>````
+$ ruby option_parser_example.rb -ns data/*.txt
+ARGV is [“-ns”, “data/gettysburg.txt”, “data/spaced_out.txt”]
+params are {:line_numbering_style=&gt;:all_lines, :squeeze_extra_newlines=&gt;true}
+files are [“data/gettysburg.txt”, “data/spaced_out.txt”]</p>
+
+<p>$ ruby option_parser_example.rb data/*.txt
+ARGV is [“data/gettysburg.txt”, “data/spaced_out.txt”]
+params are {}
+files are [“data/gettysburg.txt”, “data/spaced_out.txt”]
+```</p>
+
+<p>Although <code class="highlighter-rouge">rcat</code> requires us to parse only the most basic form of arguments, <code class="highlighter-rouge">OptionParser</code> is capable of a whole lot more than what I’ve shown here. Be sure to check out its <a href="http://ruby-doc.org/stdlib-1.9.2/libdoc/optparse/rdoc/OptionParser.html#method-i-parse">API documentation</a> to see the full extent of what it can do.</p>
+
+<p>Now that I’ve covered how to get data in and out of our <code class="highlighter-rouge">rcat</code> application, we can talk a bit about how it does <code class="highlighter-rouge">cat</code>-style formatting for line numbering.</p>
+
+<h3 id="basic-text-formatting">Basic text formatting</h3>
+
+<p>Formatting text for the console can be a bit cumbersome, but some things are easier than they seem. For example, the tidy output of <code class="highlighter-rouge">cat -n</code> shown here is not especially hard to implement:</p>
+
+<pre style="font-size: 0.8em">
+$ cat -n data/gettysburg.txt 
+   1  Four score and seven years ago, our fathers brought forth on this continent a
+   2  new nation, conceived in Liberty and dedicated to the proposition that all men
+   3  are created equal.
+   4  
+   5  Now we are engaged in a great civil war, testing whether that nation, or any
+   6  nation so conceived and so dedicated, can long endure. We are met on a great
+   7  battle-field of that war. We have come to dedicate a portion of that field as a
+   8  final resting place for those who here gave their lives that that nation might
+   9  live. It is altogether fitting and proper that we should do this.
+  10  
+  11  But, in a larger sense, we can not dedicate -- we can not consecrate -- we can
+  12  not hallow -- this ground. The brave men, living and dead, who struggled here
+  13  have consecrated it far above our poor power to add or detract. The world will
+  14  little note nor long remember what we say here, but it can never forget what
+  15  they did here. It is for us the living, rather, to be dedicated here to the
+  16  unfinished work which they who fought here have thus far so nobly advanced. It
+  17  is rather for us to be here dedicated to the great task remaining before us --
+  18  that from these honored dead we take increased devotion to that cause for which
+  19  they gave the last full measure of devotion -- that we here highly resolve that
+  20  these dead shall not have died in vain -- that this nation, under God, shall
+  21  have a new birth of freedom -- and that government of the people, by the people,
+  22  for the people, shall not perish from the earth.
+</pre>
+
+<p>On my system, <code class="highlighter-rouge">cat</code> seems to assume a fixed-width column with space for up to six digits. This format looks great for any file with fewer than a million lines in it, but eventually breaks down once you cross that boundary.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ ruby -e "1_000_000.times { puts 'blah' }" | cat -n | tail
+999991    blah
+999992    blah
+999993    blah
+999994    blah
+999995    blah
+999996    blah
+999997    blah
+999998    blah
+999999    blah
+1000000    blah
+</code></pre>
+</div>
+
+<p>This design decision makes implementing the formatting code for this feature a whole lot easier. The <code class="highlighter-rouge">RCat::Display#print_labeled_line</code> method shows that it’s possible to implement this kind of formatting with a one-liner:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">print_labeled_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+  <span class="nb">print</span> <span class="s2">"</span><span class="si">#{</span><span class="n">line_number</span><span class="p">.</span><span class="nf">to_s</span><span class="p">.</span><span class="nf">rjust</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="si">}</span><span class="se">\t</span><span class="si">#{</span><span class="n">line</span><span class="si">}</span><span class="s2">"</span> 
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Although the code in this example is sufficient for our needs in <code class="highlighter-rouge">rcat</code>, it’s worth mentioning that <code class="highlighter-rouge">String</code> also supports the <code class="highlighter-rouge">ljust</code> and <code class="highlighter-rouge">center</code> methods. All three of these justification methods can optionally take a second argument, which causes them to use an arbitrary string as padding rather than a space character; this feature is sometimes useful for creating things like ASCII status bars or tables.</p>
+
+<p>I’ve worked on a lot of different command-line report formats before, and I can tell you that streamable, fixed-width output is the easiest kind of reporting you’ll come by. Things get a lot more complicated when you have to support variable-width columns or render elements that span multiple rows and columns. I won’t get into the details of how to do those things here, but feel free to leave a comment if you’re interested in hearing more on that topic.</p>
+
+<h3 id="error-handling-and-exit-codes">Error handling and exit codes</h3>
+
+<p>The techniques we’ve covered so far are enough to get most of <code class="highlighter-rouge">rcat</code>’s tests passing, but the following three scenarios require a working knowledge of how Unix commands tend to handle errors. Read through them and do the best you can to make sense of what’s going on.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="sb">`cat </span><span class="si">#{</span><span class="n">gettysburg_file</span><span class="si">}</span><span class="sb">`</span>
+<span class="n">cat_success</span> <span class="o">=</span> <span class="vg">$?</span>
+
+<span class="sb">`rcat </span><span class="si">#{</span><span class="n">gettysburg_file</span><span class="si">}</span><span class="sb">`</span>
+<span class="n">rcat_success</span> <span class="o">=</span> <span class="vg">$?</span>
+
+<span class="k">unless</span> <span class="n">cat_success</span><span class="p">.</span><span class="nf">exitstatus</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">rcat_success</span><span class="p">.</span><span class="nf">exitstatus</span> <span class="o">==</span> <span class="mi">0</span>
+  <span class="nb">fail</span> <span class="s2">"Failed 'cat and rcat success exit codes match"</span>
+<span class="k">end</span>
+
+<span class="c1">############################################################################</span>
+
+<span class="n">cat_out</span><span class="p">,</span> <span class="n">cat_err</span><span class="p">,</span> <span class="n">cat_process</span>    <span class="o">=</span> <span class="no">Open3</span><span class="p">.</span><span class="nf">capture3</span><span class="p">(</span><span class="s2">"cat some_invalid_file"</span><span class="p">)</span>
+<span class="n">rcat_out</span><span class="p">,</span> <span class="n">rcat_err</span><span class="p">,</span> <span class="n">rcat_process</span> <span class="o">=</span> <span class="no">Open3</span><span class="p">.</span><span class="nf">capture3</span><span class="p">(</span><span class="s2">"rcat some_invalid_file"</span><span class="p">)</span> 
+
+<span class="k">unless</span> <span class="n">cat_process</span><span class="p">.</span><span class="nf">exitstatus</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">rcat_process</span><span class="p">.</span><span class="nf">exitstatus</span> <span class="o">==</span> <span class="mi">1</span>
+  <span class="nb">fail</span> <span class="s2">"Failed 'cat and rcat exit codes match on bad file"</span>
+<span class="k">end</span>
+
+<span class="k">unless</span> <span class="n">rcat_err</span> <span class="o">==</span> <span class="s2">"rcat: No such file or directory - some_invalid_file</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="nb">fail</span> <span class="s2">"Failed 'cat and rcat error messages match on bad file'"</span>
+<span class="k">end</span>
+
+<span class="c1">############################################################################</span>
+
+
+<span class="n">cat_out</span><span class="p">,</span> <span class="n">cat_err</span><span class="p">,</span> <span class="n">cat_proccess</span>  <span class="o">=</span> <span class="no">Open3</span><span class="p">.</span><span class="nf">capture3</span><span class="p">(</span><span class="s2">"cat -x </span><span class="si">#{</span><span class="n">gettysburg_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="n">rcat_out</span><span class="p">,</span><span class="n">rcat_err</span><span class="p">,</span> <span class="n">rcat_process</span> <span class="o">=</span> <span class="no">Open3</span><span class="p">.</span><span class="nf">capture3</span><span class="p">(</span><span class="s2">"rcat -x </span><span class="si">#{</span><span class="n">gettysburg_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> 
+
+<span class="k">unless</span> <span class="n">cat_process</span><span class="p">.</span><span class="nf">exitstatus</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">rcat_process</span><span class="p">.</span><span class="nf">exitstatus</span> <span class="o">==</span> <span class="mi">1</span>
+  <span class="nb">fail</span> <span class="s2">"Failed 'cat and rcat exit codes match on bad switch"</span>
+<span class="k">end</span>
+
+<span class="k">unless</span> <span class="n">rcat_err</span> <span class="o">==</span> <span class="s2">"rcat: invalid option: -x</span><span class="se">\n</span><span class="s2">usage: rcat [-bns] [file ...]</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="nb">fail</span> <span class="s2">"Failed 'rcat provides usage instructions when given invalid option"</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The first test verifies exit codes for successful calls to <code class="highlighter-rouge">cat</code> and <code class="highlighter-rouge">rcat</code>. In Unix programs, exit codes are a means to pass information back to the shell about whether a command finished successfully. The right way to signal that things worked as expected is to return an exit code of 0, which is exactly what Ruby does whenever a program exits normally without error.</p>
+
+<p>Whenever we run a shell command in Ruby using backticks, a <code class="highlighter-rouge">Process::Status</code> object is created and is then assigned to the <code class="highlighter-rouge">$?</code> global variable. This object contains (among other things) the exit status of the command that was run. Although it looks a bit cryptic, we’re able to use this feature to verify in our first test that both <code class="highlighter-rouge">cat</code> and <code class="highlighter-rouge">rcat</code> finished their jobs successfully without error.</p>
+
+<p>The second and third tests require a bit more heavy lifting because in these scenarios, we want to capture not only the exit status of these commands, but also whatever text they end up writing to the STDERR stream. To do so, we use the <code class="highlighter-rouge">Open3</code> standard library. The <code class="highlighter-rouge">Open3.capture3</code> method runs a shell command and then returns whatever was written to STDOUT and STDERR, as well as a <code class="highlighter-rouge">Process::Status</code> object similar to the one we pulled out of <code class="highlighter-rouge">$?</code> earlier.</p>
+
+<p>If you look at <em>bin/rcat</em>, you’ll find the code that causes these tests to pass:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">begin</span>
+  <span class="no">RCat</span><span class="o">::</span><span class="no">Application</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">ARGV</span><span class="p">).</span><span class="nf">run</span>
+<span class="k">rescue</span> <span class="no">Errno</span><span class="o">::</span><span class="no">ENOENT</span> <span class="o">=&gt;</span> <span class="n">err</span>
+  <span class="nb">abort</span> <span class="s2">"rcat: </span><span class="si">#{</span><span class="n">err</span><span class="p">.</span><span class="nf">message</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">rescue</span> <span class="no">OptionParser</span><span class="o">::</span><span class="no">InvalidOption</span> <span class="o">=&gt;</span> <span class="n">err</span>
+  <span class="nb">abort</span> <span class="s2">"rcat: </span><span class="si">#{</span><span class="n">err</span><span class="p">.</span><span class="nf">message</span><span class="si">}</span><span class="se">\n</span><span class="s2">usage: rcat [-bns] [file ...]"</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The <code class="highlighter-rouge">abort</code> method provides a means to write some text to STDERR and then exit with a nonzero code. The previous code provides functionality equivalent to the following, more explicit code:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">begin</span>
+  <span class="no">RCat</span><span class="o">::</span><span class="no">Application</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">ARGV</span><span class="p">).</span><span class="nf">run</span>
+<span class="k">rescue</span> <span class="no">Errno</span><span class="o">::</span><span class="no">ENOENT</span> <span class="o">=&gt;</span> <span class="n">err</span>
+  <span class="vg">$stderr</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"rcat: </span><span class="si">#{</span><span class="n">err</span><span class="p">.</span><span class="nf">message</span><span class="si">}</span><span class="s2">"</span>
+  <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">rescue</span> <span class="no">OptionParser</span><span class="o">::</span><span class="no">InvalidOption</span> <span class="o">=&gt;</span> <span class="n">err</span>
+  <span class="vg">$stderr</span><span class="p">.</span><span class="nf">puts</span> <span class="s2">"rcat: </span><span class="si">#{</span><span class="n">err</span><span class="p">.</span><span class="nf">message</span><span class="si">}</span><span class="se">\n</span><span class="s2">usage: rcat [-bns] [file ...]"</span>
+  <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Looking back on things, the errors I’ve rescued here are somewhat low level, and
+it might have been better to rescue them where they occur and then reraise
+custom errors provided by <code class="highlighter-rouge">RCat</code>. This approach would lead to code similar to
+what is shown below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">begin</span>
+  <span class="no">RCat</span><span class="o">::</span><span class="no">Application</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">ARGV</span><span class="p">).</span><span class="nf">run</span>
+<span class="k">rescue</span> <span class="no">RCat</span><span class="o">::</span><span class="no">Errors</span><span class="o">::</span><span class="no">FileNotFound</span> <span class="o">=&gt;</span> <span class="n">err</span>
+  <span class="c1"># ...</span>
+<span class="k">rescue</span> <span class="no">RCat</span><span class="o">::</span><span class="no">Errors</span><span class="o">::</span><span class="no">InvalidParameter</span> <span class="o">=&gt;</span> <span class="n">err</span>
+  <span class="c1"># ..</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Regardless of how these exceptions are labeled, it’s important to note that I intentionally let them bubble all the way up to the outermost layer and only then rescue them and call <code class="highlighter-rouge">Kernel#exit</code>. Intermingling <code class="highlighter-rouge">exit</code> calls within control flow or modeling logic makes debugging nearly impossible and also makes automated testing a whole lot harder.</p>
+
+<p>Another thing to note about this code is that I write my error messages to <code class="highlighter-rouge">STDERR</code> rather than <code class="highlighter-rouge">STDOUT</code>. Unix-based systems give us these two different streams for a reason: they let us separate debugging output and functional output so that they can be redirected and manipulated independently. Mixing the two together makes it much more difficult for commands to be chained together in a pipeline, going against the <a href="http://en.wikipedia.org/wiki/Unix_philosophy">Unix philosophy</a>.</p>
+
+<p>Error handling is a topic that could easily span several articles. But when it comes to building command-line applications, you’ll be in pretty good shape if you remember just two things: use <code class="highlighter-rouge">STDERR</code> instead of <code class="highlighter-rouge">STDOUT</code> for debugging output, and make sure to exit with a nonzero status code if your application fails to do what it is supposed to do. Following those two simple rules will make your application play a whole lot nicer with others.</p>
+
+<h3 id="reflections">Reflections</h3>
+
+<p>Holy cow, this was a hard article to write! When I originally decided to write a <code class="highlighter-rouge">cat</code> clone, I worried that the example would be too trivial and boring to be worth writing about. However, once I actually implemented it and sat down to write this article, I realized that building command-line applications that respect Unix philosophy and play nice with others is harder than it seems on the surface.</p>
+
+<p>Rather than treating this article as a definitive reference for how to build good command-line applications, perhaps we can instead use it as a jumping-off point for future topics to cover in a more self-contained fashion. I’d love to hear your thoughts on what topics in particular interested you and what areas you think should have been covered in greater detail.</p>
+
+<blockquote>
+  <p>NOTE: If you’d like to learn more about this topic, consider doing the Practicing Ruby self-guided course on <a href="https://practicingruby.com/articles/study-guide-1?u=dc2ab0f9bb">Streams, Files, and Sockets</a>. You’ve already completed one of its reading exercises by working through this article!</p>
+</blockquote>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

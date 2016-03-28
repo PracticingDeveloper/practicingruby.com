@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Criteria for disciplined inheritance, Part 1</title>
+  <meta name="description" content="Inheritance is a key concept in most object-oriented languages, but applying it skillfully can be challenging in practice. Back in 1989, M. Sakkinen wrote a ...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/disciplined-inheritance-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Criteria for disciplined inheritance, Part 1</h1>
+    <p class="post-meta"><time datetime="2012-02-15T00:00:00-05:00" itemprop="datePublished">Feb 15, 2012</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Inheritance is a key concept in most object-oriented languages, but applying it skillfully can be challenging in practice. Back in 1989, <a href="http://users.jyu.fi/~sakkinen/">M. Sakkinen</a> wrote a paper called <a href="http://scholar.google.com/scholar?cluster=5893037045851782349&amp;hl=en&amp;as_sdt=0,7&amp;sciodt=0,7">Disciplined inheritance</a> that addresses these problems and offers some useful criteria for working around them. Despite being more than two decades old, this paper is extremely relevant to the modern Ruby programmer.</p>
+
+<p>Sakkinen’s central point seems to be that most traditional uses of inheritance lead to poor encapsulation, bloated object contracts, and accidental namespace collisions. He provides two patterns for disciplined inheritance and suggests that by normalizing the way that we model things, we can apply these two patterns to a very wide range of scenarios. He goes on to show that code that conforms to these design rules can easily be modeled as ordinary object composition, exposing a solid alternative to traditional class-based inheritance.</p>
+
+<p>These topics are exactly what this two-part article will cover, but before we can address them, we should establish what qualifies as inheritance in Ruby. The general term is somewhat overloaded, so a bit of definition up front will help start us off on the right foot.</p>
+
+<h3 id="flavors-of-ruby-inheritance">Flavors of Ruby inheritance</h3>
+
+<p>Although classical inheritance is centered on the concept of class-based hierarchies, modern object-oriented programming languages provide many different mechanisms for code sharing. Ruby is no exception: it provides four common ways to model inheritance-based relationships between objects.</p>
+
+<ul>
+  <li>
+    <p>Classes provide a single-inheritance model similar to what is found in many other object-oriented languages, albeit lacking a few privacy features.</p>
+  </li>
+  <li>
+    <p>Modules provide a mechanism for modeling multiple inheritance, which is easier to reason about than C++ style class inheritance but is more powerful than Java’s interfaces.</p>
+  </li>
+  <li>
+    <p>Transparent delegation techniques make it possible for a child object to dynamically forward messages to a parent object. This technique has similar effects as class-/module-based modeling on the child object’s contract but preserves encapsulation between the objects.</p>
+  </li>
+  <li>
+    <p>Simple aggregation techniques make it possible to compose objects for the purpose of code sharing. This technique is most useful when the subobject is not meant to be a drop-in replacement for the superobject.</p>
+  </li>
+</ul>
+
+<p>Although most problems can be modeled using any one of these techniques, they each have their own strengths and weaknesses. Throughout both parts of this article, I’ll point out the trade-offs between them whenever it makes sense to do so.</p>
+
+<h3 id="modeling-incidental-inheritance">Modeling incidental inheritance</h3>
+
+<p>Sakkinen describes <strong>incidental inheritance</strong> as the use of an inheritance-based modeling approach to share implementation details between dissimiliar objects. That is to say that child (consumer) objects do not have an <em>is-a</em> relationship to their parents (dependencies) and therefore do not need to provide a superset of their parent’s functionality.</p>
+
+<p>In theory, incidental inheritance is easy to implement in a disciplined way because it does not impose complex constraints on the relationships between objects within a system. As long as the child object is capable of working without errors for the behaviors it is meant to provide, it does not need to take special care to adhere to the <a href="http://blog.rubybestpractices.com/posts/gregory/055-issue-23-solid-design.html">Liskov Substitution Principle</a>. In fact, the child needs only to expose and interact with the bits of functionality from the parent object that are specifically relevant to its domain.</p>
+
+<p>Regardless of the model of inheritance used, Sakkinen’s paper suggests that child objects should rely only on functionality provided by immediate ancestors. This is essentially an inheritance-oriented parallel to the <a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a> and sounds like good advice to follow whenever it is practical to do so. However, this constraint would be challenging to enforce at the language level in Ruby and may not be feasible to adhere to in every imaginable scenario. In practice, the lack of adequate privacy controls in Ruby make traditional class hierarchies or module mixins quite messy for incidental inheritance, which complicates things a bit. But before we discuss that problem any further, we should establish what incidental inheritance looks like from several different angles in Ruby.</p>
+
+<p>In the following set of examples, I construct a simple <code class="highlighter-rouge">Report</code> object that computes the sum and average of numbers listed in a text file. I break this problem into three distinct parts: a component that provides functionality similar to Ruby’s <code class="highlighter-rouge">Enumerable</code> module, a component that uses those features to do simple calculations on numerical data, and a component that outputs the final report. The contrived nature of this scenario should make it easier to examine the structural differences between Ruby’s various ways of implementing inheritance relationships, but be sure to keep some more realistic scenarios in the back of your mind as you work through these examples.</p>
+
+<p>The classical approach of using a class hierarchy for code sharing is worth looking at, even if most practicing Rubyists would quickly identify this as the wrong approach to this particular problem. It serves as a good baseline for identifying the problems introduced by inheritance and how to overcome them. As you read through the following code, think of its strengths and weaknesses, as well as any alternative ways to model this scenario that you can come up with.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EnumerableCollection</span>
+  <span class="k">def</span> <span class="nf">count</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span> <span class="p">}</span>
+    <span class="n">c</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Samnang's implementation from Issue 2.4</span>
+  <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">reduce</span> <span class="p">{</span><span class="o">|</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="o">|</span> <span class="n">s</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">e</span><span class="p">)}</span> <span class="k">if</span> <span class="n">arg</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Symbol</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="p">?</span> <span class="k">yield</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">:</span> <span class="n">e</span> <span class="p">}</span>
+
+    <span class="n">result</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">StatisticalCollection</span> <span class="o">&lt;</span> <span class="no">EnumerableCollection</span>
+  <span class="k">def</span> <span class="nf">sum</span>
+    <span class="n">reduce</span><span class="p">(:</span><span class="o">+</span><span class="p">)</span> 
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">average</span>
+    <span class="n">sum</span> <span class="o">/</span> <span class="n">count</span><span class="p">.</span><span class="nf">to_f</span>
+  <span class="k">end</span> 
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">StatisticalReport</span> <span class="o">&lt;</span> <span class="no">StatisticalCollection</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">input</span> <span class="o">=</span> <span class="n">filename</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">to_s</span>
+    <span class="s2">"The sum is </span><span class="si">#{</span><span class="n">sum</span><span class="si">}</span><span class="s2">, and the average is </span><span class="si">#{</span><span class="n">average</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span> 
+
+  <span class="kp">attr_accessor</span> <span class="ss">:input</span>
+
+  <span class="k">def</span> <span class="nf">each</span>
+    <span class="no">File</span><span class="p">.</span><span class="nf">foreach</span><span class="p">(</span><span class="n">input</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="k">yield</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="nf">chomp</span><span class="p">.</span><span class="nf">to_i</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="nb">puts</span> <span class="no">StatisticalReport</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"numbers.txt"</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Through its inheritance-based relationships, <code class="highlighter-rouge">StatisticalReport</code> is able to act as a simple presenter object while relying on other reusable components to crunch the numbers for it. The <code class="highlighter-rouge">EnumerableCollection</code> and <code class="highlighter-rouge">StatisticalCollection</code> objects do most of the heavy lifting while managing to remain useful for a wide range of different applications. The division of responsibilities between these components is reasonably well defined, and if you ignore the underlying mechanics of the style of inheritance being used here, this example is a good demonstration of effective code reuse.</p>
+
+<p>Unfortunately, the devil is in the details. When viewed from a different angle, it’s easy to see a wide range of problems that exist even in this very simple application of class-based inheritance:</p>
+
+<ol>
+  <li>
+    <p>It is possible to create instances of <code class="highlighter-rouge">EnumerableCollection</code> and <code class="highlighter-rouge">StatisticalCollection</code> but not possible to do anything meaningful with them as they are currently written. Although it’s not necessarily a bad idea to make use of abstract classes, valid uses of that pattern typically invert the relationship shown here, with the child object filling in a missing piece so that its parent can do a complex job.</p>
+  </li>
+  <li>
+    <p>Although <code class="highlighter-rouge">StatisticalReport</code> relies on only two relatively generic methods from <code class="highlighter-rouge">StatisticalCollection</code> and <code class="highlighter-rouge">StatisticalCollection</code> similarly relies on only two methods from <code class="highlighter-rouge">EnumerableCollection</code>, the use of class inheritance forces a rigid hierarchical relationship between the objects. Even if it’s not especially awkward to say a <code class="highlighter-rouge">StatisticalCollection</code> is an <code class="highlighter-rouge">EnumerableCollection</code>, it’s definitely weird to say that a <code class="highlighter-rouge">StatisticalReport</code> is also an <code class="highlighter-rouge">EnumerableCollection</code>. What makes matters worse is that this sort of modeling prevents <code class="highlighter-rouge">StatisticalReport</code> from inheriting from something more topically related to its domain such as a <code class="highlighter-rouge">HtmlReport</code> or something similar. As my <a href="http://lists.canonical.org/pipermail/kragen-tol/2011-August/000937.html">favorite OOP rant</a> proclaims, class hierarchies do not exist simply to satisfy our inner Linnaeus.</p>
+  </li>
+  <li>
+    <p>There is no encapsulation whatsoever between the components in this system. The purely functional nature of both <code class="highlighter-rouge">EnumerableCollection</code> and <code class="highlighter-rouge">Statistics</code> make this less of a practical concern in this particular example but is a dangerous characteristic of all code that uses class-based inheritance in Ruby. Any instance variables created within a <code class="highlighter-rouge">StatisticalReport</code> object will be directly accessible in method calls all the way up its ancestor chain, and the same goes for any methods that <code class="highlighter-rouge">StatisticalReport</code> defines. Although a bit of discipline can help prevent this from becoming a problem in most simple uses of class inheritance, deep method resolution paths can make accidental collisions of method definitions or instance variable names a serious risk. Such a risk might be mitigated somewhat by the introduction of class-specific privacy controls, but they do not currently exist in Ruby.</p>
+  </li>
+  <li>
+    <p>As a consequence of points 2 and 3, the <code class="highlighter-rouge">StatisticalReport</code> object ends up with a bloated contract that isn’t representative of its domain model. It’d be awkward to call <code class="highlighter-rouge">StatisticalReport#count</code> or <code class="highlighter-rouge">StatisticalReport#reduce</code>, but if those inherited methods are not explicitly marked as private in the <code class="highlighter-rouge">StatisticalReport</code> definition, they will still be callable by clients of the <code class="highlighter-rouge">StatisticalReport</code> object. Once again, the stateless nature of this program makes the effects less damning in this particular example, but it doesn’t take much effort to imagine the inconsistencies that could arise due to this problem. In addition to real risks of unintended side effects, this kind of modeling makes it harder to document the interface of the <code class="highlighter-rouge">StatisticalReport</code> in a natural way and diminishes the usefulness of Ruby’s reflective capabilities.</p>
+  </li>
+</ol>
+
+<p>At least some of these issues can be resolved through the use of Ruby’s module-based mixin functionality. The following example shows how our class-based code can be trivially refactored to use modules instead. Once again, as you read through the code, think of its strengths and weaknesses as well as how you might approach the problem differently if it were up to you to design this system.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimplifiedEnumerable</span>
+  <span class="k">def</span> <span class="nf">count</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span> <span class="p">}</span>
+    <span class="n">c</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Samnang's implementation from Issue 2.4</span>
+  <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">reduce</span> <span class="p">{</span><span class="o">|</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="o">|</span> <span class="n">s</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">e</span><span class="p">)}</span> <span class="k">if</span> <span class="n">arg</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Symbol</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="p">?</span> <span class="k">yield</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">:</span> <span class="n">e</span> <span class="p">}</span>
+
+    <span class="n">result</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">module</span> <span class="nn">Statistics</span>
+  <span class="k">def</span> <span class="nf">sum</span>
+    <span class="n">reduce</span><span class="p">(:</span><span class="o">+</span><span class="p">)</span> 
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">average</span>
+    <span class="n">sum</span> <span class="o">/</span> <span class="n">count</span><span class="p">.</span><span class="nf">to_f</span>
+  <span class="k">end</span> 
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">StatisticalReport</span>
+  <span class="kp">include</span> <span class="no">SimplifiedEnumerable</span>
+  <span class="kp">include</span> <span class="no">Statistics</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">input</span> <span class="o">=</span> <span class="n">filename</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">to_s</span>
+    <span class="s2">"The sum is </span><span class="si">#{</span><span class="n">sum</span><span class="si">}</span><span class="s2">, and the average is </span><span class="si">#{</span><span class="n">average</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span> 
+
+  <span class="kp">attr_accessor</span> <span class="ss">:input</span>
+
+  <span class="k">def</span> <span class="nf">each</span>
+    <span class="no">File</span><span class="p">.</span><span class="nf">foreach</span><span class="p">(</span><span class="n">input</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="k">yield</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="nf">chomp</span><span class="p">.</span><span class="nf">to_i</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="nb">puts</span> <span class="no">StatisticalReport</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"numbers.txt"</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Using module mixins does not improve the encapsulation of the components in the system or solve the problem of <code class="highlighter-rouge">StatisticalReport</code> inheriting methods that aren’t directly related to its problem domain, but it does alleviate some of the other problems that Ruby’s class-based inheritance causes. In particular, it makes it no longer possible to create instances of objects that wouldn’t be useful to use as standalone objects and also loosens the dependencies between the components in the system.</p>
+
+<p>Although the <code class="highlighter-rouge">Statistics</code> and <code class="highlighter-rouge">SimplifiedEnumerable</code> modules are still not capable of doing anything useful without being tied to some other object, the relationship between them is much looser. When the two are mixed into the <code class="highlighter-rouge">StatisticalReport</code> object, an implicit relationship between <code class="highlighter-rouge">Statistics</code> and <code class="highlighter-rouge">SimplifiedEnumerable</code> exists due to the calls to <code class="highlighter-rouge">reduce</code> and <code class="highlighter-rouge">count</code> from within the <code class="highlighter-rouge">Statistics</code> module, but this relationship is an implementation detail rather than a structural constraint. To see the difference yourself, think about how easy it would be to switch <code class="highlighter-rouge">StatisticalReport</code> to use Ruby’s <code class="highlighter-rouge">Enumerable</code> module instead of the <code class="highlighter-rouge">SimplifiedEnumerable</code> module I provided and compare that to the class-based implementation of this scenario.</p>
+
+<p>The bad news is that the way that modules solve some of the problems that we discovered about class hierarchies in Ruby ends up making some of the other problems even worse. Because modules tend to provide a whole lot of functionality based on a very thin contract with the object they get mixed into, they are one of the leading causes of child obesity. For example, swapping my <code class="highlighter-rouge">SimplifiedEnumerable</code> module for Ruby’s <code class="highlighter-rouge">Enumerable</code> method would cause a net increase of 42 new methods that could be directly called on <code class="highlighter-rouge">StatisticalReport</code>. And now, rather than having a single path to follow in <code class="highlighter-rouge">StatisticalReport</code> to determine its ancestry chain, there are two. A nice feature of mixins is that they have fairly simple rules about how they get added to the method lookup path to avoid some of the complexities involved in class-based multiple inheritance, but you still need to memorize those rules and be aware of the combinatorial effects of module inclusion.</p>
+
+<p>As it turns out, modules are a pragmatic compromise that is convenient to use but only slightly more well-behaved than traditional class inheritance. In simple situations, they work just fine, but for more complex systems they end up requiring an increasing amount of discipline to use effectively. Nonetheless, modules tend to be used ubiquitously in Ruby programs despite these problems. A naïve observer might assume that this is a sign that we don’t have a better way of doing things in Ruby, but they would be mostly wrong.</p>
+
+<p>All the problems discussed so far with inheritance can be solved via simple aggregation techniques. For strong evidence of that claim, take a look at the refactored code shown here. As in the previous examples, keep an eye out for the pros and cons of this modeling strategy, and think about what you might do differently.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">StatisticalCollection</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">data</span> <span class="o">=</span> <span class="n">data</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">sum</span>
+    <span class="n">data</span><span class="p">.</span><span class="nf">reduce</span><span class="p">(:</span><span class="o">+</span><span class="p">)</span> 
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">average</span>
+    <span class="n">sum</span> <span class="o">/</span> <span class="n">data</span><span class="p">.</span><span class="nf">count</span><span class="p">.</span><span class="nf">to_f</span>
+  <span class="k">end</span> 
+
+  <span class="kp">private</span>
+
+  <span class="kp">attr_accessor</span> <span class="ss">:data</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">StatisticalReport</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">input</span> <span class="o">=</span> <span class="n">filename</span>
+    
+    <span class="nb">self</span><span class="p">.</span><span class="nf">stats</span> <span class="o">=</span> <span class="no">StatisticalCollection</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">each</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">to_s</span>
+    <span class="s2">"The sum is </span><span class="si">#{</span><span class="n">stats</span><span class="p">.</span><span class="nf">sum</span><span class="si">}</span><span class="s2">, and the average is </span><span class="si">#{</span><span class="n">stats</span><span class="p">.</span><span class="nf">average</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span> 
+
+  <span class="kp">attr_accessor</span> <span class="ss">:input</span><span class="p">,</span> <span class="ss">:stats</span>
+
+  <span class="k">def</span> <span class="nf">each</span>
+    <span class="k">return</span> <span class="n">to_enum</span><span class="p">(</span><span class="n">__method__</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">block_given?</span>
+
+    <span class="no">File</span><span class="p">.</span><span class="nf">foreach</span><span class="p">(</span><span class="n">input</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="k">yield</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="nf">chomp</span><span class="p">.</span><span class="nf">to_i</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="nb">puts</span> <span class="no">StatisticalReport</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"numbers.txt"</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>The first thing you’ll notice is that the code is much shorter, as if by magic, but really it’s because I completely cheated here and got rid of my counterfeit <code class="highlighter-rouge">Enumerable</code> object so that I could expose a potentially good idiom for dealing with iteration in an aggregation-friendly way. Feel free to mentally replace the object passed to <code class="highlighter-rouge">StatisticalCollection</code>’s constructor with something like the code shown here if you don’t want me to get away with parlor tricks:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"forwardable"</span>
+
+<span class="k">class</span> <span class="nc">EnumerableCollection</span>
+  <span class="kp">extend</span> <span class="no">Forwardable</span>
+
+  <span class="c1"># Forwardable bypasses privacy, which is what we want here.</span>
+  <span class="n">delegate</span> <span class="ss">:each</span> <span class="o">=&gt;</span> <span class="ss">:data</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">data</span> <span class="o">=</span> <span class="n">data</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">count</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span> <span class="p">}</span>
+    <span class="n">c</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Samnang's implementation from Issue 2.4</span>
+  <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="n">arg</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">reduce</span> <span class="p">{</span><span class="o">|</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="o">|</span> <span class="n">s</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">e</span><span class="p">)}</span> <span class="k">if</span> <span class="n">arg</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Symbol</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="p">?</span> <span class="k">yield</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">:</span> <span class="n">e</span> <span class="p">}</span>
+
+    <span class="n">result</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="kp">attr_accessor</span> <span class="ss">:data</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Regardless of what iteration strategy we end up using, the following points are worth noting about the way we’ve modeled our system this time around:</p>
+
+<ol>
+  <li>
+    <p>There are three components in this system, all of which are useful and testable as standalone objects.</p>
+  </li>
+  <li>
+    <p>The relationships between all three components are purely indirect, and the coupling between the objects is limited to the names and behavior of the methods called on them rather than their complete surfaces.</p>
+  </li>
+  <li>
+    <p>There is strict encapsulation between the three components: each have their own namespace, and each can enforce their own privacy controls. It’s possible of course to side-step these protections, but they are at least enabled by default. The issue of accidental naming collisions between methods or variables of objects is completely eliminated.</p>
+  </li>
+  <li>
+    <p>As a result of points 2 and 3, the surface of each object is kept narrowly in line with its own domain. In fact, the public interface of <code class="highlighter-rouge">StatisticalReport</code> has been reduced to its constructor and the <code class="highlighter-rouge">to_s</code> method, making it about as thin as possible while still being useful.</p>
+  </li>
+</ol>
+
+<p>There are certainly downsides to using aggregation; it is not a golden hammer by any means. But when it comes to <strong>incidental inheritance</strong>, it seems to be the right tool for the job more often than not. I’d love to hear counterarguments to this claim, though, so please do share them if you have something in mind that you don’t think would gracefully fit this style of modeling.</p>
+
+<h3 id="reflections">Reflections</h3>
+
+<p>Although it may be a bit hard to see why disciplined inheritance matters in the trivial scenario we’ve been talking about throughout this article, it become increasingly clear as systems become more complex. Most scenarios that involve incidental inheritance are actually relatively horizontal problems in nature, but the use of class-based inheritance or module mixins forces a vertical method lookup path that can become very unwieldy, to say the least. When taken to the extremes, you end up with objects like <code class="highlighter-rouge">ActiveRecord::Base</code>, which has a path that is 43 levels deep, or <code class="highlighter-rouge">Prawn::Document</code>, which has a 26-level-deep path. In the case of Prawn, at least, this is just pure craziness that I am ashamed to have unleashed upon the world, even if it seemed like a good idea at the time.</p>
+
+<p>In a language like Ruby that lacks both multiple inheritance and true class-specific privacy for variables and methods, using class-based hierarchies or module mixins for complex forms of incidental inheritance requires a tremendous amount of discipline. For that reason, the extra effort involved in refactoring towards an aggregation-based design pales in comparison to the maintenance headaches caused by following the traditional route. For example, in both <code class="highlighter-rouge">Prawn</code> and <code class="highlighter-rouge">ActiveRecord</code>, aggregation would make it possible to flatten that chain by an order of magnitude while simultaneously reducing the chance of namespace collisions, dependencies on lookup order, and accidental side effects due to state mutations. It seems like the cost of somewhat more verbose code would be well worth it in these scenarios.</p>
+
+<p>In Issue 3.8, we will move on to discuss an essential form of inheritance that Sakkinen refers to as <strong>completely consistent inheritance</strong>. Exploring that topic will get us closer to the concept of mathematical subtypes, which are much more interesting at the theoretical level than incidental inheritance relationships are. But because Ruby’s language features make even the simple relationships described in this issue somewhat challenging to manage in an elegant way, I am still looking forward to hearing your ideas and questions about the things I’ve covered so far.</p>
+
+<p>A major concern I have about incidental inheritance is that I still don’t have a clear sense of where to draw the line between the two extremes I’ve outlined in this article. I definitely want to look further into this area, so please leave a comment if you don’t mind sharing your thoughts on this.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

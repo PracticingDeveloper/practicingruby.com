@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>How to practice, Part 2</title>
+  <meta name="description" content="  NOTE: I generally remove temporal references in Practicing Ruby articles to keep them disconnected from a particular point in time, butin this case I inten...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/how-to-practice-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">How to practice, Part 2</h1>
+    <p class="post-meta"><time datetime="2011-01-28T00:00:00-05:00" itemprop="datePublished">Jan 28, 2011</time> • Gregory Brown</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <blockquote>
+  <p><strong>NOTE:</strong> I generally remove temporal references in Practicing Ruby 
+articles to keep them disconnected from a particular point in time, but
+in this case I intentionally left them in because the post is written
+in a sort of “diary” style. It was originally posted in January 2011.</p>
+</blockquote>
+
+<p>In the <a href="http://practicingruby.com/articles/50">previous issue</a>, I provided a
+series of questions and instructions that outlined the way I practice. While
+some may have been expecting code katas or other indirect exercises, my style is
+more geared towards learning on the job. You start by figuring out what’s
+important to you, figure out a baby-step that you can make, and then execute.
+Once you’ve brought yourself one step closer to your goal, you reflect a bit on
+how things are going, in particular, what parts of the project still scare you.</p>
+
+<p>I use this technique often, in particular, when I want to get started on a new
+project or explore a new area that I’m not that familiar with. As luck would
+have it, I actually have a new project I need to start, and so today I’ll give
+you the chance to metaphorically look over my shoulder as I work through this
+exercise myself. If you haven’t read <a href="http://practicingruby.com/articles/50">Issue
+#21</a>, now is a good time to do that, so
+that the rest of this article makes sense.</p>
+
+<h3 id="step-1-find-out-whats-important">Step 1: Find out what’s important</h3>
+
+<p>What interesting problems do you need to solve?</p>
+
+<p>Lately, this question has been one that has caused me great anxiety.The success
+of Mendicant University and even Practicing Ruby to a certain extent has caused
+an explosion of ideas that all feel worthwhile and important to me. But they’re
+fairly easy to separate into wants and needs, and thankfully, much of what I’ve
+come up with falls in the former category.</p>
+
+<p>When I think about it, there is something that I feel I need to do sooner rather
+than later. While our courses are booked up until May, we will need to start
+admissions for our second trimester soon. Towards the end of last year, we
+decided we wanted to do something more fun and lighthearted than an
+entrance exam, but we didn’t take much action since then. With the clock
+ticking down, making headway on this project would surely help give me some
+peace of mind.</p>
+
+<p>What I’d like to build is a programming quiz site that is inspired by the
+<a href="http://ipsc.ksp.sk">Internet Problem Solving Contest</a> and <a href="http://projecteuler.net">Project
+Euler</a>, but with an MU-themed twist. I’ll have
+Mendicant’s co-founder <a href="http://twitter.com/Jordan_Byron">Jordan Byron</a> to help
+me with the frontend, but since he’s busy with 100 other tasks for
+MU, I’m the one who needs to build out the backend for this new app. I’ll use my
+need to write this article as motivation to help me break ground on this new
+project today.</p>
+
+<h3 id="step-2-make-a-commitment">Step 2: Make a commitment</h3>
+
+<p>I made the broad commitment to our students that we’d have a nice replacement
+for MU’s currently dull admissions process before the next trimester began. But
+broad commitments don’t particularly inspire action, so I needed to make a
+specific commitment as well.</p>
+
+<p>With that in mind, I told Jordan I’d have something for him to look
+at today, even if it was just a small start. Since he’ll be arriving at my
+home within an hour of me finishing this article, I am already feeling the
+pressure of having something to show for myself, which is a good thing.</p>
+
+<h3 id="step-3-identify-a-baby-step">Step 3: Identify a baby step</h3>
+
+<p>The next step in this process is to come up with a small step to get you just a
+little bit closer to your goal. I knew by the time I finished Issue
+#21 that I’d be working on this project, so I’ve been subconsciously chewing on
+my baby-step for a couple days now. This to me is totally fine, it gives my
+brain a chance to think things through and makes actually sitting down and
+coding something easier. Of course, the key thing is that my delivery time was
+still boxed in. If you leave things open ended, you may end up
+talking yourself out of building anything at all.</p>
+
+<p>When coming up with a tiny step, I try to focus on something that is core to the
+underlying project, to maximize the amount I learn from the mini spike. In the
+case of our quiz application (which we’re calling PuzzleNode), validating user
+submissions is one of the most important pieces of functionality.</p>
+
+<p>What I’ll do today is do a rough proof of concept of the submission validation
+system, which compares the expected output to the actual file
+uploaded by a user. I like to subdivide my tasks even when working
+only for an hour, so I’m going to attack this in three phases:</p>
+
+<ol>
+  <li>
+    <p>A simple function that compares two files using a SHA1 hash and returns true
+or false depending on whether they match.</p>
+  </li>
+  <li>
+    <p>A tiny sinatra application that does the same, but introduces file uploads
+into the picture.</p>
+  </li>
+  <li>
+    <p>A minimal Rails app that actually records whether a submission was valid or
+invalid, and properly links puzzles with their expected output.</p>
+  </li>
+</ol>
+
+<p>I’m setting my time limit for an hour, so I’m not sure how far I’ll actually
+get. No matter what happens, I’ll try to jot down some notes to give you a feel
+for my though process as I work through this exercise.</p>
+
+<h3 id="step-4-get-one-step-closer">Step 4: Get one step closer</h3>
+
+<p>[06:40] I’ve got my clock set now, and I’m ready to get started. Please excuse
+me while I go heads down for a bit. I’ll pop up with some brief notes here each
+time I reach a transition point, and then go into more detail in the reflections
+phase.</p>
+
+<p>[06:45] Basic <a href="https://github.com/sandal/pr-issue-22">github project</a> set up for
+this experiment.</p>
+
+<p>[06:48] Add three text files, a reference which is meant to act as the expected
+solution, a good file which is just a copy of the reference, and a bad file with
+some modifications to make it not match the reference.</p>
+
+<p>[06:51] Phase 1 complete!</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">ruby</span> <span class="n">check_solution</span><span class="p">.</span><span class="nf">rb</span> <span class="n">samples</span><span class="o">/</span><span class="n">reference</span><span class="p">.</span><span class="nf">txt</span> <span class="n">samples</span><span class="o">/</span><span class="n">good</span><span class="p">.</span><span class="nf">txt</span> 
+<span class="no">GOOD</span>
+
+<span class="err">$</span> <span class="n">ruby</span> <span class="n">check_solution</span><span class="p">.</span><span class="nf">rb</span> <span class="n">samples</span><span class="o">/</span><span class="n">reference</span><span class="p">.</span><span class="nf">txt</span> <span class="n">samples</span><span class="o">/</span><span class="n">bad</span><span class="p">.</span><span class="nf">txt</span>
+<span class="no">BAD</span>
+</code></pre>
+</div>
+
+<p>Source code is dead simple, just a few lines.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"digest/sha1"</span>
+
+<span class="n">expected</span> <span class="o">=</span> <span class="no">Digest</span><span class="o">::</span><span class="no">SHA1</span><span class="p">.</span><span class="nf">hexdigest</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="no">ARGV</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">actual</span>   <span class="o">=</span> <span class="no">Digest</span><span class="o">::</span><span class="no">SHA1</span><span class="p">.</span><span class="nf">hexdigest</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="no">ARGV</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="nb">puts</span><span class="p">(</span><span class="n">expected</span> <span class="o">==</span> <span class="n">actual</span> <span class="p">?</span> <span class="s2">"GOOD"</span> <span class="p">:</span> <span class="s2">"BAD"</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>[06:54] Next step is to remind myself how file uploads work in Sinatra, an
+indicator of how rusty my frontend webdev knowledge is…</p>
+
+<p>[06:57] Google for “File uploads sinatra” and find Peter Cooper talking about
+<a href="http://technotales.wordpress.com/2008/03/05/sinatra-the-simplest-thing-that-could-possibly-work/">this blog
+post</a>
+via Ruby Inside.</p>
+
+<p>Outdated, but worth a shot since it’s just a one liner.</p>
+
+<p>[07:00] File uploads working via curl. Time to integrate the phase 1 code
+into my sinata app.</p>
+
+<p>[07:06] Have something I think should work but found some unexpected
+bugs. Drat!</p>
+
+<p>[07:08] Oh, apparently I just don’t know how to use curl, working now! (albiet
+with a little echo hack to add a newline)</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">curl</span> <span class="o">-</span><span class="no">F</span> <span class="s2">"data=@samples/bad.txt"</span> <span class="mi">127</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span><span class="mi">4567</span><span class="o">/</span><span class="n">reference</span><span class="p">.</span><span class="nf">txt</span><span class="p">;</span> <span class="n">echo</span>
+<span class="no">BAD</span>
+<span class="err">$</span> <span class="n">curl</span> <span class="o">-</span><span class="no">F</span> <span class="s2">"data=@samples/good.txt"</span> <span class="mi">127</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span><span class="mi">4567</span><span class="o">/</span><span class="n">reference</span><span class="p">.</span><span class="nf">txt</span><span class="p">;</span> <span class="n">echo</span>
+<span class="no">GOOD</span>
+</code></pre>
+</div>
+
+<p>Source is still quite simple, so I can inline it here.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"rubygems"</span>
+<span class="nb">require</span> <span class="s2">"sinatra"</span>
+<span class="nb">require</span> <span class="s2">"digest/sha1"</span>
+
+<span class="no">ACCEPTED_FILES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"reference.txt"</span><span class="p">]</span>
+
+<span class="n">post</span> <span class="s2">"/:expected"</span> <span class="k">do</span>
+  <span class="k">raise</span> <span class="k">unless</span> <span class="no">ACCEPTED_FILES</span><span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:expected</span><span class="p">])</span>
+
+  <span class="n">expected</span> <span class="o">=</span> 
+    <span class="no">Digest</span><span class="o">::</span><span class="no">SHA1</span><span class="p">.</span><span class="nf">hexdigest</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="s2">"samples/</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="ss">:expected</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">))</span>
+
+  <span class="n">actual</span>   <span class="o">=</span> <span class="no">Digest</span><span class="o">::</span><span class="no">SHA1</span><span class="p">.</span><span class="nf">hexdigest</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:data</span><span class="p">][</span><span class="ss">:tempfile</span><span class="p">].</span><span class="nf">read</span><span class="p">)</span>
+
+  <span class="n">expected</span> <span class="o">==</span> <span class="n">actual</span> <span class="p">?</span> <span class="s2">"GOOD"</span> <span class="p">:</span> <span class="s2">"BAD"</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Off we go to phase 3!</p>
+
+<p>[07:11] I need to think up a few AR models. Off to the whiteboard, back in a
+moment.</p>
+
+<p>[07:15] I’ve decided to cheat a bit. I realized that for a very basic demo, I
+don’t actually need to store the uploaded files anywhere, but instead, I just
+need each puzzle to store its SHA1 fingerprint. Then, when a new submission is
+made, you just hash the file uploaded by the user and compare it to the
+associated puzzle.</p>
+
+<p>This data model omits a lot, and would need a lot of love to actually be used in
+our application, but it is sufficient for demonstrating just the validation
+step.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Puzzle(name: text, fingerprint: text) 
+Submission(puzzle_id: integer, correct: boolean)
+</code></pre>
+</div>
+
+<p>Time to go spit out a Rails skeleton, I suppose. The key thing this has saved me
+is a trip through paperclip’s documentation, and a host of questions about
+whether that’s still the right tool for the job and whether it works with Rails
+3 smoothly. I roughly assume that the answer to each of those questions is yes,
+but better to not have to answer them right now.</p>
+
+<p>[07:22] Only 18 minutes to go and rails is still installing, sloooooow.</p>
+
+<p>[07:24] Still installing! Should have used –no-rdoc –no-ri!</p>
+
+<p>[07:25] Finally finished installing, while waiting I stumbled upon <a href="http://stackoverflow.com/questions/1381725/how-to-make-no-ri-no-rdoc-default-for-gem-install">this post on
+disabling documentation by
+default</a>.
+Will need to try that out later.</p>
+
+<p>[07:26] Doh, never going to undo my stupid muscle memory</p>
+
+<p>$ rails puzzlenode
+Usage:
+  rails new APP_PATH [options]</p>
+
+<p>[07:29] Hmm, rails comes with a .gitignore file now? That’s handy. Though I’m
+pretty sure I just accidentally checked in my config/database.yml. Not
+a big deal, this is just a spike, right?</p>
+
+<p>[07:30] Wow, now is not the time to be punished by the fact that I aliased mvim
+to sl on my Gentoo box in an effort to stop typing mvim where it doesn’t work.
+That seemed like a good idea at the time, of course.</p>
+
+<p>[07:32] Toot toot! Time to switch consoles, this is taking forever. Dear reader,
+you <em>have</em> googled sl by now, right? :)</p>
+
+<p>[07:39] Ran out of time, so just messed with the data models a bit in the
+console to imagine their interactions. Will need to save a proper implementation
+for later.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">Puzzle</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"Reference"</span><span class="p">,</span> <span class="ss">:fingerprint</span> <span class="o">=&gt;</span>
+<span class="o">&gt;&gt;</span> <span class="no">Digest</span><span class="o">::</span><span class="no">SHA1</span><span class="p">.</span><span class="nf">hexdigest</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="s2">"</span><span class="si">#{</span><span class="no">RAILS_ROOT</span><span class="si">}</span><span class="s2">/samples/reference.txt"</span><span class="p">)))</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;Puzzle id: 1, name: "Reference", fingerprint:</span>
+<span class="s2">"a59eb2c51e07e2b7369baef8a0c3cb3b5d7ed3d9"</span><span class="p">,</span> <span class="ss">created_at: </span><span class="s2">"2011-01-28
+12:37:41"</span><span class="p">,</span> <span class="ss">updated_at: </span><span class="s2">"2011-01-28 12:37:41"</span><span class="o">&gt;</span>
+
+<span class="o">&gt;&gt;</span> <span class="no">Submission</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:puzzle_id</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="ss">:correct</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">)</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;Submission id: 1, puzzle_id: 1, correct: false, </span>
+     <span class="ss">created_at: </span><span class="s2">"2011-01-28 12:38:41"</span><span class="p">,</span> <span class="ss">updated_at: </span><span class="s2">"2011-01-28 12:38:41"</span><span class="o">&gt;</span>
+<span class="o">&gt;&gt;</span> <span class="no">Submission</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:puzzle_id</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="ss">:correct</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">)</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;Submission id: 2, puzzle_id: 1, correct: false, </span>
+   <span class="ss">created_at: </span><span class="s2">"2011-01-28 12:38:42"</span><span class="p">,</span> <span class="ss">updated_at: </span><span class="s2">"2011-01-28 12:38:42"</span><span class="o">&gt;</span>
+
+<span class="o">&gt;&gt;</span> <span class="no">Submission</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:puzzle_id</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="ss">:correct</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">)</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;Submission id: 3, puzzle_id: 1, correct: true, </span>
+   <span class="ss">created_at: </span><span class="s2">"2011-01-28 12:38:45"</span><span class="p">,</span> <span class="ss">updated_at: </span><span class="s2">"2011-01-28 12:38:45"</span><span class="o">&gt;</span>
+
+<span class="o">&gt;&gt;</span> <span class="no">Puzzle</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nf">submissions</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">:correct</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">).</span><span class="nf">count</span>
+<span class="o">=&gt;</span> <span class="mi">1</span>
+<span class="o">&gt;&gt;</span> <span class="no">Puzzle</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nf">submissions</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">:correct</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">).</span><span class="nf">count</span>
+<span class="o">=&gt;</span> <span class="mi">2</span>
+</code></pre>
+</div>
+
+<p>Hah, at least my associations seem to be working correctly. I can has rails!</p>
+
+<h3 id="step-5-reflect-on-your-progress">Step 5: Reflect on your progress</h3>
+
+<p>This exercise went more or less as I expected it to, with a couple surprises
+here and there. One thing that didn’t dawn on me until I reached stage 3 is that
+I don’t necessarily need to worry about file attachments in this application.
+While certain features such as having the ability to review user submissions or
+display the reference output would require it, a simple alpha product could be
+shipped without those features and still be quite usable.</p>
+
+<p>The exercise hopefully also reflects a bit of realism, as I didn’t rehearse it
+ahead of time and ran into some stupid things that slowed me down, which is what
+might happen to anyone. That’s really okay, because in the process, I learned
+some things worth looking into later on.</p>
+
+<p>Now that I’m an hour into this project, my instructions call for me to reflect
+on what scares me about it. I actually have a lot of general fears, but in order
+to explain them I’d need to give a lot of context about the project and those
+ideas are still fuzzy even in my own mind. That having been said, there is a 
+concern that I can share which this small spike keeps reminding me of.</p>
+
+<h3 id="what-about-this-project-scares-me">What about this project scares me?</h3>
+
+<p>I’m not sure that I like fingerprinting as a method for
+determining the validity of a solution. It scares me to think that if a problem
+called for you to generate some XML, alterations to whitespace could
+result in an otherwise perfectly valid submission getting rejected.</p>
+
+<p>The way that IPSC and Project Euler solve this problem is by restricting
+the submission format. In the case of IPSC this consists of bits of numbers or
+text separated by newlines, and for Project Euler the solutions are always to
+compute a simple number. I could adopt this strategy, but it makes me
+worried that it’ll limit the kinds of problems I can run at PuzzleNode.</p>
+
+<p>I want to avoid making the problems at PuzzleNode too academic in
+nature, with a focus more on practical problem solving and creative thinking.
+Both Project Euler and IPSC do a good job of this within a subset of their
+problems, but most of them are algorithmic. I wonder if that’s due to the 
+input constraints, and if it is, that would be bad for MU.</p>
+
+<p>One possibility is that rather than doing a bitwise matching via a fingerprint,
+I could force users to provide JSON data which I could then process and compare
+based on the object structure. This would allow for much greater flexibility in
+the way I validate submissions, and eliminate the failure-by-formatting issue I
+pointed out before, but it’d both increase the overhead of submitting a solution
+and make the backend functionality a good deal more complex.</p>
+
+<p>I think that what I need to do is draft up a few puzzles and see how much the
+current fingerprinting validation restrictions get in the way. I may be worrying
+about nothing, but the only way to tell is to produce some content and see where
+that brings me.</p>
+
+<h3 id="step-6-rinse-and-repeat">Step 6: Rinse and Repeat</h3>
+
+<p>My next step is to actually flesh out the Rails backend, since I didn’t get that
+far with it. I’m glad to have found that I can defer file uploads until a bit
+later, this is something I don’t think I would have realized if I started
+directly by jumping into the Rails boilerplate.</p>
+
+<p>Once I have a minimal system functioning, my next step will be to come up with
+a few more problems to test it against. I already have one idea in mind;
+generating more should be easy.</p>
+
+<p>With my next step planned, I feel confident that this project will keep 
+moving forward.</p>
+
+<h3 id="closing-thoughts">Closing Thoughts</h3>
+
+<p>This is a real outline of how I practice. At first, when I wrote up the set of
+instructions, I thought formalizing it would make it feel artificial to me. But
+honestly, once I got rolling on the spike, things happened pretty much the way
+they always would, and the comments I left were just the thoughts that came up
+in my mind as I went along. In that sense, it didn’t feel like practice.</p>
+
+<p>You’ll notice that I start with what I know and work outwards from there. I
+rarely try to think too hard about what I need to know ahead of time, because I
+find it causes me to study the wrong things at the wrong time. A more formal
+approach might have lead me to study paperclip up front, because this process
+involves file uploads. But the 20-30 minutes that might have costed me we found
+through experimentation is something that I can put off for several weeks
+without it affecting my progress.</p>
+
+<p>I tend not to plug into the firehose of information coming from books, blogs,
+and reddit/HN for the same reason. Soaking up that material is begging to find a
+solution in search of a problem, rather than the other way around. It’s always
+easy to ask for a recommendation at the time you actually need something, and
+Google is pretty good at digging up well read blog posts or articles about
+whatever tool you might need, and so I put off studying until it is necessary.</p>
+
+<p>I don’t do a whole lot of code katas, or little practice exercises that I can’t
+actually use for something. I will certainly do those things for entertainment,
+but I don’t schedule ‘practice time’ in my day to day life and honestly, I never
+have. There is no shortage of necessary learning that takes place when chasing
+practical goals, and the reward is much greater than just having an abstract
+feeling of learning a bit more, you end up with something you can use.</p>
+
+<p>The more I can make my life my practice, the less I need to be disciplined about
+making time for formal academic exercises. I admit that there are
+a lot of things about my lifestyle and circumstances that make me especially
+blessed, but I wasn’t always in a fortunate position and would give 
+similar advice even when I was struggling to make ends meet.</p>
+
+<p>So in closing, it may be true that the way to Carnegie Hall is via the
+“Practice! Practice! Practice!” path, but in my mind, that means less time
+playing with yourself in the comfort of your own home, and more time on small
+stages until they lead you to a slightly bigger stage which you can then occupy
+until it too, becomes too small.</p>
+
+<p>This is how I practice. I hope hearing about it has been useful to you.</p>
+
+<p><b>UPDATE 2011.09.09</b>: <i> The <a href="http://puzzlenode.com">PuzzleNode website</a>
+was successfully launched on time, and has been used to conduct three entrance
+exams for Mendicant University already. The puzzles there are language agnostic,
+and may be fun to try out even if you aren’t planning to apply to MU. But I’d be
+just as happy to hear that you’re too busy working on real projects that you
+care a lot about instead.</i></p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> This article has also been published on the Ruby Best Practices blog. 
+There <a href="http://blog.rubybestpractices.com/posts/gregory/054-issue-22-how-to-practice.html#disqus_thread">may be additional commentary</a> 
+over there worth taking a look at.</p>
+</blockquote>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

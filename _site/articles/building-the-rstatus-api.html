@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Building the rstat.us API: Choices and challenges</title>
+  <meta name="description" content="This article was contributed by Carol Nichols(@carols10cents,carols10cents@rstat.us), oneof the active maintainers of rstat.us. Carol isalso involved in the ...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/articles/building-the-rstatus-api">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Practicing Ruby</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Building the rstat.us API: Choices and challenges</h1>
+    <p class="post-meta"><time datetime="2012-09-18T00:00:00-04:00" itemprop="datePublished">Sep 18, 2012</time> • Carol Nichols</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><em>This article was contributed by Carol Nichols
+(<a href="http://twitter.com/carols10cents">@carols10cents</a>,
+<a href="https://rstat.us/users/Carols10cents">carols10cents@rstat.us</a>), one
+of the active maintainers of <a href="https://rstat.us">rstat.us</a>. Carol is
+also involved in the Pittsburgh Ruby community, and is a co-organizer of the
+<a href="http://steelcityrubyconf.org/">Steel City Ruby Conf</a>.</em></p>
+
+<p><a href="https://rstat.us">Rstat.us</a> is a microblogging site that is similar to Twitter, but 
+based on the <a href="http://ostatus.org/about">OStatus</a> open standard. It’s designed to be federated so
+that anyone can run an instance of rstat.us on their own domain while still being
+able to follow people on other domains. Although rstat.us is an active project 
+which has a lot to offer its users, the lack of an API has limited its
+adoption. In particular, an API would facilitate the development of mobile
+clients, which are a key part of what makes microblogging convenient for many people.</p>
+
+<p>Two different types of APIs have been considered for possible implementation
+in rstat.us: a hypermedia API using an open microblogging spec and a JSON API that is
+compatible with Twitter’s API. In this article, we’ll compare these two API styles 
+in the context of rstat.us, and discuss the decision that the project’s
+developers have made after weighing out the options.</p>
+
+<h2 id="hypermedia-api">Hypermedia API</h2>
+
+<p>Hypermedia APIs currently have a reputation for being complicated and hard to
+understand, but they’re really nothing to be scared of. There are many, many
+articles about what hypermedia is or is not, but the general definition that
+made hypermedia click for me is that a hypermedia API returns links in its
+responses that the client then uses to make its next calls. This means that the
+server does not have a set of URLs with parameters documented for you up front;
+it has documentation of the controls that you will see within the responses.</p>
+
+<p>The specific hypermedia API type that we are considering for rstat.us is one
+that complies with the <a href="http://amundsen.com/hypermedia/profiles/">Application-Level Profile Semantics (ALPS) microblogging
+spec</a>. This spec is an experiment
+started by Mike Amundsen to explore the advantages and disadvantages of multiple
+client and server implementations agreeing only on what particular values for
+the XHTML attributes <code class="highlighter-rouge">class</code>, <code class="highlighter-rouge">id</code>, <code class="highlighter-rouge">rel</code>, and <code class="highlighter-rouge">name</code> signify. The spec does not
+contain any URLs, example queries, or example responses.</p>
+
+<p>Here is a subset of the ALPS spec attributes and definitions; these have to do
+with the rendering of one status update and its metadata:</p>
+
+<ul>
+  <li>li.message - A representation of a single message</li>
+  <li>span.message-text - The text of a message posted by a user</li>
+  <li>span.user-text - The user nickname text</li>
+  <li>a with rel ‘message’ - A reference to a message representation</li>
+</ul>
+
+<p>This is one way you could render an update that is compatible with these attributes:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"message"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"message-text"</span><span class="nt">&gt;</span>
+    I had a fantastic sandwich at Primanti's for lunch.
+  <span class="nt">&lt;/span&gt;</span>
+  <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"user-text"</span><span class="nt">&gt;</span>Carols10cents<span class="nt">&lt;/span&gt;</span>
+  <span class="nt">&lt;a</span> <span class="na">rel=</span><span class="s">"message"</span> <span class="na">href=</span><span class="s">"http://rstat.us/12345"</span><span class="nt">&gt;</span>(permalink)<span class="nt">&lt;/a&gt;</span>
+<span class="nt">&lt;/li&gt;</span>
+</code></pre>
+</div>
+
+<p>And this is another way that is also compatible:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"message even"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;p&gt;</span>
+    <span class="nt">&lt;a</span> <span class="na">rel=</span><span class="s">"permalink message"</span> <span class="na">href=</span><span class="s">"http://rstat.us/update?id=12345"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"user-text"</span><span class="nt">&gt;</span>Carols10cents<span class="nt">&lt;/span&gt;</span> said:
+    <span class="nt">&lt;/a&gt;</span>
+    <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"message-text"</span><span class="nt">&gt;</span>
+      I had a fantastic sandwich at Primanti's for lunch.
+    <span class="nt">&lt;/span&gt;</span>
+  <span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/li&gt;</span>
+</code></pre>
+</div>
+
+<p>Notice some of the differences between the two:</p>
+
+<ul>
+  <li>All the elements being siblings vs some nested within each other</li>
+  <li>Only having the ALPS attribute values vs having other classes and rels as well</li>
+  <li>Only having the ALPS elements vs having the <code class="highlighter-rouge">&lt;p&gt;</code> element 
+between the <code class="highlighter-rouge">&lt;li&gt;</code> and the rest of the children</li>
+  <li>Simple resource-based routing vs. passing the id as a parameter</li>
+</ul>
+
+<p>All of these are perfectly fine! If a client only depends on the values of the
+attributes and not the exact structure that’s returned, it will be flexible
+enough to handle both responses. For example, you can extract the username 
+from either fragment using the following CSS selector:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'nokogiri'</span>
+
+<span class="c1"># Create a Nokogiri HTML Document from the first example, the second example </span>
+<span class="c1"># could be substituted and the result would be the same</span>
+<span class="n">html</span> <span class="o">=</span> <span class="o">&lt;&lt;</span><span class="no">HERE</span><span class="sh">
+  &lt;li class="message"&gt;
+    &lt;span class="message-text"&gt;
+      I had a fantastic sandwich at Primanti's for lunch.
+    &lt;/span&gt;
+    &lt;span class="user-text"&gt;Carols10cents&lt;/span&gt;
+    &lt;a rel="message" href="http://rstat.us/12345"&gt;(permalink)&lt;/a&gt;
+  &lt;/li&gt;
+</span><span class="no">HERE</span>
+
+<span class="n">doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+
+<span class="c1"># Using CSS selectors</span>
+<span class="n">username</span> <span class="o">=</span> <span class="n">doc</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s2">"li.message span.user-text"</span><span class="p">).</span><span class="nf">text</span> 
+</code></pre>
+</div>
+
+<p>With this kind of contract, we can change the representation
+of an update by the server from the first format to the second without breaking
+client functionality. While we will discuss the tradeoffs involved in using
+hypermedia APIs in more detail later, it is worth noting
+that structural flexibility is a big part of what makes them attractive
+from a design perspective.</p>
+
+<h2 id="json-api">JSON API</h2>
+
+<p>JSON APIs are much more common than hypermedia APIs right now. This style of API
+typically has a published list of URLs, one for each action a client may want to
+take. Each URL also has a number of documented parameters through which a client can
+send arguments, and the requests return data in a defined format. This style is 
+similar to a Remote Procedure Call (RPC) –
+functions are called with arguments, and values are returned, but the work is
+done on a remote machine. Because this style matches the way we code locally,
+it feels familiar, and that may explain why the technique is so popular.</p>
+
+<p><a href="https://dev.twitter.com/docs/api">Twitter’s API</a> is currently implemented in
+this RPC-like style. There is a lot of documentation about all the URLs
+available, what parameters they take, and what the returned data or resulting
+state will be. For example, here is how you would get the text of the 3 most
+recent tweets made by user @climagic with Twitter’s JSON API (<a href="https://dev.twitter.com/docs/api/1/get/statuses/home_timeline">relevant
+documentation</a>):</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'open-uri'</span>
+<span class="nb">require</span> <span class="s1">'json'</span>
+
+<span class="c1"># Make a request to the home_timeline resource with the format json.</span>
+<span class="c1"># Pass the parameter screen_name with the value climagic and the </span>
+<span class="c1"># parameter count with the value 3.</span>
+
+<span class="n">base</span> <span class="o">=</span> <span class="s2">"http://api.twitter.com/1/statuses/user_timeline.json"</span>
+<span class="n">uri</span>  <span class="o">=</span> <span class="no">URI</span><span class="p">(</span><span class="s2">"</span><span class="si">#{</span><span class="n">base</span><span class="si">}</span><span class="s2">?screen_name=climagic&amp;count=3"</span><span class="p">)</span>
+
+<span class="c1"># The response object is a list of tweets, which is documented at</span>
+<span class="c1"># https://dev.twitter.com/docs/platform-objects/tweets</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="no">JSON</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">uri</span><span class="p">).</span><span class="nf">read</span><span class="p">)</span>
+
+<span class="n">tweets</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span> <span class="n">t</span><span class="p">[</span><span class="s2">"text"</span><span class="p">]</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Rendering JSON from the server is usually fairly simple as well, and
+the simplicity of providing and consuming JSON in many different languages
+is another one of the big reasons why JSON APIs are gaining in popularity. Twitter
+actually decided to <a href="https://dev.twitter.com/docs/api/1.1/overview#JSON_support_only">drop support for XML, RSS, and
+Atom</a> in
+version 1.1 of their API, leaving ONLY support for JSON. <a href="http://blog.programmableweb.com/2011/05/25/1-in-5-apis-say-bye-xml/">According to
+Programmable
+Web</a> 20%
+of new APIs released in 2011 offered only JSON support.</p>
+
+<p>That said, popularity is neither the best nor the only metric for evaluating
+design strategies; costs and benefits of different approaches 
+can only be weighed out in the context of a real project. To illustrate that point, we can consider how 
+each of these API styles would impact the development of rstat.us.</p>
+
+<h3 id="comparing-and-contrasting-the-two-styles">Comparing and contrasting the two styles</h3>
+
+<p>There are many clients that have been built against Twitter’s current API. There
+are even some clients that allow you to change the root URL of all the requests
+(ex:
+<a href="https://play.google.com/store/apps/details?id=org.mariotaku.twidere">Twidere</a>)
+If rstat.us implemented the same parameters and response data,
+people could use those clients to interact with both Twitter and rstat.us. 
+Even if rstat.us doesn’t end up having this level of compatibility with
+Twitter’s API, a close approximation to it would still feel a lot more 
+familiar to client developers, which may encourage them to support rstat.us.</p>
+
+<p>But is it really a good idea to be coupled to Twitter’s API design? If Twitter changes a
+parameter name, or a URL, or the structure of the data returned, rstat.us will
+need to implement those changes or risk breaking its Twitter-compatible clients.
+Because one of the reasons rstat.us was developed was to reduce this kind of
+dependency of Twitter, this is a big price to pay, and hypermedia APIs can help
+guard against this kind of brittleness.</p>
+
+<p>In addition to flexibility in representation on both the client and server side,
+another advantage of a hypermedia API is that
+it uses XHTML as its media type, and we just so happen to already have an XHTML
+representation of rstat.us’ functionality: the web interface itself! If
+you take a look at the source of <a href="http://rstat.us">http://rstat.us</a>, you can see
+that the markup for an update contains the attribute values we’ve been talking
+about. We haven’t made rstat.us completely compliant with the ALPS spec yet, 
+but adding attributes to our existing output <a href="https://github.com/hotsh/rstat.us/commit/4e234556c73426dc16526883661b3feb1e2f7d9f">has been fairly
+simple</a>.
+By contrast, building out a Twitter-compatible JSON API would mean reimplementing an almost
+entirely separate interface to rstat.us that would need to maintain a mapping
+between its core functionality and the external behavior of Twitter’s API.</p>
+
+<p>But looking at the source of http://rstat.us again, you’ll also see a lot of
+other information in the source of the page. Most of it isn’t needed for the use
+of the API, so we’re transferring a lot of unnecessary data back and forth. The
+JSON responses are very compact in comparison; over time and with scale, this
+could make a difference in performance.</p>
+
+<p>I am also concerned that some operations that are straightforward with a
+Twitter-style JSON API (such as getting one user’s updates given their username)
+seem complex when following the ALPS spec. With the JSON API, there is a
+predefined URL with the username as a parameter, and the response contains
+the user’s updates. With the ALPS spec, starting from the root URL (which is the
+only predefined URL in an ideal hypermedia API), we would need to do a minimum
+of 4 HTTP requests. That would lead to some very tedious client code:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'nokogiri'</span>
+<span class="nb">require</span> <span class="s1">'open-uri'</span>
+
+<span class="no">USERNAME</span> <span class="o">=</span> <span class="s2">"carols10cents"</span>
+<span class="no">BASE_URI</span> <span class="o">=</span> <span class="s2">"https://rstat.us/"</span>
+
+<span class="k">def</span> <span class="nf">find_a_in</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="p">{})</span>
+  <span class="k">raise</span> <span class="s2">"no rel specified"</span> <span class="k">unless</span> <span class="n">params</span><span class="p">[</span><span class="ss">:rel</span><span class="p">]</span>
+
+  <span class="c1"># This XPath is necessary because @rels could have more than one value.</span>
+  <span class="n">link</span> <span class="o">=</span> <span class="n">html</span><span class="p">.</span><span class="nf">xpath</span><span class="p">(</span>
+    <span class="s2">".//a[contains(concat(' ', normalize-space(@rel), ' '), ' </span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="ss">:rel</span><span class="p">]</span><span class="si">}</span><span class="s2"> ')]"</span>
+  <span class="p">).</span><span class="nf">first</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">resolve_relative_uri</span><span class="p">(</span><span class="n">params</span> <span class="o">=</span> <span class="p">{})</span>
+  <span class="k">raise</span> <span class="s2">"no relative uri specified"</span> <span class="k">unless</span> <span class="n">params</span><span class="p">[</span><span class="ss">:relative</span><span class="p">]</span>
+  <span class="k">raise</span> <span class="s2">"no base uri specified"</span> <span class="k">unless</span> <span class="n">params</span><span class="p">[</span><span class="ss">:base</span><span class="p">]</span>
+
+  <span class="p">(</span><span class="no">URI</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:base</span><span class="p">])</span> <span class="o">+</span> <span class="no">URI</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:relative</span><span class="p">])).</span><span class="nf">to_s</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">request_html</span><span class="p">(</span><span class="n">relative_uri</span><span class="p">)</span>
+  <span class="n">absolute_uri</span> <span class="o">=</span> <span class="n">resolve_relative_uri</span><span class="p">(</span>
+    <span class="ss">:relative</span> <span class="o">=&gt;</span> <span class="n">relative_uri</span><span class="p">,</span>
+    <span class="ss">:base</span>     <span class="o">=&gt;</span> <span class="no">BASE_URI</span>
+  <span class="p">)</span>
+  <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">absolute_uri</span><span class="p">).</span><span class="nf">read</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="c1"># Request the root URL</span>
+<span class="c1"># HTTP Request #1</span>
+<span class="n">root_response</span> <span class="o">=</span> <span class="n">request_html</span><span class="p">(</span><span class="no">BASE_URI</span><span class="p">)</span>
+
+<span class="c1"># Find the `a` with `rel=users-search` and follow its `href`</span>
+<span class="c1"># HTTP Request #2</span>
+<span class="n">users_search_path</span> <span class="o">=</span> <span class="n">find_a_in</span><span class="p">(</span><span class="n">root_response</span><span class="p">,</span> <span class="ss">:rel</span> <span class="o">=&gt;</span> <span class="s2">"users-search"</span><span class="p">)[</span><span class="s2">"href"</span><span class="p">]</span>
+<span class="n">users_search_response</span> <span class="o">=</span> <span class="n">request_html</span><span class="p">(</span><span class="n">users_search_path</span><span class="p">)</span>
+
+<span class="c1"># Fill out the `form` that has `class=users-search`,</span>
+<span class="c1"># putting the username in the `input` with `name=search`</span>
+
+<span class="n">search_path</span> <span class="o">=</span> <span class="n">users_search_response</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s2">"form.users-search"</span><span class="p">).</span><span class="nf">first</span><span class="p">[</span><span class="s2">"action"</span><span class="p">]</span>
+<span class="n">user_lookup_query</span> <span class="o">=</span> <span class="s2">"</span><span class="si">#{</span><span class="n">search_path</span><span class="si">}</span><span class="s2">?search=</span><span class="si">#{</span><span class="no">USERNAME</span><span class="si">}</span><span class="s2">"</span>
+
+<span class="c1"># HTTP Request #3</span>
+<span class="n">user_lookup_response</span> <span class="o">=</span> <span class="n">request_html</span><span class="p">(</span><span class="n">user_lookup_query</span><span class="p">)</span>
+
+<span class="c1"># Find the search result beneath `div#users ul.search li.user` that has</span>
+<span class="c1"># `span.user-text` equal to the username</span>
+<span class="n">search_results</span> <span class="o">=</span> <span class="n">user_lookup_response</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s2">"div#users ul.search li.user"</span><span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">search_results</span><span class="p">.</span><span class="nf">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">sr</span><span class="o">|</span>
+  <span class="n">sr</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s2">"span.user-text"</span><span class="p">).</span><span class="nf">text</span><span class="p">.</span><span class="nf">match</span><span class="p">(</span><span class="sr">/^</span><span class="si">#{</span><span class="no">USERNAME</span><span class="si">}</span><span class="sr">$/i</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1"># Follow the `a` with `rel=user` within that search result</span>
+<span class="c1"># HTTP Request #4</span>
+<span class="n">user_path</span> <span class="o">=</span> <span class="n">find_a_in</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="ss">:rel</span> <span class="o">=&gt;</span> <span class="s2">"user"</span><span class="p">)[</span><span class="s2">"href"</span><span class="p">]</span>
+<span class="n">user_response</span> <span class="o">=</span> <span class="n">request_html</span><span class="p">(</span><span class="n">user_path</span><span class="p">)</span>
+
+<span class="c1"># Extract the user's updates using the update attributes.</span>
+<span class="n">updates</span> <span class="o">=</span> <span class="n">user_response</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s2">"div#messages ul.messages-user li"</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="n">updates</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">li</span><span class="o">|</span> <span class="n">li</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s2">"span.message-text"</span><span class="p">).</span><span class="nf">text</span><span class="p">.</span><span class="nf">strip</span> <span class="p">}.</span><span class="nf">join</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>This workflow could be cached so that the next time we try to get a user’s
+updates, we wouldn’t have to make so many requests. The first two
+requests for the root page and the user search page are unlikely to change
+often, so when we get a new username we can start with the construction
+of the <code class="highlighter-rouge">user_lookup_query</code> with a cached <code class="highlighter-rouge">search_path</code> value. That way, we would
+only need to make the last two requests to look up subsequent users.
+However, if the root page or the user search page do change, subsequent 
+requests could fail. In that case, we’d need error handling code that clears 
+the cache and and starts from the root page again. Unfortunately, doing 
+so would make the client code even more complicated.</p>
+
+<p>We could simplify things by extending the ALPS spec to include a URI
+template on the root page with a <code class="highlighter-rouge">rel</code> attribute to indicate that it’s a
+transition to information about a user when the template is filled out with
+the username. The ALPS spec path would still work, but the shortcut would
+allow clients to get at this data in fewer requests.
+However, since it wouldn’t be an official part of the spec, we’d need to
+document it, and all clients that wanted to remain compatible with ALPS would
+still need to implement the long way of doing things.</p>
+
+<p>As you can see, there are significant tradeoffs between the two API styles,
+and so it isn’t especially easy to decide what to do. But because rstat.us
+really needs an API in order to be a serious alternative to Twitter, we must 
+figure out a way forward!</p>
+
+<h3 id="making-a-decision">Making a decision</h3>
+
+<p>After weighing all these considerations, we’ve decided to concentrate first on
+implementing a Twitter-compatible JSON API, because it may allow our users
+to interact with rstat.us using the clients they are already familiar with. Even
+if those clients end up requiring some modifications, having an API that is easily 
+understood by many developers will still be a big plus. For the long term, having a more flexible and
+scalable solution is important, but those problems won’t need to be solved
+until there is more adoption. We may implement a hypermedia API (probably an
+extension of the ALPS spec) in the future, but for now we will take the
+pragmatic route in the hopes that it will encourage others to use
+rstat.us and support its development.</p>
+
+<h3 id="references">References</h3>
+
+<ul>
+  <li><a href="http://rstat.us">rstat.us</a> and its <a href="https://github.com/hotsh/rstat.us">code on github</a></li>
+  <li><a href="http://amundsen.com/hypermedia/profiles/">ALPS microblogging spec</a></li>
+  <li><a href="http://designinghypermediaapis.com">Designing Hypermedia APIs</a> by Steve Klabnik</li>
+  <li><a href="https://gist.github.com/2187514">A Shoes hypermedia client for ALPS microblogging</a></li>
+  <li><a href="https://dev.twitter.com/docs/api">Twitter API docs</a></li>
+  <li><a href="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">REST APIs must be hypertext-driven</a></li>
+</ul>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Send questions and feedback to:</li>
+          <li><a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/practicingdeveloper"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">practicingdeveloper</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/practicingdev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">practicingdev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>The world's largest collection of lessons for experienced Ruby developers.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
