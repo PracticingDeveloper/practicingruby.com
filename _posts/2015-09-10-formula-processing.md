@@ -2,8 +2,9 @@
 layout: post
 title:  "Safely evaluating user-defined formulas and calculations"
 date:   2015-09-10 10:00 -0500
-categories: article
+categories: articles
 author: Solomon White, Gregory Brown
+permalink: articles/formula-processing
 ---
 
 > This article was written in collaboration with Solomon White ([@rubysolo](http://twitter.com/rubysolo)). Solomon is a software developer from Denver, where he builds web applications with Ruby and ENV.JAVASCRIPT_FRAMEWORK.  He likes code, caffeine, and capsaicin.
