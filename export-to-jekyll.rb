@@ -7,17 +7,19 @@ articles = YAML.load_file("article-dump.yaml")
 # KEYS: [:slug, :title, :summary, :published, :issue_number, :volume, :body]
 
 def create_yaml_frontmatter(article)
-  puts '---'
-  puts 'layout: post'
-  puts "title:  \"#{article[:title]}\""
-  puts "date: #{article[:published]}"
-  puts 'categories: articles', 'author: Practicing Ruby'
-  puts "pemalink: articles/#{article[:slug]}"
-  puts "---\n\n"
+  yaml = {
+    'layout' => 'post',
+    'title' => article[:title],
+    'date' => article[:published].strftime("%F %R %z"),
+    'categories' => 'articles',
+    'author' => 'Practicing Ruby',
+    'permalink' => "articles/#{article[:slug]}"
+  }.to_yaml
+  puts yaml, "---\n\n"
 end
 
 def write_body(article)
-  puts '> ' + article[:summary] + "\n"
+  puts "> #{article[:summary]}\n\n"
   puts article[:body]
 end
 
