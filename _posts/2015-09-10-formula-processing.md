@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Safely evaluating user-defined formulas and calculations"
-date:   2015-09-10 10:00 -0500
+title: 'Safely evaluating user-defined formulas and calculations '
+date: '2015-09-10'
 categories: articles
-author: Solomon White, Gregory Brown
+author: Solomon White
 permalink: articles/formula-processing
 ---
 
