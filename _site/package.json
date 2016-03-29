@@ -5,7 +5,7 @@
         "module": "custom-errors",
         "options": {
           "errors": {
-            "404": "errors/404.html",
+            "404": "errors/404.html"
           }
         }
       },
