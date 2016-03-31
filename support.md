@@ -14,7 +14,7 @@ If you enjoy Practicing Ruby and want to support my work, please sign up
 for the free <a href="http://tinyletter.com/programming-beyond-practices">Programming Beyond Practices newsletter</a>.</p>
 
 <p>
-I am currently working on a book for O'Reilly by the same name, and that newsletter
+I am currently working on a book for O'Reilly by the same name, and its newsletter
 is where I've been sharing ideas, notes, and sample chapters.
 If you like what I'm posting there, please forward the emails along to others,
 and buy the book when it's ready for purchase.
