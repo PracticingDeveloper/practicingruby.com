@@ -4,6 +4,7 @@
       {
         "module": "redirect",
         "options": {
+          "/articles": "/",
           "/articles/1": "/articles/ways-to-load-code",
           "/articles/2": "/articles/attacking-sticky-problems",
           "/articles/3": "/articles/closures-are-complicated",
