@@ -28,7 +28,7 @@ so this is a very labor-intensive process for me.
 </p>
 
 <p>
-Thanks to a <a href="https://www.kickstarter.com/projects/828998531/practicing-ruby-contributors-fund)">Kickstarter campaign</a> we ran in June 2015, funding has already been secured to pay a $500 honorarium to
+Thanks to a <a href="https://www.kickstarter.com/projects/828998531/practicing-ruby-contributors-fund">Kickstarter campaign</a> we ran in June 2015, funding has already been secured to pay a $500 honorarium to
 each collaborator that contributes to Practicing Ruby.
 </p>
 
