@@ -13,4 +13,4 @@ issue_number: '6.4'
 
 In many of our articles, I have attempted to discuss the question of code reuse in Ruby (particularly composition vs. inheritance), but have found it difficult to express these ideas in our traditional format. Ruby's code sharing semantics cannot be easily expressed in a simple linear story arc, so a more formal style might help reveal the deeply interconnected concepts that make up this topic.
 
-Because it fits the structure a bit better, I've rendered this article in PDF format. Please [download the document](http://notes.practicingruby.com/2013-02-12-code-reuse-in-ruby.pdf) and let me know what you think!
+Because it fits the structure a bit better, I've rendered this article in PDF format. Please [download the document](/files/2013-02-12-code-reuse-in-ruby.pdf) and let me know what you think!
