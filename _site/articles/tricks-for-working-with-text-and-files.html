@@ -10,8 +10,8 @@
   <meta name="description" content="While it may not seem like it at first, you can learn a great deal about Ruby by building something as simple as a static website generator. Although the tas...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/tricks-for-working-with-text-and-files">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/tricks-for-working-with-text-and-files">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -86,7 +86,7 @@ Is not nearly as **small** as you might think she is.
 
 <p>Jackal’s job is to split the metadata from the content in this file and then generate a new file called <strong>_site/essays/2012/05/09/tiniest_kitten.html</strong> that ends up looking like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;h1&gt;</span>The Tiniest Kitten<span class="nt">&lt;/h1&gt;</span>
+<div class="language-html highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;h1&gt;</span>The Tiniest Kitten<span class="nt">&lt;/h1&gt;</span>
 
 <span class="nt">&lt;p&gt;</span>Is not nearly as <span class="nt">&lt;strong&gt;</span>small<span class="nt">&lt;/strong&gt;</span> as you might think she is.<span class="nt">&lt;/p&gt;</span>
 </code></pre>
@@ -104,7 +104,7 @@ Is not nearly as **small** as you might think she is.
 
 <p>The first step that Jackal (and Jekyll) need to take before further processing can be done on source files is to split the YAML-based metadata from the post’s content. In Jekyll, the following code is used to split things up:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="nb">self</span><span class="p">.</span><span class="nf">content</span> <span class="o">=~</span> <span class="sr">/^(---\s*\n.*?\n?)^(---\s*$\n?)/m</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="nb">self</span><span class="p">.</span><span class="nf">content</span> <span class="o">=~</span> <span class="sr">/^(---\s*\n.*?\n?)^(---\s*$\n?)/m</span>
   <span class="nb">self</span><span class="p">.</span><span class="nf">content</span> <span class="o">=</span> <span class="vg">$POSTMATCH</span>
   <span class="nb">self</span><span class="p">.</span><span class="nf">data</span>    <span class="o">=</span> <span class="no">YAML</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="vg">$1</span><span class="p">)</span>
 <span class="k">end</span>
@@ -126,7 +126,7 @@ Is not nearly as **small** as you might think she is.
 
 <p>While it is not necessarily terrible to use variables like <code class="highlighter-rouge">$1</code> and <code class="highlighter-rouge">$POSTMATCH</code>, I tend to avoid them whenever it is not strictly necessary to use them. I find that using <code class="highlighter-rouge">String#match</code> feels a lot more object-oriented and is more aesthetically pleasing:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="n">md</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nf">content</span><span class="p">.</span><span class="nf">match</span><span class="p">(</span><span class="sr">/^(---\s*\n.*?\n?)^(---\s*$\n?)/m</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="n">md</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nf">content</span><span class="p">.</span><span class="nf">match</span><span class="p">(</span><span class="sr">/^(---\s*\n.*?\n?)^(---\s*$\n?)/m</span><span class="p">)</span>
   <span class="nb">self</span><span class="p">.</span><span class="nf">content</span> <span class="o">=</span> <span class="n">md</span><span class="p">.</span><span class="nf">post_match</span>
   <span class="nb">self</span><span class="p">.</span><span class="nf">data</span>    <span class="o">=</span> <span class="n">md</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="k">end</span>
@@ -135,7 +135,7 @@ Is not nearly as **small** as you might think she is.
 
 <p>If you combine this with the use of Ruby 1.9’s named groups, your code ends up looking even better. The following example is what I ended up using in Jackal:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">md</span> <span class="o">=</span> <span class="n">contents</span><span class="p">.</span><span class="nf">match</span><span class="p">(</span><span class="sr">/^(?&lt;metadata&gt;---\s*\n.*?\n?)^(---\s*$\n?)/m</span><span class="p">))</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">md</span> <span class="o">=</span> <span class="n">contents</span><span class="p">.</span><span class="nf">match</span><span class="p">(</span><span class="sr">/^(?&lt;metadata&gt;---\s*\n.*?\n?)^(---\s*$\n?)/m</span><span class="p">))</span>
   <span class="nb">self</span><span class="p">.</span><span class="nf">contents</span> <span class="o">=</span> <span class="n">md</span><span class="p">.</span><span class="nf">post_match</span>
   <span class="nb">self</span><span class="p">.</span><span class="nf">metadata</span> <span class="o">=</span> <span class="no">YAML</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">md</span><span class="p">[</span><span class="ss">:metadata</span><span class="p">])</span>
 <span class="k">end</span>
@@ -148,7 +148,7 @@ Is not nearly as **small** as you might think she is.
 
 <p>I tend to be very strict about keeping my code formatted so that my lines are under 80 characters, and as a result of that I find that I am often having to think about how to break up long statements. I ended up using the <code class="highlighter-rouge">/x</code> modifier in one of Jackal’s regular expressions for this purpose, as shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Jackal</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Jackal</span>
   <span class="k">class</span> <span class="nc">Post</span>
     <span class="nc">PATTERN</span> <span class="o">=</span> <span class="sr">/\A(?&lt;year&gt;\d{4})-(?&lt;month&gt;\d{2})-(?&lt;day&gt;\d{2})-
                 (?&lt;basename&gt;.*).markdown\z/x</span>
@@ -161,13 +161,13 @@ Is not nearly as **small** as you might think she is.
 
 <p>This mode makes it so that patterns ignore whitespace characters, making the previous pattern functionally equivalent to the following pattern:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="sr">/\A(?&lt;year&gt;\d{4})-(?&lt;month&gt;\d{2})-(?&lt;day&gt;\d{2})-(?&lt;basename&gt;.*).markdown\z/x</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="sr">/\A(?&lt;year&gt;\d{4})-(?&lt;month&gt;\d{2})-(?&lt;day&gt;\d{2})-(?&lt;basename&gt;.*).markdown\z/x</span>
 </code></pre>
 </div>
 
 <p>However, this mode does not exist primarily to serve the needs of those with obsessive code formatting habits, but instead exists to make it possible to break up and document long regular expressions, such as in the following example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># adapted from: http://refactormycode.com/codes/573-phone-number-regex</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># adapted from: http://refactormycode.com/codes/573-phone-number-regex</span>
 
 <span class="no">PHONE_NUMBER_PATTERN</span> <span class="o">=</span> <span class="sr">/^
   (?:
@@ -194,7 +194,7 @@ $/x</span>
 
 <p>Whenever I am building up a string from a list of elements, I tend to use <code class="highlighter-rouge">Array#join</code> rather than string interpolation (i.e. the <code class="highlighter-rouge">#{}</code> operator) if I am working with more than two elements. As an example, take a look at my implementation of the <code class="highlighter-rouge">Jackal::Post#dirname</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Jackal</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Jackal</span>
   <span class="k">class</span> <span class="nc">Post</span>
     <span class="k">def</span> <span class="nf">dirname</span>
       <span class="k">raise</span> <span class="no">ArgumentError</span> <span class="k">unless</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">"category"</span><span class="p">]</span>
@@ -223,7 +223,7 @@ $/x</span>
 
 <p>I expect that most folks will already be familiar with <code class="highlighter-rouge">File.dirname</code>, but if that is not the case, the tests below should familiarize you with one of its use cases:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="no">Jackal</span><span class="o">::</span><span class="no">Page</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="no">Jackal</span><span class="o">::</span><span class="no">Page</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:page</span><span class="p">)</span> <span class="k">do</span>
     <span class="n">posts_dir</span> <span class="o">=</span> <span class="s2">"</span><span class="si">#{</span><span class="no">File</span><span class="p">.</span><span class="nf">dirname</span><span class="p">(</span><span class="kp">__FILE__</span><span class="p">)</span><span class="si">}</span><span class="s2">/../fixtures/sample_app/_posts"</span>
     <span class="no">Jackal</span><span class="o">::</span><span class="no">Page</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"</span><span class="si">#{</span><span class="n">posts_dir</span><span class="si">}</span><span class="s2">/2012-05-07-first-post.markdown"</span><span class="p">)</span>
@@ -238,7 +238,7 @@ $/x</span>
 
 <p>When used in conjunction with the special <code class="highlighter-rouge">__FILE__</code> variable, <code class="highlighter-rouge">File.dirname</code> is used generate a relative path. So for example, if the <code class="highlighter-rouge">__FILE__</code> variable in the previous tests evaluates to <code class="highlighter-rouge">"test/units/page_test.rb"</code>, you end up with the following return value from <code class="highlighter-rouge">File.dirname</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">File</span><span class="p">.</span><span class="nf">dirname</span><span class="p">(</span><span class="s2">"test/units/page_test.rb"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">File</span><span class="p">.</span><span class="nf">dirname</span><span class="p">(</span><span class="s2">"test/units/page_test.rb"</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="s2">"test/units"</span>
 </code></pre>
 </div>
@@ -289,7 +289,7 @@ $/x</span>
 
 <p>However, because doing so doesn’t really simplify the code, it is hard to see the advantages of using <code class="highlighter-rouge">Pathname</code> objects in this particular example. A much better example can be found in <code class="highlighter-rouge">Jackal::Post#save</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Jackal</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Jackal</span>
   <span class="k">class</span> <span class="nc">Post</span>
     <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span>
       <span class="n">target_dir</span> <span class="o">=</span> <span class="no">Pathname</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span> <span class="o">+</span> <span class="n">dirname</span>
@@ -324,13 +324,13 @@ $/x</span>
 
 <p>When I first started using Ruby, I was really impressed by how simple and expressive the <code class="highlighter-rouge">File.read</code> method was. Because of that, it was kind of a shock to find out that simply writing some text to a file was not as simple. The following code felt like the opposite of elegance to me, but we all typed it for years:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span> <span class="o">&lt;&lt;</span> <span class="n">contents</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span> <span class="o">&lt;&lt;</span> <span class="n">contents</span> <span class="p">}</span>
 </code></pre>
 </div>
 
 <p>In modern versions of Ruby 1.9, the above code can be replaced with something far nicer, as shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">File</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">contents</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">File</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">contents</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -344,7 +344,7 @@ $/x</span>
 
 <p>I like to use this method in combination with <code class="highlighter-rouge">Dir.chdir</code> to build up a temporary directory structure, do some work in it, and then automatically discard all the files I generated as soon as my test is completed. The tests below are a nice example of how that works:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"must be able to save contents to file"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"must be able to save contents to file"</span> <span class="k">do</span>
   <span class="no">Dir</span><span class="p">.</span><span class="nf">mktmpdir</span> <span class="k">do</span> <span class="o">|</span><span class="n">base_dir</span><span class="o">|</span>
     <span class="n">post</span><span class="p">.</span><span class="nf">save</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span>
 

@@ -10,8 +10,8 @@
   <meta name="description" content="One of the lessons I always try to teach programmers of various skill levels is that it is very important to work in small steps. This approach is especially...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/learning-new-things-step-by-step">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/learning-new-things-step-by-step">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -103,7 +103,7 @@
 
 <p>The following code was taken directly from Ray’s website and is simple enough that it’s pretty obvious what’s going on, even if you haven’t worked with the library before.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'ray'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'ray'</span>
 
 <span class="no">Ray</span><span class="p">.</span><span class="nf">game</span> <span class="s2">"Hello world!"</span> <span class="k">do</span>
   <span class="n">register</span> <span class="p">{</span> <span class="n">add_hook</span> <span class="ss">:quit</span><span class="p">,</span> <span class="nb">method</span><span class="p">(</span><span class="ss">:exit!</span><span class="p">)</span> <span class="p">}</span>
@@ -140,7 +140,7 @@
 
 <p>The simple program here shares the same boilerplate code as the previous “Hello world” example but simply swaps out the text rendering code with some polygon manipulation code.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'ray'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'ray'</span>
 
 <span class="no">Ray</span><span class="p">.</span><span class="nf">game</span> <span class="s2">"Test"</span> <span class="k">do</span>
   <span class="n">register</span> <span class="p">{</span> <span class="n">add_hook</span> <span class="ss">:quit</span><span class="p">,</span> <span class="nb">method</span><span class="p">(</span><span class="ss">:exit!</span><span class="p">)</span> <span class="p">}</span>
@@ -181,7 +181,7 @@
 
 <p>This code shows the changes that I made to make the square follow the mouse pointer around the screen. If you are trying to run these examples as you read along, simply replace the scene code from step 2 with this new implementation. All the other boilerplate code will remain the same throughout the rest of this article.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
   <span class="vi">@rect</span> <span class="o">=</span> <span class="no">Ray</span><span class="o">::</span><span class="no">Polygon</span><span class="p">.</span><span class="nf">rectangle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="no">Ray</span><span class="o">::</span><span class="no">Color</span><span class="p">.</span><span class="nf">red</span><span class="p">)</span>
   <span class="vi">@rect</span><span class="p">.</span><span class="nf">pos</span> <span class="o">=</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span><span class="mi">200</span><span class="p">]</span>
 
@@ -214,7 +214,7 @@
 
 <p>The following code uses an instance variable <code class="highlighter-rouge">@moving_left</code> to track whether the square needs to continue moving left. Whenever <code class="highlighter-rouge">@moving_left</code> is true, it uses vector addition to translate the current position of the rectangle.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
   <span class="vi">@rect</span> <span class="o">=</span> <span class="no">Ray</span><span class="o">::</span><span class="no">Polygon</span><span class="p">.</span><span class="nf">rectangle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="no">Ray</span><span class="o">::</span><span class="no">Color</span><span class="p">.</span><span class="nf">red</span><span class="p">)</span>
   <span class="vi">@rect</span><span class="p">.</span><span class="nf">pos</span> <span class="o">=</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span><span class="mi">200</span><span class="p">]</span>
 
@@ -250,7 +250,7 @@
 
 <p>The following code uses the conditionless callback <code class="highlighter-rouge">always</code> to run some code on each tick and checks whether a key is being held down by calling the aptly named <code class="highlighter-rouge">holding?</code> method that I overlooked in step 4.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
   <span class="vi">@rect</span> <span class="o">=</span> <span class="no">Ray</span><span class="o">::</span><span class="no">Polygon</span><span class="p">.</span><span class="nf">rectangle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="no">Ray</span><span class="o">::</span><span class="no">Color</span><span class="p">.</span><span class="nf">red</span><span class="p">)</span>
   <span class="vi">@rect</span><span class="p">.</span><span class="nf">pos</span> <span class="o">=</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span><span class="mi">200</span><span class="p">]</span>
 
@@ -284,7 +284,7 @@
 
 <p>In the following code, I changed the distance that the red square moves when a key is held down from 1 to 2, effectively doubling its speed.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
   <span class="vi">@rect</span> <span class="o">=</span> <span class="no">Ray</span><span class="o">::</span><span class="no">Polygon</span><span class="p">.</span><span class="nf">rectangle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="no">Ray</span><span class="o">::</span><span class="no">Color</span><span class="p">.</span><span class="nf">red</span><span class="p">)</span>
   <span class="vi">@rect</span><span class="p">.</span><span class="nf">pos</span> <span class="o">=</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span><span class="mi">200</span><span class="p">]</span>
 
@@ -320,7 +320,7 @@
 
 <p>The following code generates 20 random squares and renders them completely within the visible area on the screen. It does not introduce any new Ray concepts, so it should be pretty easy to follow.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
   <span class="vi">@rect</span> <span class="o">=</span> <span class="no">Ray</span><span class="o">::</span><span class="no">Polygon</span><span class="p">.</span><span class="nf">rectangle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="no">Ray</span><span class="o">::</span><span class="no">Color</span><span class="p">.</span><span class="nf">red</span><span class="p">)</span>
   <span class="vi">@rect</span><span class="p">.</span><span class="nf">pos</span> <span class="o">=</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span><span class="mi">200</span><span class="p">]</span>
 
@@ -370,7 +370,7 @@
 
 <p>The following code checks to make sure that the top-left corner of the red square never exits the screen by updating its position only if the new location is within the screen’s dimensions. I show only the updated <code class="highlighter-rouge">always</code> callback because it was the only thing that changed.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">always</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">always</span> <span class="k">do</span>
   <span class="k">if</span> <span class="vi">@rect</span><span class="p">.</span><span class="nf">pos</span><span class="p">.</span><span class="nf">x</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">&gt;</span> <span class="mi">0</span>
     <span class="vi">@rect</span><span class="p">.</span><span class="nf">pos</span> <span class="o">+=</span> <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">holding?</span><span class="p">(</span><span class="ss">:left</span><span class="p">)</span>
   <span class="k">end</span>
@@ -408,7 +408,7 @@
 
 <p>The following code uses the <code class="highlighter-rouge">Array#to_rect</code> core extension that Ray provides for creating <code class="highlighter-rouge">Ray::Rect</code> objects. This object provides basic collision detection routines, including an <code class="highlighter-rouge">inside?</code> method that can be used to determine whether one rectangle is completely contained within another. On each tick, any of the white squares that are contained with the bounds of the red square get removed.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">always</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">always</span> <span class="k">do</span>
   <span class="c1"># same code as in step 8 goes here</span>
 
   <span class="vi">@goodies</span><span class="p">.</span><span class="nf">reject!</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
@@ -438,7 +438,7 @@
 
 <p>Only a minor modification to the <code class="highlighter-rouge">render</code> callback was needed to complete this step. We simply check whether the array of white squares is empty, and if so, render the phrase “YOU WIN” to the screen similar to the way we rendered “Hello World” in step 1.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">render</span> <span class="k">do</span> <span class="o">|</span><span class="n">win</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">render</span> <span class="k">do</span> <span class="o">|</span><span class="n">win</span><span class="o">|</span>
   <span class="k">if</span> <span class="vi">@goodies</span><span class="p">.</span><span class="nf">empty?</span>
     <span class="n">win</span><span class="p">.</span><span class="nf">draw</span> <span class="n">text</span><span class="p">(</span><span class="s2">"YOU WIN"</span><span class="p">,</span> <span class="ss">:at</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span> <span class="ss">:size</span> <span class="o">=&gt;</span> <span class="mi">60</span><span class="p">)</span>
   <span class="k">else</span>
@@ -465,7 +465,7 @@
 
 <p>The following code shows the changes that needed to be made to get the blue squares onto the screen. They are very similar to those in step 7, but if you want to see the full context, you can view <a href="https://github.com/elm-city-craftworks/goodies_and_baddies/blob/41110cc71d3f94231754313fec47d1ad6a87e902/game.rb">a snapshot of the game’s source code for this step</a> on github.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
   <span class="c1"># same code as step 10 goes here</span>
 
   <span class="vi">@baddies</span> <span class="o">=</span> <span class="mi">5</span><span class="p">.</span><span class="nf">times</span><span class="p">.</span><span class="nf">map</span> <span class="k">do</span>
@@ -511,7 +511,7 @@
 
 <p>Revisiting the <code class="highlighter-rouge">Ray::Rect</code> source code, I found that it also provides a simple <code class="highlighter-rouge">collide?</code> method that tells you whether any part of a given rectangle intersects with another. The following code uses this feature to make it so that even if a single point of a blue rectangle touches the red one, the game ends in a loss. If this excerpt is too hard to follow without the surrounding context, check out <a href="https://github.com/elm-city-craftworks/goodies_and_baddies/blob/5595b3fe43decd1f06f1376cc2bd1cfd9c24ec06/game.rb">the source code of the game at this step</a> on github.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
   <span class="c1"># same code as in step 11</span>
 
   <span class="n">always</span> <span class="k">do</span>
@@ -554,7 +554,7 @@
 
 <p>This code should be fairly self-explanatory, as it does not introduce any new Ray concepts. It uses a simple algorithm for moving each blue square towards the red square that randomizes the distance traveled on each tick by choosing a number between 0 and 2.5. The <a href="https://github.com/elm-city-craftworks/goodies_and_baddies/blob/cdf0fe1b59fe2416886e94da6e45c2affc1dc111/game.rb">final source code for the game</a> is available on github.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">scene</span> <span class="ss">:square</span> <span class="k">do</span>
   <span class="c1"># same code as in step 12</span>
 
   <span class="n">always</span> <span class="k">do</span>

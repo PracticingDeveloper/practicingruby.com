@@ -10,8 +10,8 @@
   <meta name="description" content="In Issue #3, we looked at the downsidesof mixing configuration code with application code. We discussed how storingconfiguration data in YAML files can solve...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/configurable-applications-2">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/configurable-applications-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -122,7 +122,7 @@ start going down that road, we need to ask what it would take to implement
 the entire configuration in pure Ruby. As you can see in the following example, 
 the answer is ‘not much’:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MyApp</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MyApp</span>
   <span class="k">module</span> <span class="nn">Config</span>
     <span class="no">HOST</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'localhost'</span><span class="p">,</span> <span class="ss">:port</span> <span class="o">=&gt;</span> <span class="mi">3000</span> <span class="p">}</span>
     <span class="no">WEB</span>  <span class="o">=</span> <span class="p">{</span> <span class="ss">:login_url</span> <span class="o">=&gt;</span>  <span class="s2">"</span><span class="si">#{</span><span class="no">HOST</span><span class="p">[</span><span class="ss">:name</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">#{</span><span class="no">HOST</span><span class="p">[</span><span class="ss">:port</span><span class="p">]</span><span class="si">}</span><span class="s2">/login"</span> <span class="p">}</span>
@@ -135,7 +135,7 @@ the answer is ‘not much’:</p>
 that we saw in the first example in Issue #3. But by defining this module
 in its own file and requiring that file, those issues are avoided:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"config/my_app_config"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"config/my_app_config"</span>
 <span class="nb">require</span> <span class="s2">"rest_client"</span>
 
 <span class="k">module</span> <span class="nn">MyApp</span>
@@ -158,7 +158,7 @@ stored in a YAML file, but gives you the full power of Ruby in your
 configuration scripts. In more complex configurations, you may even build
 a mini-DSL, as shown in the following example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">AccessControl</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">AccessControl</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span>
   <span class="n">role</span> <span class="s2">"basic"</span><span class="p">,</span> 
     <span class="ss">:permissions</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:read_answers</span><span class="p">,</span> <span class="ss">:answer_questions</span><span class="p">]</span>
   
@@ -179,7 +179,7 @@ a mini-DSL, as shown in the following example:</p>
 
 <p>While this looks like vanilla configuration code on the surface, we can see that what we’re working with are full blown Ruby objects. Here are some examples of how this system is used:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">AccessControl</span><span class="p">.</span><span class="nf">roles_with_permission</span><span class="p">(</span><span class="ss">:create_quizzes</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">AccessControl</span><span class="p">.</span><span class="nf">roles_with_permission</span><span class="p">(</span><span class="ss">:create_quizzes</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"manager"</span><span class="p">,</span> <span class="s2">"owner"</span><span class="p">]</span>
 <span class="o">&gt;&gt;</span> <span class="no">AccessControl</span><span class="p">[</span><span class="s2">"premium"</span><span class="p">].</span><span class="nf">permissions</span>
 <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:hide_advertisements</span><span class="p">,</span> <span class="ss">:read_answers</span><span class="p">,</span> <span class="ss">:answer_questions</span><span class="p">]</span>
@@ -192,7 +192,7 @@ a mini-DSL, as shown in the following example:</p>
 
 <p>This is an advanced configuration system that not only encapsulates some configuration data, but also makes it possible to query that data in useful ways. The following implementation code illustrates how little magic is involved in building such a system.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">AccessControl</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">AccessControl</span>
   <span class="kp">extend</span> <span class="nb">self</span>
  
   <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
@@ -295,7 +295,7 @@ Restarting app...done.
 <p>In the application, these variables are accessed in a similar fashion to our
 previous example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">AWS</span><span class="o">::</span><span class="no">S3</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection!</span><span class="p">(</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">AWS</span><span class="o">::</span><span class="no">S3</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection!</span><span class="p">(</span>
   <span class="ss">:access_key_id</span>     <span class="o">=&gt;</span> <span class="no">ENV</span><span class="p">[</span><span class="s1">'S3_KEY'</span><span class="p">],</span>
   <span class="ss">:secret_access_key</span> <span class="o">=&gt;</span> <span class="no">ENV</span><span class="p">[</span><span class="s1">'S3_SECRET'</span><span class="p">]</span>
 <span class="p">)</span>
@@ -316,7 +316,7 @@ previous example:</p>
 
 <p>Here’s an example pulled directly out of a project of mine which illustrates a reverse search from the current working directory back to the filesystem’s root directory.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'pathname'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'pathname'</span>
 
 <span class="k">def</span> <span class="nf">config_dir</span><span class="p">(</span><span class="n">dir</span> <span class="o">=</span> <span class="no">Pathname</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"."</span><span class="p">))</span>
   <span class="n">app_config_dir</span> <span class="o">=</span> <span class="n">dir</span> <span class="o">+</span> <span class="s2">".myappconfigfolder"</span>

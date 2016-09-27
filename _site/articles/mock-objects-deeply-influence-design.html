@@ -10,8 +10,8 @@
   <meta name="description" content="  NOTE: This is one of four lessonslearned from my 90 day self-study ontest-driven development. If this topic interests you, be sure to check out the other l...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/mock-objects-deeply-influence-design">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/mock-objects-deeply-influence-design">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -163,7 +163,7 @@ see this trend in action. For example, in BrokenRecord, my first test
 was for a struct-like object that would be used for storing field
 data:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">Row</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">Row</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"must create readers for all attributes"</span> <span class="k">do</span>
     <span class="n">row</span> <span class="o">=</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">Row</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:a</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="ss">:b</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
 
@@ -177,7 +177,7 @@ data:</p>
 <p>Similarly, when I was working on the Blind game, my first test was for a <code class="highlighter-rouge">Map</code> object
 that allowed you to place named objects at specific coordinates:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="no">Blind</span><span class="o">::</span><span class="no">Map</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="no">Blind</span><span class="o">::</span><span class="no">Map</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"must be able to store elements at a position"</span> <span class="k">do</span>
     <span class="n">map</span> <span class="o">=</span> <span class="no">Blind</span><span class="o">::</span><span class="no">Map</span><span class="p">.</span><span class="nf">new</span>
     <span class="n">map</span><span class="p">.</span><span class="nf">add_object</span><span class="p">(</span><span class="s2">"player"</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>

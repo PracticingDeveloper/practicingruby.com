@@ -10,8 +10,8 @@
   <meta name="description" content="  This article was written in collaboration with Solomon White (@rubysolo). Solomon is a software developer from Denver, where he builds web applications wit...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/formula-processing">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/formula-processing">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -91,7 +91,7 @@
 
 <p>The purpose of Dentaku is to provide a safe way to execute user-defined mathematical formulas within a Ruby application.  For example, consider the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"dentaku"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"dentaku"</span>
 
 <span class="n">calc</span> <span class="o">=</span> <span class="no">Dentaku</span><span class="o">::</span><span class="no">Calculator</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">volume</span> <span class="o">=</span> <span class="n">calc</span><span class="p">.</span><span class="nf">evaluate</span><span class="p">(</span><span class="s2">"length * width * height"</span><span class="p">,</span> 
@@ -105,7 +105,7 @@
 
 <p>To understand the risks, you consider an alternative implementation that allows mathematical formulas to be evaluated directly as plain Ruby code. You implement the equivalent formula evaluator without the use of an external library, just to see what it would look like:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">evaluate_formula</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">evaluate_formula</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
    <span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
 
    <span class="k">def</span> <span class="nc">obj</span><span class="o">.</span><span class="nf">context</span>
@@ -196,7 +196,7 @@
 
 <p>After a bit of experimentation, you end up implementing the following interface:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">p</span> <span class="no">Project</span><span class="p">.</span><span class="nf">available_projects</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">p</span> <span class="no">Project</span><span class="p">.</span><span class="nf">available_projects</span> 
 <span class="c1">#=&gt; ["calm", "yinyang”]</span>
 
 <span class="nb">p</span> <span class="no">Project</span><span class="p">.</span><span class="nf">variables</span><span class="p">(</span><span class="s2">"calm"</span><span class="p">)</span> 
@@ -220,7 +220,7 @@
 
 <p>This class will be instantiated with the name of a particular garden layout and a set of dimensional parameters that will be used to determine how much of each material is needed, and how much the entire garden kit will weigh. Sketching this concept out in code, you decide that the <code class="highlighter-rouge">Calculator</code> class should work as shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">calc</span> <span class="o">=</span> <span class="no">Calculator</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"yinyang"</span><span class="p">,</span> <span class="s2">"diameter"</span> <span class="o">=&gt;</span> <span class="s2">"20"</span><span class="p">,</span> <span class="s2">"height"</span> <span class="o">=&gt;</span> <span class="s2">"5"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">calc</span> <span class="o">=</span> <span class="no">Calculator</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"yinyang"</span><span class="p">,</span> <span class="s2">"diameter"</span> <span class="o">=&gt;</span> <span class="s2">"20"</span><span class="p">,</span> <span class="s2">"height"</span> <span class="o">=&gt;</span> <span class="s2">"5"</span><span class="p">)</span>
 
 <span class="nb">p</span> <span class="n">calc</span><span class="p">.</span><span class="nf">materials</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="s1">'quantity'</span><span class="p">].</span><span class="nf">ceil</span><span class="p">,</span> <span class="n">e</span><span class="p">[</span><span class="s1">'unit'</span><span class="p">]]</span> <span class="p">}</span> <span class="c1">#=&gt;</span>
 <span class="c1"># [["1cm thick flexible strip", 472, "sq cm"],</span>
@@ -245,7 +245,7 @@
 
 <p>The resulting code ends up looking like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Calculator</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Calculator</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{})</span>
     <span class="vi">@params</span> <span class="o">=</span> <span class="no">Hash</span><span class="p">[</span><span class="n">params</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="o">|</span> <span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="no">Dentaku</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span> <span class="p">}]</span>  <span class="c1">#1</span>
 
@@ -270,7 +270,7 @@
 
 <p>A few lines of code later, and you have a freshly minted <code class="highlighter-rouge">Calculator#materials</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># class Calculator</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># class Calculator</span>
 
   <span class="k">def</span> <span class="nf">materials</span>
     <span class="n">calculator</span> <span class="o">=</span> <span class="no">Dentaku</span><span class="o">::</span><span class="no">Calculator</span><span class="p">.</span><span class="nf">new</span> <span class="c1">#1</span>
@@ -290,7 +290,7 @@
 
 <p>Because currently all shipping weight computations are simple arithmetic operations on a <code class="highlighter-rouge">quantity</code> for each material, you don’t need to load up the various common formulas used in the geometry equations. You just need to look up the relevant weight formulas by name, then evaluate them for each material in the list to get a weight value for that material. Sum up those values, for the entire materials list, and you’re done!</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># class Calculator</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># class Calculator</span>
 
   <span class="k">def</span> <span class="nf">shipping_weight</span>
     <span class="n">calculator</span> <span class="o">=</span> <span class="no">Dentaku</span><span class="o">::</span><span class="no">Calculator</span><span class="p">.</span><span class="nf">new</span>

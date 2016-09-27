@@ -10,8 +10,8 @@
   <meta name="description" content="If you are using send to test private methods in your tests, you are almost certainly doing it wrong. Most private methods tend to fall into one of the follo...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/testing-private-methods">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/testing-private-methods">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -71,7 +71,7 @@
 
 <p>Take a look at the three objects below and try to match them to the patterns listed above.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Book</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Book</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
     <span class="vi">@name</span> <span class="o">=</span> <span class="nb">name</span>
   <span class="k">end</span>
@@ -160,7 +160,7 @@
 
 <p>If you guessed that <code class="highlighter-rouge">Inventory</code> was the object which demonstrated a private method that doesn’t implement an external behavior, you guessed right. The sole purpose of <code class="highlighter-rouge">Inventory#item_class</code> is just to make the code in <code class="highlighter-rouge">Inventory#count</code> and <code class="highlighter-rouge">Inventory#receive</code> a bit cleaner to read. Therefore, it’d be wasteful to write an explicit test such as the one below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_item_class</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_item_class</span>
   <span class="n">assert_equal</span> <span class="no">InStockBook</span><span class="p">,</span> <span class="no">Inventory</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:item_class</span><span class="p">,</span> <span class="ss">:book</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
@@ -168,7 +168,7 @@
 
 <p>The following tests implicitly cover the functionality of <code class="highlighter-rouge">Inventory#item_class</code> while focusing on actual interactions through the public interface.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_stocking_a_book</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_stocking_a_book</span>
   <span class="no">Inventory</span><span class="p">.</span><span class="nf">receive</span><span class="p">(</span><span class="ss">:book</span><span class="p">,</span> <span class="s2">"Ruby Best Practices"</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
   <span class="n">assert_equal</span> <span class="mi">100</span><span class="p">,</span> <span class="no">Inventory</span><span class="p">.</span><span class="nf">count</span><span class="p">(</span><span class="ss">:book</span><span class="p">,</span> <span class="s2">"Ruby Best Practices"</span><span class="p">)</span>
 <span class="k">end</span>
@@ -181,7 +181,7 @@
 
 <p>Book implements a method called <code class="highlighter-rouge">available_for_purchase?</code>, which relies on a private method called <code class="highlighter-rouge">copies_remaining</code> to operate. The following code demonstrates a poorly implemented test.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_copies_remaining</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_copies_remaining</span>
   <span class="n">book</span> <span class="o">=</span> <span class="no">Book</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Ruby Best Practices"</span><span class="p">)</span>
   <span class="no">Inventory</span><span class="p">.</span><span class="nf">receive</span><span class="p">(</span><span class="n">book</span><span class="p">.</span><span class="nf">name</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
  
@@ -194,7 +194,7 @@
 
 <p>The rule of thumb here is that if a method provides a sensible behavior that fits the context of your object, it’s better off to just make it public. The following test seems very natural to me.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_copies_remaining</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_copies_remaining</span>
   <span class="n">book</span> <span class="o">=</span> <span class="no">Book</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Ruby Best Practices"</span><span class="p">)</span>
   <span class="no">Inventory</span><span class="p">.</span><span class="nf">receive</span><span class="p">(</span><span class="n">book</span><span class="p">.</span><span class="nf">name</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
   
@@ -207,7 +207,7 @@
 
 <p>Let’s think a bit about how we could test the <code class="highlighter-rouge">InStockBook#isbn</code> shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">InStockBook</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">InStockBook</span>
 
   <span class="c1"># .. other features omitted</span>
 
@@ -221,7 +221,7 @@
 
 <p>One way to do it the would be to mock out the call to <code class="highlighter-rouge">isbn_from_service</code> as we do in the following tests.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_retreive_isbn</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_retreive_isbn</span>
   <span class="n">book</span> <span class="o">=</span> <span class="no">InStockBook</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Ruby Best Practices"</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
   <span class="n">book</span><span class="p">.</span><span class="nf">expects</span><span class="p">(</span><span class="ss">:isbn_from_service</span><span class="p">).</span><span class="nf">once</span><span class="p">.</span><span class="nf">returns</span><span class="p">(</span><span class="s2">"978-0-596-52300-8"</span><span class="p">)</span>
 
@@ -234,7 +234,7 @@
 
 <p>The downside of this approach is that by mocking out the call to <code class="highlighter-rouge">isbn_from_service</code>, we’re bypassing all of the following code, leaving it untested.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">isbn_from_service</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">isbn_from_service</span>
   <span class="n">isbn_service_connect</span>
 
   <span class="n">isbn</span> <span class="o">=</span> <span class="vi">@isbn_service</span><span class="p">.</span><span class="nf">find_isbn_for</span><span class="p">(</span><span class="vi">@title</span><span class="p">)</span>
@@ -257,7 +257,7 @@
 
 <p>Making these methods public on <code class="highlighter-rouge">InStockBook</code> doesn’t make much sense, but we also can’t say that these are mere implementation details that can be ignored. In these situations, typically some redesign is necessary, and in this case, a simple shift of this functionality upstream to the <code class="highlighter-rouge">IsbnService</code> class makes the most sense.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">IsbnService</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">IsbnService</span>
 
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">find_isbn_for</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
     <span class="n">service</span> <span class="o">=</span> <span class="kp">new</span>
@@ -277,7 +277,7 @@
 
 <p>This functionality can now easily be tested as a public behavior of the <code class="highlighter-rouge">IsbnService</code> class, where it won’t get jumbled up with <code class="highlighter-rouge">InStockBook</code>’s logic. All that’s left to do is rewrite our <code class="highlighter-rouge">InStockBook#isbn</code> method so that it delegates to this new class.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">InStockBook</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">InStockBook</span>
 
   <span class="c1"># .. other features omitted</span>
 
@@ -292,7 +292,7 @@
 <p>Our updated <code class="highlighter-rouge">isbn</code> tests only need to change slightly to accommodate this
 change:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_retreive_isbn</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">test_retreive_isbn</span>
   <span class="n">book</span> <span class="o">=</span> <span class="no">InStockBook</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Ruby Best Practices"</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
   <span class="no">IsbnService</span><span class="p">.</span><span class="nf">expects</span><span class="p">(</span><span class="ss">:find_isbn_for</span><span class="p">).</span><span class="nf">with</span><span class="p">(</span><span class="n">book</span><span class="p">.</span><span class="nf">title</span><span class="p">).</span><span class="nf">once</span><span class="p">.</span>
               <span class="nf">returns</span><span class="p">(</span><span class="s2">"978-0-596-52300-8"</span><span class="p">)</span>

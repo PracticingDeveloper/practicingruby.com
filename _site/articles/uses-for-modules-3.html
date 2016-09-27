@@ -10,8 +10,8 @@
   <meta name="description" content="  Note: This article series on modules is also available as a PDF download. ThePDF version has been revised and is more up-to-date than what you see here.In ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/uses-for-modules-3">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/uses-for-modules-3">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -80,7 +80,7 @@ foundation for us.</p>
 
 <p>To understand this trick of mixing modules into themselves, one first must understand how <code class="highlighter-rouge">extend()</code> works. We covered this concept at the end of the last article, but we can touch on it again for good measure. Start by considering the trivial module shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
   <span class="k">def</span> <span class="nf">hello</span>
     <span class="s2">"hi"</span>
   <span class="k">end</span>
@@ -90,7 +90,7 @@ foundation for us.</p>
 
 <p>We had shown that unlike <code class="highlighter-rouge">include()</code> which is especially designed for augmenting class definitions so that a mixin can add instance methods to some target class, <code class="highlighter-rouge">extend()</code> has a much more simple behavior and works with any object.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">obj</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Greeter</span><span class="p">)</span>
 <span class="n">obj</span><span class="p">.</span><span class="nf">hello</span> <span class="c1">#=&gt; "hi"</span>
 </code></pre>
@@ -100,7 +100,7 @@ foundation for us.</p>
 
 <p>In Ruby, classes and modules are ordinary objects. We can confirm this by doing a tiny bit of introspection on <code class="highlighter-rouge">Greeter</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">Greeter</span><span class="p">.</span><span class="nf">object_id</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">Greeter</span><span class="p">.</span><span class="nf">object_id</span>
 <span class="o">=&gt;</span> <span class="mi">212500</span>
 <span class="o">&gt;&gt;</span> <span class="no">Greeter</span><span class="p">.</span><span class="nf">class</span>
 <span class="o">=&gt;</span> <span class="no">Module</span>
@@ -111,7 +111,7 @@ foundation for us.</p>
 
 <p>While this may be a mental leap for some, you might be able to find peace with it by considering the ordinary module definition syntax to be a bit of sugar that is functionally equivalent to the following bit of code.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Greeter</span> <span class="o">=</span> <span class="no">Module</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Greeter</span> <span class="o">=</span> <span class="no">Module</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span>
   <span class="k">def</span> <span class="nf">hello</span>
     <span class="s2">"hi"</span>
   <span class="k">end</span>
@@ -121,19 +121,19 @@ foundation for us.</p>
 
 <p>When written in this way, it becomes far more obvious that <code class="highlighter-rouge">Greeter</code> is actually just an instance of the class Module, making it an ordinary Ruby object at its core. Once you feel that you understand this point, consider what happens when the following line of code is run.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Greeter</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Greeter</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Greeter</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Greeter</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>If we compare this to previous examples of <code class="highlighter-rouge">extend()</code>, it should be clear now that despite the seemingly circular reference, this line does exactly what it would if called on any other object: It mixes the methods defined by <code class="highlighter-rouge">Greeter</code> directly into the <code class="highlighter-rouge">Greeter</code> object itself. A simple test confirms this to be true.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Greeter</span><span class="p">.</span><span class="nf">hello</span> <span class="c1">#=&gt; "hi"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Greeter</span><span class="p">.</span><span class="nf">hello</span> <span class="c1">#=&gt; "hi"</span>
 </code></pre>
 </div>
 
 <p>If we unravel things a bit, we find that we could have written our <code class="highlighter-rouge">extend()</code> call slightly differently, by doing it from within the module definition itself:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
   <span class="kp">extend</span> <span class="no">Greeter</span>
 
   <span class="k">def</span> <span class="nf">hello</span>
@@ -147,7 +147,7 @@ foundation for us.</p>
 Noticing this detail allows us to use slightly more dynamic approach, resulting
 in the following code.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
   <span class="kp">extend</span> <span class="nb">self</span>
 
   <span class="k">def</span> <span class="nf">hello</span>
@@ -171,7 +171,7 @@ in the following code.</p>
 
 <p>When we create class definitions, we tend to think of the objects we’re building as little structures which manage state and provide behaviors which manipulate that state. But sometimes, a more stateless model makes sense. The closer you get to pure mathematics, the more a pure functional model makes sense. We need to look no farther than Ruby’s own <code class="highlighter-rouge">Math</code> module for an example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">Math</span><span class="p">.</span><span class="nf">sin</span><span class="p">(</span><span class="no">Math</span><span class="o">::</span><span class="no">PI</span><span class="o">/</span><span class="mi">2</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">Math</span><span class="p">.</span><span class="nf">sin</span><span class="p">(</span><span class="no">Math</span><span class="o">::</span><span class="no">PI</span><span class="o">/</span><span class="mi">2</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span>
 <span class="o">&gt;&gt;</span> <span class="no">Math</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="no">Math</span><span class="o">::</span><span class="no">E</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span>
@@ -184,7 +184,7 @@ call. But it might be desirable to mix this functionality into another object so
 that you can call math functions without repeating the <code class="highlighter-rouge">Math</code> constant
 excessively. For this reason, Ruby implements <code class="highlighter-rouge">Math</code> as a module.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">Math</span><span class="p">.</span><span class="nf">class</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">Math</span><span class="p">.</span><span class="nf">class</span>
 <span class="o">=&gt;</span> <span class="no">Module</span>
 </code></pre>
 </div>
@@ -195,7 +195,7 @@ excessively. For this reason, Ruby implements <code class="highlighter-rouge">Ma
 
 <p>While I could have stuck this logic in a number of different places, I decided I wanted to put it within a module of its own, because its logic did not rely on any persistent state and could be defined independently of the way our questions and quizzes were modeled. The following code is what I came up with:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MinimalAnswer</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MinimalAnswer</span>
   <span class="kp">extend</span> <span class="nb">self</span>
 
   <span class="k">def</span> <span class="nf">match?</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">input</span><span class="p">)</span>
@@ -217,7 +217,7 @@ excessively. For this reason, Ruby implements <code class="highlighter-rouge">Ma
 
 <p>Here is a simple example of how my <code class="highlighter-rouge">MinimalAnswer</code> module is used within the application:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">MinimalAnswer</span><span class="p">.</span><span class="nf">match?</span><span class="p">(</span><span class="s2">"Cop,Police Officer"</span><span class="p">,</span> <span class="s2">"COP"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">MinimalAnswer</span><span class="p">.</span><span class="nf">match?</span><span class="p">(</span><span class="s2">"Cop,Police Officer"</span><span class="p">,</span> <span class="s2">"COP"</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="kp">true</span>
 <span class="o">&gt;&gt;</span> <span class="no">MinimalAnswer</span><span class="p">.</span><span class="nf">match?</span><span class="p">(</span><span class="s2">"Cop,Police Officer"</span><span class="p">,</span> <span class="s2">"police officer"</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="kp">true</span>
@@ -242,7 +242,7 @@ excessively. For this reason, Ruby implements <code class="highlighter-rouge">Ma
 
 <p>The following example shows a simple DSL I wrote for the trivia application I had mentioned earlier. It may look familiar, and that is because it appeared in our discussion on writing configuration systems some weeks ago. This time around, our focus will be on how this system actually works rather than what purpose it serves.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">AccessControl</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">AccessControl</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span>
   <span class="n">role</span> <span class="s2">"basic"</span><span class="p">,</span>
     <span class="ss">:permissions</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:read_answers</span><span class="p">,</span> <span class="ss">:answer_questions</span><span class="p">]</span>
 
@@ -267,7 +267,7 @@ excessively. For this reason, Ruby implements <code class="highlighter-rouge">Ma
 
 <p>By modeling <code class="highlighter-rouge">AccessControl</code> as a module rather than class, we end up with an object that we can store data on that can’t be instantiated.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">AccessControl</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">AccessControl</span>
   <span class="kp">extend</span> <span class="nb">self</span>
 
   <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
@@ -299,7 +299,7 @@ excessively. For this reason, Ruby implements <code class="highlighter-rouge">Ma
 
 <p>Once we recognize these key points, a bit of introspection shows us what is really going on.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">AccessControl</span><span class="p">.</span><span class="nf">configure</span> <span class="p">{</span> <span class="s2">"I am </span><span class="si">#{</span><span class="nb">self</span><span class="p">.</span><span class="nf">inspect</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">AccessControl</span><span class="p">.</span><span class="nf">configure</span> <span class="p">{</span> <span class="s2">"I am </span><span class="si">#{</span><span class="nb">self</span><span class="p">.</span><span class="nf">inspect</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
 <span class="o">=&gt;</span> <span class="s2">"I am AccessControl"</span>
 <span class="o">&gt;&gt;</span> <span class="no">AccessControl</span><span class="p">.</span><span class="nf">instance_eval</span> <span class="p">{</span> <span class="s2">"I am </span><span class="si">#{</span><span class="nb">self</span><span class="p">.</span><span class="nf">inspect</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
 <span class="o">=&gt;</span> <span class="s2">"I am AccessControl"</span>

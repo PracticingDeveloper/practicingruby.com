@@ -10,8 +10,8 @@
   <meta name="description" content="As programmers we are very comfortable with the idea of usingsoftware to solve concrete problems. However, it is easy tounderestimate the role that code can ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/simulating-tiny-worlds">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/simulating-tiny-worlds">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -101,7 +101,7 @@ underestimate the role that code can play in problem-solving itself, and that bl
 
 <p>The code that was used to generate this visualization is shown below, and is nearly a direct translation of the rules shown above:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Terrarium</span><span class="o">::</span><span class="no">Scenario</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Terrarium</span><span class="o">::</span><span class="no">Scenario</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
   <span class="c1"># Rule 1: Build the forest</span>
   <span class="n">patches</span> <span class="k">do</span>
     <span class="n">with_probability</span><span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span> <span class="p">{</span> <span class="n">set_color</span> <span class="ss">:green</span> <span class="p">}</span> 
@@ -162,7 +162,7 @@ underestimate the role that code can play in problem-solving itself, and that bl
 
 <p>Taking a purely analytical approach towards thinking through the relationships between all of these variables would be a challenging task to say the least. However, it does not take much specialized knowledge at all to model this problem using StarLogo-style creatures. In fact, the code below is all you need to implement this scenario. Try reading it one rule at a time while looking at the animation, and you should be able to piece together the main concepts even if you’ve never heard of StarLogo before reading this article:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Terrarium</span><span class="o">::</span><span class="no">Scenario</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Terrarium</span><span class="o">::</span><span class="no">Scenario</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
   <span class="n">healthy_color</span> <span class="o">=</span> <span class="ss">:cyan</span>
   <span class="n">sick_color</span>    <span class="o">=</span> <span class="ss">:yellow</span>
 
@@ -279,7 +279,7 @@ underestimate the role that code can play in problem-solving itself, and that bl
 
 <p>The full source code for this scenario is shown below, and you’re should skim it at least, but you don’t need to get bogged down in the details unless you plan to play around with StarLogo or my Terrarium engine after you’re done reading this article. If you’re feeling a bit tired by now, you can skip right past it to the next section without losing too much.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Terrarium</span><span class="o">::</span><span class="no">Scenario</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Terrarium</span><span class="o">::</span><span class="no">Scenario</span><span class="p">.</span><span class="nf">define</span> <span class="k">do</span>
   <span class="n">cabbage_density</span>    <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mi">5</span> 
   <span class="n">regrowth_rate</span>      <span class="o">=</span> <span class="mi">0</span><span class="o">.</span><span class="mo">02</span>
   <span class="n">initial_population</span> <span class="o">=</span> <span class="mi">200</span>

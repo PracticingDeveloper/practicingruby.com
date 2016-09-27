@@ -10,8 +10,8 @@
   <meta name="description" content="This article was contributed by Jesse Storimer. He isthe author of Working with Unix Processesand Working with TCP Sockets, a pair ofebooks providing fundame...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/process-spawning-patterns">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/process-spawning-patterns">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -73,7 +73,7 @@ object-oriented fundamentals and for being a great scripting language. One of th
 this latter benefit is that it’s so easy to marry Ruby with command-line
 utilities. Here’s an example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:console</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:console</span> <span class="k">do</span>
   <span class="sb">`irb -r my_app`</span>
 <span class="k">end</span>
 </code></pre>
@@ -88,7 +88,7 @@ going on inside that backtick method?</p>
 <p>Ruby provides many ways of spawing processes. Why use backticks instead of
 <code class="highlighter-rouge">system</code>?</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:console</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:console</span> <span class="k">do</span>
   <span class="nb">system</span><span class="p">(</span><span class="s1">'irb -r my_app'</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
@@ -96,7 +96,7 @@ going on inside that backtick method?</p>
 
 <p>Or what about <code class="highlighter-rouge">exec</code>? Would that have been better?</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:console</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:console</span> <span class="k">do</span>
   <span class="nb">exec</span><span class="p">(</span><span class="s1">'irb'</span><span class="p">,</span> <span class="s1">'-r'</span><span class="p">,</span> <span class="s1">'my_app'</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
@@ -163,7 +163,7 @@ for installation instructions. To verify that things are working as
 expected, try running the kernel tests from within the RubySpec project
 directory:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mspec core/kernel
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mspec core/kernel
 </code></pre>
 </div>
 
@@ -172,7 +172,7 @@ the familiar <code class="highlighter-rouge">-r</code> option with <code class="
 the methods we want to override. Let’s do that, while at the same time 
 running the <code class="highlighter-rouge">Kernel.system</code> specs:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>touch practicing_spawning.rb
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>touch practicing_spawning.rb
 <span class="gp">$ </span>mspec -r ./practicing_spawning.rb core/kernel/system_spec.rb
 </code></pre>
 </div>
@@ -183,7 +183,7 @@ running the <code class="highlighter-rouge">Kernel.system</code> specs:</p>
 
 <p>Let’s begin our implementation by causing the tests to fail:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># practicing_spawning.rb</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># practicing_spawning.rb</span>
 <span class="k">module</span> <span class="nn">Kernel</span>
   <span class="k">def</span> <span class="nf">system</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
   <span class="k">end</span>
@@ -197,15 +197,16 @@ running the <code class="highlighter-rouge">Kernel.system</code> specs:</p>
 away because it’s not the interesting part. If we run the <code class="highlighter-rouge">system</code> specs again,
 we get our first of several failures:</p>
 
-<pre><code class="language-console">1)
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>1)
 Kernel#system executes the specified command in a subprocess FAILED
 Expected (STDOUT): "a\n"
           but got: ""
 </code></pre>
+</div>
 
 <p>This failure directly relates to the following spec:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"executes the specified command in a subprocess"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"executes the specified command in a subprocess"</span> <span class="k">do</span>
   <span class="nb">lambda</span> <span class="p">{</span> <span class="vi">@object</span><span class="p">.</span><span class="nf">system</span><span class="p">(</span><span class="s2">"echo a"</span><span class="p">)</span> <span class="p">}.</span><span class="nf">should</span> <span class="n">output_to_fd</span><span class="p">(</span><span class="s2">"a</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
@@ -269,7 +270,7 @@ about <code class="highlighter-rouge">exec</code>?</p>
 <code class="highlighter-rouge">exec</code>, you can transform a Ruby process into an <code class="highlighter-rouge">ls</code> process, another Ruby
 process, or an <code class="highlighter-rouge">echo</code> process:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">puts</span> <span class="s1">'hi from Ruby'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">puts</span> <span class="s1">'hi from Ruby'</span>
 <span class="nb">exec</span><span class="p">(</span><span class="s1">'ls'</span><span class="p">)</span>
 <span class="nb">puts</span> <span class="s1">'bye from Ruby'</span> <span class="c1"># will never be reached</span>
 </code></pre>
@@ -285,7 +286,7 @@ execution.</p>
 <p>With <code class="highlighter-rouge">fork</code> and <code class="highlighter-rouge">exec</code>, we now have the building blocks that we need to implement
 our own <code class="highlighter-rouge">system</code> method. Here’s the most basic implementation:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># practicing_spawning.rb</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># practicing_spawning.rb</span>
 <span class="k">module</span> <span class="nn">Kernel</span>
   <span class="k">def</span> <span class="nf">system</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
@@ -326,7 +327,7 @@ and <code class="highlighter-rouge">false</code> for any other value.</p>
 <p>Now we need to get the rest of the <code class="highlighter-rouge">system</code> specs passing. In
 the remainder of the failures, we see the following output:</p>
 
-<pre><code class="language-console">1) 
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>1) 
 Kernel#system returns nil when command execution fails FAILED
 Expected false to be nil
 &lt;snipped backtrace...&gt;
@@ -338,10 +339,11 @@ Expected (STDERR): ""
          file or directory - sad (Errno::ENOENT)
 &lt;snipped backtrace...&gt;
 </code></pre>
+</div>
 
 <p>These failures relate to the following specs:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">ruby_version_is</span> <span class="s2">"1.9"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">ruby_version_is</span> <span class="s2">"1.9"</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"returns nil when command execution fails"</span> <span class="k">do</span>
     <span class="vi">@object</span><span class="p">.</span><span class="nf">system</span><span class="p">(</span><span class="s2">"sad"</span><span class="p">).</span><span class="nf">should</span> <span class="n">be_nil</span>
   <span class="k">end</span>
@@ -376,7 +378,7 @@ Keeping with the general theme of this article, we’ll use a Unix pipe.</p>
 one writable. Together, they form a one-way data ‘pipe’. Data is written
 to one <code class="highlighter-rouge">IO</code> object and read from the other:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">rd</span><span class="p">,</span> <span class="n">wr</span> <span class="o">=</span> <span class="no">IO</span><span class="p">.</span><span class="nf">pipe</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">rd</span><span class="p">,</span> <span class="n">wr</span> <span class="o">=</span> <span class="no">IO</span><span class="p">.</span><span class="nf">pipe</span>
 <span class="n">wr</span><span class="p">.</span><span class="nf">write</span> <span class="s2">"ping"</span>
 <span class="n">wr</span><span class="p">.</span><span class="nf">close</span>
 
@@ -396,7 +398,7 @@ Ruby processes.</p>
 <p>Now we can roll together all of these concepts and write our own implementation
 of <code class="highlighter-rouge">system</code> that passes all the specs:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># practicing_spawning.rb</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># practicing_spawning.rb</span>
 <span class="k">module</span> <span class="nn">Kernel</span>
   <span class="k">def</span> <span class="nf">system</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
@@ -448,7 +450,7 @@ of <code class="highlighter-rouge">system</code> that passes all the specs:</p>
 <p>Now that you’ve got the fundamentals under your belt, we can apply these concepts to the
 implementation of other process-spawning methods. Let’s do backticks:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># practicing_spawning.rb</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># practicing_spawning.rb</span>
 <span class="k">module</span> <span class="nn">Kernel</span>
   <span class="k">def</span> <span class="nf">`</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
     <span class="n">rd</span><span class="p">,</span> <span class="n">wr</span> <span class="o">=</span> <span class="no">IO</span><span class="p">.</span><span class="nf">pipe</span>
@@ -485,8 +487,9 @@ implementation of other process-spawning methods. Let’s do backticks:</p>
 <p>Now we can run the backticks spec against our implementation and see that it’s
 all green!</p>
 
-<pre><code class="language-console">$ mspec -r ./practicing_spawning.rb core/kernel/backtick_spec.rb
-</code></pre>
+<div class="language-console highlighter-rouge"><pre class="highlight"><code><span class="w">$ </span><span class="nc">mspec</span><span class="kv"> -r ./practicing_spawning.rb core/kernel/backtick_spec.rb
+</span></code></pre>
+</div>
 
 <p>The full source for our <code class="highlighter-rouge">practicing_spawning.rb</code> file is available <a href="https://gist.github.com/3730986">as a gist</a>.</p>
 

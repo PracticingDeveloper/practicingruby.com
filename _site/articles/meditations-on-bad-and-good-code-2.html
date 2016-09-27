@@ -10,8 +10,8 @@
   <meta name="description" content="In Issue #6, you got to see my intentionally bad implementation of Tic Tac Toe. For today, I have promised to show you some better code and the steps I took ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/meditations-on-bad-and-good-code-2">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/meditations-on-bad-and-good-code-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -65,7 +65,7 @@
 
 <p>To start this exercise, I had challenged myself to implement this simple game without using any user defined classes or methods. Given that I wanted to make sure I produced <em>bad</em> code to start with, I got a little nervous when my back-of-the-napkin proof of concept didn’t come out looking that bad. Here it is again below, for those who forgot about it.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">board</span> <span class="o">=</span> <span class="p">[[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">],</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">board</span> <span class="o">=</span> <span class="p">[[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">],</span>
          <span class="p">[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">],</span>
          <span class="p">[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">]]</span>
 
@@ -161,7 +161,7 @@ it does two things for me:</p>
 
 <p>The thing I kept wrestling with was how to manage the screen output stuff. I wrestled with a bunch of ideas, including defining a simply <code class="highlighter-rouge">display()</code> method on <code class="highlighter-rouge">Game</code> like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
   <span class="nb">puts</span> <span class="n">message</span>
 <span class="k">end</span>
 </code></pre>
@@ -171,7 +171,7 @@ it does two things for me:</p>
 
 <p>Imagine that my <code class="highlighter-rouge">check_draw</code> method in Rules was written like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">check_draw</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">check_draw</span>
   <span class="k">if</span> <span class="vi">@board</span><span class="p">.</span><span class="nf">covered?</span>
      <span class="nb">display</span> <span class="s2">"It's a draw"</span>
      <span class="n">game_over</span>
@@ -184,7 +184,7 @@ it does two things for me:</p>
 
 <p>But instead, I chose to let <code class="highlighter-rouge">Game</code> fill in the blanks with an implementation like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">check_draw</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">check_draw</span>
   <span class="k">if</span> <span class="vi">@board</span><span class="p">.</span><span class="nf">covered?</span>
      <span class="k">yield</span>
      <span class="n">game_over</span>
@@ -196,7 +196,7 @@ it does two things for me:</p>
 <p>This allows the draw logic to live in <code class="highlighter-rouge">Rules</code>, with calling code in <code class="highlighter-rouge">Game</code>
 that looks like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">check_draw</span> <span class="p">{</span> <span class="nb">puts</span> <span class="s2">"It's a draw"</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">check_draw</span> <span class="p">{</span> <span class="nb">puts</span> <span class="s2">"It's a draw"</span> <span class="p">}</span>
 </code></pre>
 </div>
 
@@ -212,7 +212,7 @@ that looks like this:</p>
 
 <p>Still, I don’t like things like these constants:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">LEFT_DIAGONAL_POSITIONS</span>  <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]]</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">LEFT_DIAGONAL_POSITIONS</span>  <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]]</span>
 <span class="no">RIGHT_DIAGONAL_POSITIONS</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]]</span>
 <span class="no">SPAN</span>                     <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="mi">2</span><span class="p">)</span>
 <span class="no">CELL_COUNT</span>               <span class="o">=</span> <span class="mi">9</span>

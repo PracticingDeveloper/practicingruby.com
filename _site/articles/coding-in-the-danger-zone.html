@@ -10,8 +10,8 @@
   <meta name="description" content="Writing robust code is always challenging, even when dealing with extremely well controlled environments. But when you enter the danger zone where software f...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/coding-in-the-danger-zone">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/coding-in-the-danger-zone">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -86,7 +86,7 @@ I, [2012-03-10T12:46:57.274896 #9841]  INFO -- RESPONSE:
 
 <p>Because Newman currently only understands how to filter messages based on their TO and SUBJECT fields, the standard log information is fairly helpful for basic application debugging needs. However, when dealing with complex problems, it is nice to be able to see <a href="https://raw.github.com/gist/01fbab481a21f4d43bbf/0778e1a0ae887e6423bce985298e3f8d60eb37a0/gistfile1.txt">the raw contents of the messages</a>. Rather than choosing one or the other, Newman handles both log formats by outputting them at different log levels:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Newman</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Newman</span>
   <span class="k">module</span> <span class="nn">EmailLogger</span>
     <span class="k">def</span> <span class="nf">log_email</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
       <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"</span><span class="se">\n</span><span class="si">#{</span><span class="n">email</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
@@ -115,7 +115,7 @@ I, [2012-03-10T12:46:57.274896 #9841]  INFO -- RESPONSE:
 
 <p>Because Newman does not know anything about the applications it runs except that they all implement a <code class="highlighter-rouge">call</code> method, it is not possible to be selective about what kinds of errors to handle. Instead, a catch-all mechanism is implemented in the <code class="highlighter-rouge">process_request</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Newman</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Newman</span>
   <span class="k">class</span> <span class="nc">Server</span>
     <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
       <span class="n">apps</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
@@ -147,7 +147,7 @@ I, [2012-03-10T12:46:57.274896 #9841]  INFO -- RESPONSE:
 
 <p>While <code class="highlighter-rouge">Newman::Server#process_request</code> does a good job of handling application errors, there are a range of failures that can happen as a result of server operations as well. This means that <code class="highlighter-rouge">Newman::Server#tick</code> needs to implement its own exception handling and logging, as shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Newman</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Newman</span>
   <span class="k">class</span> <span class="nc">Server</span>
     <span class="k">def</span> <span class="nf">tick</span>         
       <span class="n">mailer</span><span class="p">.</span><span class="nf">messages</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">request</span><span class="o">|</span> 
@@ -176,7 +176,7 @@ infinite send/receive loop into the experimental Newman-based mailing list syste
 
 <p>While the infinite loop I introduced could probably be avoided by doing some simple checks in Newman, the problem of the server failing repeatedly is a general defect that could cause all sorts of different problems down the line. To solve this problem, I’ve implemented a simplified version of the <a href="http://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">circuit breaker</a> pattern in MailWhale, as shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"fileutils"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"fileutils"</span>
 
 <span class="c1"># unimportant details omitted...</span>
 

@@ -10,8 +10,8 @@
   <meta name="description" content="Ruby makes it easy to quickly put together a proof-of-concept for almost any kind of project, as long as you have some experience in rapid application develo...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/rapid-prototyping">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/rapid-prototyping">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -175,7 +175,7 @@ coming up with something I felt I could build within an hour or two.</p>
 
 <p>Imagining this canvas object already existed, I wrote some code for generating the very first bit out output we see in the requirements.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">canvas</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Canvas</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">canvas</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Canvas</span><span class="p">.</span><span class="nf">new</span>
 
 <span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="mi">2</span><span class="p">).</span><span class="nf">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span>
   <span class="n">canvas</span><span class="p">.</span><span class="nf">paint</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"|"</span><span class="p">)</span>
@@ -221,7 +221,7 @@ coming up with something I felt I could build within an hour or two.</p>
 
 <p>What we have done is narrowed the problem down to a much simpler task, making it easier to get started. The following implementation is sufficient to get the example working, and is simple enough that we probably don’t need to discuss it further.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FallingBlocks</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FallingBlocks</span>
   <span class="k">class</span> <span class="nc">Canvas</span>
     <span class="nc">SIZE</span> <span class="o">=</span> <span class="mi">10</span>
 
@@ -256,13 +256,13 @@ coming up with something I felt I could build within an hour or two.</p>
 
 <p>While a full implementation of the game would require implementing rotations and movement, our prototype looks at pieces frozen in time. This means that a piece is really just represented by a collection of points. If we define each piece based on an origin of [0,0], we end up with something like this for a vertical line:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">line</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">line</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
 </code></pre>
 </div>
 
 <p>Similarly, a bent S-shaped piece would be defined like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">bent</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">bent</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
 </code></pre>
 </div>
 
@@ -270,7 +270,7 @@ coming up with something I felt I could build within an hour or two.</p>
 
 <p>We could use the origin at [0,0], but for aesthetic reason, I didn’t like the mental model of grasping a piece by a position that could potentially be unoccupied. Instead, I decided to define the anchor as the top-left position occupied by the piece, which could later be translated to a different position on the canvas. This gives us an anchor of [0,3] for the line, and an anchor of [0,2] for the bent shape. I wrote the following example to outline how the API should work.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">line</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">line</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
 <span class="nb">p</span> <span class="n">line</span><span class="p">.</span><span class="nf">anchor</span> <span class="c1">#=&gt; [0,3]</span>
 
 <span class="n">bent</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
@@ -280,7 +280,7 @@ coming up with something I felt I could build within an hour or two.</p>
 
 <p>Once again, a simple example gives me enough constraints to make it easy to write an object that implements the desired behavior.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Piece</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Piece</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
     <span class="vi">@points</span> <span class="o">=</span> <span class="n">points</span>
     <span class="n">establish_anchor</span>
@@ -302,7 +302,7 @@ coming up with something I felt I could build within an hour or two.</p>
 with their absolute coordinates to verify my shape definitions. The following example 
 outlines the behavior I had expected.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">canvas</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Canvas</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">canvas</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Canvas</span><span class="p">.</span><span class="nf">new</span>
 
 <span class="n">bent_shape</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
 <span class="n">bent_shape</span><span class="p">.</span><span class="nf">paint</span><span class="p">(</span><span class="n">canvas</span><span class="p">)</span>
@@ -330,7 +330,7 @@ outlines the behavior I had expected.</p>
 
 <p>Getting this far was easy, the following definition of <code class="highlighter-rouge">Piece</code> does the trick:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Piece</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Piece</span>
    <span class="nc">SYMBOL</span> <span class="o">=</span> <span class="s2">"#"</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
@@ -356,7 +356,7 @@ outlines the behavior I had expected.</p>
 
 <p>This demonstrates to me that the concept of considering pieces as a collection of points can work, and that my basic coordinates for a bent piece are right. But since I need a way to translate these coordinates to arbitrary positions of the grid for this code to be useful, this iteration was only a stepping stone. A new example pushes us forward.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">canvas</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Canvas</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">canvas</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Canvas</span><span class="p">.</span><span class="nf">new</span>
 
 <span class="n">bent_shape</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
 
@@ -385,7 +385,7 @@ outlines the behavior I had expected.</p>
 
 <p>As you can see in the code above, I decided that my <code class="highlighter-rouge">Piece#paint</code> method was probably better off as <code class="highlighter-rouge">Canvas#paint_shape</code>, just to collect the presentation logic in one place. Here’s what the updated code ended up looking like.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Canvas</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Canvas</span>
  <span class="c1"># ...</span>
 
  <span class="k">def</span> <span class="nf">paint_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
@@ -399,7 +399,7 @@ outlines the behavior I had expected.</p>
 
 <p>This new code does not rely directly on the <code class="highlighter-rouge">Piece#points</code> method anymore, but instead, passes a position to the newly created <code class="highlighter-rouge">Piece#translated_points</code> to get a set of coordinates anchored by the specified position.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Piece</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Piece</span>
   <span class="c1">#...</span>
   
   <span class="k">def</span> <span class="nf">translated_points</span><span class="p">(</span><span class="n">new_anchor</span><span class="p">)</span>
@@ -421,7 +421,7 @@ cropped up while implementing it confirmed my gut feeling. But with the light
 visible at the end of the tunnel, I wrote an example to unify piece objects 
 with the junk left on the grid from previous moves.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">game</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Game</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">game</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Game</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">bent_shape</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
 <span class="n">game</span><span class="p">.</span><span class="nf">piece</span> <span class="o">=</span> <span class="n">bent_shape</span>
 <span class="n">game</span><span class="p">.</span><span class="nf">piece_position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
@@ -453,7 +453,7 @@ with the junk left on the grid from previous moves.</p>
 
 <p>The key component that tied this all together is the <code class="highlighter-rouge">Game</code> object, which essentially is just a container that knows how to use a <code class="highlighter-rouge">Canvas</code> object to render itself.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Game</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Game</span>
   <span class="k">def</span> <span class="nf">initialize</span>
     <span class="vi">@junk</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="vi">@piece</span> <span class="o">=</span> <span class="kp">nil</span>
@@ -485,7 +485,7 @@ with the junk left on the grid from previous moves.</p>
 
 <h3 id="case-1-lineshapedemorb">CASE 1: line_shape_demo.rb</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s2">"falling_blocks"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s2">"falling_blocks"</span>
 
 <span class="n">game</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Game</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">line_shape</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
@@ -507,7 +507,7 @@ with the junk left on the grid from previous moves.</p>
 
 <h3 id="case-2-bendedshapedemorb">CASE 2: bended_shape_demo.rb</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s2">"falling_blocks"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s2">"falling_blocks"</span>
 
 <span class="n">game</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Game</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">bent_shape</span> <span class="o">=</span> <span class="no">FallingBlocks</span><span class="o">::</span><span class="no">Piece</span><span class="p">.</span><span class="nf">new</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>

@@ -10,8 +10,8 @@
   <meta name="description" content="In this issue and the next one, I’d like to demonstrate one of my favorite learning exercises while inviting you to follow along at home. It’s something I us...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/meditations-on-bad-and-good-code-1">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/meditations-on-bad-and-good-code-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -73,7 +73,7 @@
 
 <p>In fact, if you ignore end game conditions and error handling, you can get a simple prompt for a two player game with just a few lines of Ruby.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">board</span> <span class="o">=</span> <span class="p">[[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">],</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">board</span> <span class="o">=</span> <span class="p">[[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">],</span>
          <span class="p">[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">],</span>
          <span class="p">[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">]]</span>
 
@@ -92,7 +92,7 @@
 
 <p>But of course, the devil is in the details. To get a fully playable game, you need some basic error checking to ensure that you can’t play out of bounds or on top of another player’s marker. You also need to figure out when a player has won, and when the game has ended in a draw. While this doesn’t sound like a lot of work, you’ll see in the code below how much complexity these simple changes add.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">board</span>   <span class="o">=</span> <span class="p">[[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">],</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">board</span>   <span class="o">=</span> <span class="p">[[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">],</span>
            <span class="p">[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">],</span>
            <span class="p">[</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">,</span><span class="kp">nil</span><span class="p">]]</span>
 

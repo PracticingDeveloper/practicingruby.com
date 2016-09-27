@@ -10,8 +10,8 @@
   <meta name="description" content="This article was written by Luke Francl, a Ruby developer living inSan Francisco. He is a developer at Swiftype where heworks on everything from web crawling...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/implementing-an-http-file-server">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/implementing-an-http-file-server">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -129,7 +129,7 @@ that always responds “Hello World” with HTTP 200 to any request. The followi
 code mostly follows the process outlined in the previous section, but is
 commented line-by-line to help you understand its implementation details:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'socket'</span> <span class="c1"># Provides TCPServer and TCPSocket classes</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'socket'</span> <span class="c1"># Provides TCPServer and TCPSocket classes</span>
 
 <span class="c1"># Initialize a TCPServer object that will listen</span>
 <span class="c1"># on localhost:2345 for incoming connections.</span>
@@ -230,7 +230,7 @@ to security issues. To simplify things a bit, let’s assume for the moment that
 <code class="highlighter-rouge">requested_file</code> function has been implemented for us already that can handle
 this task safely. Then we could build a rudimentary HTTP file server in the following way:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'socket'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'socket'</span>
 <span class="nb">require</span> <span class="s1">'uri'</span>
 
 <span class="c1"># Files will be served from this directory</span>
@@ -323,7 +323,7 @@ server’s filesystem is easy: you extract the Request-URI, scrub
 out any parameters and URI-encoding, and then finally turn that 
 into a path to a file in the server’s public folder:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># Takes a request line (e.g. "GET /path?foo=bar HTTP/1.1")</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Takes a request line (e.g. "GET /path?foo=bar HTTP/1.1")</span>
 <span class="c1"># and extracts the path from it, scrubbing out parameters</span>
 <span class="c1"># and unescaping URI-encoding.</span>
 <span class="c1">#</span>
@@ -365,7 +365,7 @@ The approach shown below was actually added to <code class="highlighter-rouge">R
 security vulnerability</a> that
 was disclosed in early 2013:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">requested_file</span><span class="p">(</span><span class="n">request_line</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">requested_file</span><span class="p">(</span><span class="n">request_line</span><span class="p">)</span>
   <span class="n">request_uri</span>  <span class="o">=</span> <span class="n">request_line</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s2">" "</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
   <span class="n">path</span>         <span class="o">=</span> <span class="no">URI</span><span class="p">.</span><span class="nf">unescape</span><span class="p">(</span><span class="no">URI</span><span class="p">(</span><span class="n">request_uri</span><span class="p">).</span><span class="nf">path</span><span class="p">)</span>
 
@@ -407,7 +407,7 @@ implement that.</p>
 <p>This change is more simple than it seems, and can be accomplished by adding
 a single line of code to our server script:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code># ...
+<div class="language-diff highlighter-rouge"><pre class="highlight"><code># ...
 path = requested_file(request_line)
 
 <span class="gi">+ path = File.join(path, 'index.html') if File.directory?(path)
@@ -425,7 +425,7 @@ the end of it. This way, <code class="highlighter-rouge">/</code> becomes <code 
 to be changed. Let’s recall what they look like and then examine why
 that’s the case:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="no">File</span><span class="p">.</span><span class="nf">exist?</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="no">File</span><span class="p">.</span><span class="nf">directory?</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="no">File</span><span class="p">.</span><span class="nf">exist?</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="no">File</span><span class="p">.</span><span class="nf">directory?</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
   <span class="c1"># serve up the file...</span>
 <span class="k">else</span>
   <span class="c1"># respond with a 404</span>

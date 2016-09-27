@@ -10,8 +10,8 @@
   <meta name="description" content="This article is written by James Edward Gray II.  James is an old friend ofGreg’s, so he was thrilled to contribute. From late 2011 to mid 2012, James wrote ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/solving-the-scoring-predictions-kata">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/solving-the-scoring-predictions-kata">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -100,7 +100,7 @@ $ touch spec/scoring_spec.rb
 
 <p>At this point I opened <code class="highlighter-rouge">spec/scoring_spec.rb</code> in my editor and set to work.  We’re supposed to begin with the happy path, so I wrote an example for a set of perfect guesses:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"race"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"race"</span>
 
 <span class="n">describe</span> <span class="s2">"Race::score"</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:winners</span><span class="p">)</span> <span class="p">{</span> <span class="sx">%w[First Second Third Fourth Fifth]</span> <span class="p">}</span>
@@ -120,7 +120,7 @@ $ touch spec/scoring_spec.rb
 
 <p>With these thoughts in mind, I finished writing examples for the rules of the challenge:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"race"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"race"</span>
 
 <span class="n">describe</span> <span class="s2">"Race::score"</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:winners</span><span class="p">)</span> <span class="p">{</span> <span class="sx">%w[First Second Third Fourth Fifth]</span> <span class="p">}</span>
@@ -203,7 +203,7 @@ rspec ./spec/scoring_spec.rb:12 # Race::score gives 0 points for …
 
 <p>The first pass my student made at this problem landed on some code like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Race</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Race</span>
   <span class="kp">module_function</span>
 
   <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="n">guesses</span><span class="p">,</span> <span class="n">winners</span><span class="p">)</span>
@@ -233,7 +233,7 @@ rspec ./spec/scoring_spec.rb:12 # Race::score gives 0 points for …
 
 <p>First, I mentioned that you can often tell that you have the wrong iterator if it does extra iterations.  The <code class="highlighter-rouge">else</code> code in the previous example is a good example of this.  It may find the <code class="highlighter-rouge">guess</code> in the first position of <code class="highlighter-rouge">winners</code>, but it would keep looking.  Although it’s possible to add a <code class="highlighter-rouge">break</code> statement to fix this problem, there are iterators that “short-circuit” when they find an answer.  For example, <code class="highlighter-rouge">find()</code>, which is close to what we want, or <code class="highlighter-rouge">any?()</code> which is even closer.  What we really want though, is this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Race</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Race</span>
   <span class="kp">module_function</span>
 
   <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="n">guesses</span><span class="p">,</span> <span class="n">winners</span><span class="p">)</span>
@@ -267,7 +267,7 @@ rspec ./spec/scoring_spec.rb:12 # Race::score gives 0 points for …
 
 <p>That gives us the first step.  We need to move to something more like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Race</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Race</span>
   <span class="kp">module_function</span>
 
   <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="n">guesses</span><span class="p">,</span> <span class="n">winners</span><span class="p">)</span>
@@ -287,7 +287,7 @@ rspec ./spec/scoring_spec.rb:12 # Race::score gives 0 points for …
 
 <p>This code solves one of our problems.  We’re now working with <code class="highlighter-rouge">Array</code> objects all the way down.  That’s nice, but I don’t really like that change I just made.  It makes it painfully obvious that it’s a list of magic numbers.  That makes me want to give them a name:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Race</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Race</span>
   <span class="no">SCORES</span>    <span class="o">=</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
   <span class="no">MISPLACED</span> <span class="o">=</span> <span class="mi">1</span>
 
@@ -312,7 +312,7 @@ rspec ./spec/scoring_spec.rb:12 # Race::score gives 0 points for …
 
 <p>Of course, we took that step to get to this one:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Race</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Race</span>
   <span class="no">SCORES</span>    <span class="o">=</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
   <span class="no">MISPLACED</span> <span class="o">=</span> <span class="mi">1</span>
 

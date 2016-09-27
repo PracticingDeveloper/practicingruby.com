@@ -10,8 +10,8 @@
   <meta name="description" content="Imagine you’re a programmer for a dental clinic, and they need your help to build a vacation scheduling system for their staff. Among other things, this syst...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/problem-discovery">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/problem-discovery">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -81,7 +81,7 @@
 
 <p>An idea pops into your head. You rush to your desk, and pop open a Rails console in production. You write a crude query and then massage the data with an ugly chain of Enumerable methods, and end up with a report that looks like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code> <span class="p">[</span><span class="s2">"Nikko Bergnaum"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Hygienists"</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]],</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code> <span class="p">[</span><span class="s2">"Nikko Bergnaum"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Hygienists"</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]],</span>
  <span class="p">[</span><span class="s2">"Anderson Miller"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Billing"</span><span class="p">,</span> <span class="mi">50</span><span class="p">]]],</span>
  <span class="p">[</span><span class="s2">"Bell Effertz"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Hygienists"</span><span class="p">,</span> <span class="mi">14</span><span class="p">]]],</span>
  <span class="p">[</span><span class="s2">"Vicky Okuneva"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Receptionists"</span><span class="p">,</span> <span class="mi">30</span><span class="p">]]],</span>
@@ -139,7 +139,7 @@
 
 <p>This listing shows all the shifts planned for the next ten weeks, with counts for each employee by role. You copy and paste it into a text editor, and delete any of the lines for employees that have a single role. Here’s what you end up with:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>   <span class="p">[</span><span class="s2">"Adalberto Doyle"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Management"</span><span class="p">,</span> <span class="mi">49</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Receptionists"</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]],</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>   <span class="p">[</span><span class="s2">"Adalberto Doyle"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Management"</span><span class="p">,</span> <span class="mi">49</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Receptionists"</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]],</span>
  <span class="p">[</span><span class="s2">"Noel Ortiz"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Management"</span><span class="p">,</span> <span class="mi">28</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Receptionists"</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]],</span>
  <span class="p">[</span><span class="s2">"Monique McLaughlin"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Receptionists"</span><span class="p">,</span> <span class="mi">43</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Assistants"</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]],</span>
  <span class="p">[</span><span class="s2">"Jaleel Graham"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Billing"</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Receptionists"</span><span class="p">,</span> <span class="mi">18</span><span class="p">]]],</span>
@@ -156,7 +156,7 @@
 
 <p>Filtering the list again, you remove anyone who works in a single role at least 90% of the time. After this step, only three employees remain on your list:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code> <span class="p">[</span><span class="s2">"Jaleel Graham"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Billing"</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Receptionists"</span><span class="p">,</span> <span class="mi">18</span><span class="p">]]],</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code> <span class="p">[</span><span class="s2">"Jaleel Graham"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Billing"</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Receptionists"</span><span class="p">,</span> <span class="mi">18</span><span class="p">]]],</span>
  <span class="p">[</span><span class="s2">"Caesar Goldner"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Management"</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Receptionists"</span><span class="p">,</span> <span class="mi">16</span><span class="p">]]],</span>
  <span class="p">[</span><span class="s2">"Kirstin Weissnat"</span><span class="p">,</span> <span class="p">[[</span><span class="s2">"Receptionists"</span><span class="p">,</span> <span class="mi">26</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Assistants"</span><span class="p">,</span> <span class="mi">28</span><span class="p">]]]]]]]</span>
 </code></pre>

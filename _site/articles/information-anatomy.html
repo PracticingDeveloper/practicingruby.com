@@ -10,8 +10,8 @@
   <meta name="description" content="Suppose that you want catch up with your friends Alice, Bob, and Carol. To do this, you might log into your favoritechat service, join a group chat room, and...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/information-anatomy">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/information-anatomy">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -124,7 +124,7 @@ a channel, and that the message to be delivered is
 text to produce the following array, you probably would have
 no trouble doing so without any further instruction:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="s2">"PRIVMSG"</span><span class="p">,</span> <span class="s2">"#practicing-ruby-testing"</span><span class="p">,</span> <span class="s2">"Seasons greetings to you all!"</span><span class="p">]</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="s2">"PRIVMSG"</span><span class="p">,</span> <span class="s2">"#practicing-ruby-testing"</span><span class="p">,</span> <span class="s2">"Seasons greetings to you all!"</span><span class="p">]</span>
 </code></pre>
 </div>
 
@@ -180,7 +180,7 @@ formats, consider what happens when we shift the representation
 of a chat message into a generic structure that
 we are already familiar with, such as a Ruby array:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="s2">"PRIVMSG"</span><span class="p">,</span> <span class="s2">"#practicing-ruby-testing"</span><span class="p">,</span> <span class="s2">"Seasons greetings to you all!"</span><span class="p">]</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="s2">"PRIVMSG"</span><span class="p">,</span> <span class="s2">"#practicing-ruby-testing"</span><span class="p">,</span> <span class="s2">"Seasons greetings to you all!"</span><span class="p">]</span>
 </code></pre>
 </div>
 
@@ -240,7 +240,7 @@ before processing even begins.</p>
 
 <p>Now consider what happens when we use Ruby syntax instead:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="s2">"PRIVMSG"</span><span class="p">,</span> <span class="s2">"#practicing ruby testing"</span><span class="p">,</span> <span class="s2">"Seasons greetings to you all!"</span><span class="p">]</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="s2">"PRIVMSG"</span><span class="p">,</span> <span class="s2">"#practicing ruby testing"</span><span class="p">,</span> <span class="s2">"Seasons greetings to you all!"</span><span class="p">]</span>
 </code></pre>
 </div>
 
@@ -270,7 +270,7 @@ express the same exact concept using a single word.</p>
 
 <p>Consider once more our fascinating Ruby array:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="s2">"PRIVMSG"</span><span class="p">,</span> <span class="s2">"#practicing-ruby-testing"</span><span class="p">,</span> <span class="s2">"Seasons greetings to you all!"</span><span class="p">]</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="s2">"PRIVMSG"</span><span class="p">,</span> <span class="s2">"#practicing-ruby-testing"</span><span class="p">,</span> <span class="s2">"Seasons greetings to you all!"</span><span class="p">]</span>
 </code></pre>
 </div>
 
@@ -340,7 +340,7 @@ reading its contents. But when we discover that the vast majority of
 these bytes are just encoded character data, things get a little
 more comprehensible:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="s2">"</span><span class="se">\x93\xA7</span><span class="s2">PRIVMSG</span><span class="se">\xB8</span><span class="s2">#practicing-ruby-testing</span><span class="se">\xBD</span><span class="s2">Seasons greetings to you all!"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="s2">"</span><span class="se">\x93\xA7</span><span class="s2">PRIVMSG</span><span class="se">\xB8</span><span class="s2">#practicing-ruby-testing</span><span class="se">\xBD</span><span class="s2">Seasons greetings to you all!"</span>
 </code></pre>
 </div>
 
@@ -392,7 +392,7 @@ All three of our strings are in this range, so to compute
 their size, we just need to subtract the bottom of the range
 from each of them:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># note that results are in decimal, not hexadecimal</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># note that results are in decimal, not hexadecimal</span>
 <span class="c1"># String sizes are also computed explicitly for comparison</span>
 
 <span class="o">&gt;&gt;</span> <span class="mh">0xA7</span><span class="o">-</span><span class="mh">0xA0</span>
@@ -493,7 +493,7 @@ MessagePack-based messages. You’d need to make an explicit mapping
 between type identifiers and the handlers for each type, perhaps
 using an API similar to what you see below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">data_types</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span> <span class="o">=&gt;</span> <span class="no">CommandName</span><span class="p">,</span> <span class="mi">2</span> <span class="o">=&gt;</span> <span class="no">Parameter</span><span class="p">,</span> <span class="mi">3</span> <span class="o">=&gt;</span> <span class="no">MessageBody</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">data_types</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span> <span class="o">=&gt;</span> <span class="no">CommandName</span><span class="p">,</span> <span class="mi">2</span> <span class="o">=&gt;</span> <span class="no">Parameter</span><span class="p">,</span> <span class="mi">3</span> <span class="o">=&gt;</span> <span class="no">MessageBody</span> <span class="p">}</span>
 
 <span class="n">command</span> <span class="o">=</span> <span class="no">MessagePackDecoder</span><span class="p">.</span><span class="nf">unpack</span><span class="p">(</span><span class="n">raw_bytes</span><span class="p">,</span> <span class="n">data_types</span><span class="p">)</span>
 <span class="c1">#  [ CommandName &lt;"PRIVMSG"&gt;, </span>
@@ -507,7 +507,7 @@ into meaningful data objects. For example, the following class might
 be used to convert message parameters (e.g. the channel name) into
 a text-based representation:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Parameter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Parameter</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">byte_array</span><span class="p">)</span>
     <span class="vi">@text</span> <span class="o">=</span> <span class="n">byte_array</span><span class="p">.</span><span class="nf">pack</span><span class="p">(</span><span class="s2">"C*"</span><span class="p">)</span>
 
@@ -728,7 +728,7 @@ end
 <p>Loading this grammar into Citrus, we end up with a parser that can correctly
 extract the commands and paramaters from our original <code class="highlighter-rouge">PRIVMSG</code> example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'citrus'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'citrus'</span>
 <span class="no">Citrus</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="s1">'irc'</span><span class="p">)</span>
 
 <span class="n">msg</span> <span class="o">=</span> <span class="s2">"PRIVMSG #practicing-ruby-testing :Seasons greetings to you all!</span><span class="se">\r\n</span><span class="s2">"</span>

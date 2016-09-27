@@ -10,8 +10,8 @@
   <meta name="description" content="  NOTE: This issue of Practicing Ruby was one of several content experiments that was run in Volume 6. It uses a cookbook format (e.g. problem -&gt; solution...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/low-cost-approach-to-side-projects">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/low-cost-approach-to-side-projects">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -225,7 +225,7 @@ than flipping to a particular page of a book, so it turned out to be a
 good enough system to start with. After that quick usability test,
 I hacked together the following script to give me randomized meal selections:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"csv"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"csv"</span>
 
 <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -333,7 +333,7 @@ labeled them with an “X”, to indicate that they’d need to be imported late
 <p>Thanks to my active laziness, the script only required very minor changes. The
 updated version is shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"csv"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"csv"</span>
 
 <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">effort</span>     <span class="o">=</span> <span class="no">ARGV</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">?</span> <span class="no">Integer</span><span class="p">(</span><span class="no">ARGV</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="p">:</span> <span class="mi">3</span>
@@ -380,7 +380,7 @@ browser. The UI is nothing special, but it gets the job done:</p>
 especially exciting, it’s just basic glue code and an ERB 
 template:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"sinatra"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"sinatra"</span>
 <span class="nb">require</span> <span class="s2">"csv"</span>
 
 <span class="k">def</span> <span class="nf">meal_list</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">effort</span><span class="p">)</span>

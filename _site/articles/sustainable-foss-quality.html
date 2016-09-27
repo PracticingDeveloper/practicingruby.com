@@ -10,8 +10,8 @@
   <meta name="description" content="  This article was written in collaboration with Eric Hodel(@drbrain), a developer from Seattle. Eric is a Ruby core team member, and he also maintains RubyG...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/sustainable-foss-quality">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/sustainable-foss-quality">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -168,7 +168,7 @@ you don’t understand them. Instead, just look at the method that would need to
 be altered to fix this problem, and ask yourself whether you would feel
 comfortable making a change to it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">build_image_object</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">build_image_object</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
   <span class="n">file</span><span class="p">.</span><span class="nf">rewind</span>  <span class="k">if</span> <span class="n">file</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:rewind</span><span class="p">)</span>
   <span class="n">file</span><span class="p">.</span><span class="nf">binmode</span> <span class="k">if</span> <span class="n">file</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:binmode</span><span class="p">)</span>
 
@@ -204,7 +204,7 @@ it’s hard to even summarize what it is supposed to do! Fortunately for Matt,
 the part that he would need to change was only the first few lines of the 
 method, which are reasonably easy to group together:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">build_image_object</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">build_image_object</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
   <span class="n">file</span><span class="p">.</span><span class="nf">rewind</span>  <span class="k">if</span> <span class="n">file</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:rewind</span><span class="p">)</span>
   <span class="n">file</span><span class="p">.</span><span class="nf">binmode</span> <span class="k">if</span> <span class="n">file</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:binmode</span><span class="p">)</span>
 
@@ -226,7 +226,7 @@ little bit better in the process of doing so. Pushing these lines of code down
 into a helper method and tweaking them slightly resulted in the following
 cleanup to the <code class="highlighter-rouge">build_image_object</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">build_image_object</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">build_image_object</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
   <span class="n">io</span> <span class="o">=</span> <span class="n">verify_and_open_image</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
   <span class="n">image_content</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">read</span>
 
@@ -242,7 +242,7 @@ the duck typing test to look for <code class="highlighter-rouge">rewind</code> r
 that it would be a more reliable way to detect I/O-like objects. Everything 
 else would be wrapped in a <code class="highlighter-rouge">Pathname</code> instance:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">verify_and_open_image</span><span class="p">(</span><span class="n">io_or_path</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">verify_and_open_image</span><span class="p">(</span><span class="n">io_or_path</span><span class="p">)</span>
   <span class="k">if</span> <span class="n">io_or_path</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:rewind</span><span class="p">)</span>
     <span class="n">io</span> <span class="o">=</span> <span class="n">io_or_path</span>
 
@@ -273,7 +273,7 @@ longer corrupted, but this kind of testing is slightly tedious to do in Prawn.
 Noticing this rough spot, Matt created an RSpec matcher to make this kind of
 testing easier to do in the future:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">RSpec</span><span class="o">::</span><span class="no">Matchers</span><span class="p">.</span><span class="nf">define</span> <span class="ss">:have_parseable_xobjects</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">RSpec</span><span class="o">::</span><span class="no">Matchers</span><span class="p">.</span><span class="nf">define</span> <span class="ss">:have_parseable_xobjects</span> <span class="k">do</span>
   <span class="n">match</span> <span class="k">do</span> <span class="o">|</span><span class="n">actual</span><span class="o">|</span>
     <span class="n">expect</span> <span class="p">{</span> <span class="no">PDF</span><span class="o">::</span><span class="no">Inspector</span><span class="o">::</span><span class="no">XObject</span><span class="p">.</span><span class="nf">analyze</span><span class="p">(</span><span class="n">actual</span><span class="p">.</span><span class="nf">render</span><span class="p">)</span> <span class="p">}.</span><span class="nf">not_to</span> <span class="n">raise_error</span>
     <span class="kp">true</span>
@@ -289,7 +289,7 @@ testing easier to do in the future:</p>
 fixed the problem he was interested in, and also covered some other 
 common use cases as well:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">context</span> <span class="s2">"setting the length of the bytestream"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">context</span> <span class="s2">"setting the length of the bytestream"</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"should correctly work with images from Pathname objects"</span> <span class="k">do</span>
     <span class="n">info</span> <span class="o">=</span> <span class="vi">@pdf</span><span class="p">.</span><span class="nf">image</span><span class="p">(</span><span class="no">Pathname</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="vi">@filename</span><span class="p">))</span>
     <span class="n">expect</span><span class="p">(</span><span class="vi">@pdf</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_parseable_xobjects</span>
@@ -410,7 +410,7 @@ was already implemented by <code class="highlighter-rouge">Gem::UriFormatter</co
 initial commit for this pull request involved changing just a single line 
 of code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>     request = @request_class.new @uri.request_uri
+<div class="language-diff highlighter-rouge"><pre class="highlight"><code>     request = @request_class.new @uri.request_uri
  
      unless @uri.nil? || @uri.user.nil? || @uri.user.empty? then
 <span class="gd">-      request.basic_auth @uri.user, @uri.password
@@ -477,7 +477,7 @@ using HTTP Basic Auth wasn’t covered by the tests. So rather than simply
 adding a test for the new behavior he added, he went ahead and wrote tests 
 for both cases:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">TestGemRequest</span> <span class="o">&lt;</span> <span class="no">Gem</span><span class="o">::</span><span class="no">TestCase</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">TestGemRequest</span> <span class="o">&lt;</span> <span class="no">Gem</span><span class="o">::</span><span class="no">TestCase</span>
  <span class="k">def</span> <span class="nf">test_fetch_basic_auth</span>
     <span class="n">uri</span> <span class="o">=</span> <span class="no">URI</span><span class="p">.</span><span class="nf">parse</span> <span class="s2">"https://user:pass@example.rubygems/specs."</span> <span class="o">+</span>
                      <span class="no">Gem</span><span class="p">.</span><span class="nf">marshal_version</span>
@@ -629,7 +629,7 @@ kinds of extensions.</p>
 <p>After about 20 minutes of research and tinkering, I was able 
 to produce the following example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'rdoc'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'rdoc'</span>
 
 <span class="no">REPO_URL</span> <span class="o">=</span> <span class="s2">"https://github.com/prawnpdf/prawn"</span>
 

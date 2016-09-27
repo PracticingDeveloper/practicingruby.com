@@ -10,8 +10,8 @@
   <meta name="description" content="This article was written by Aaron Patterson, a Rubydeveloper living in Seattle, WA.  He’s been having fun writing Ruby for the past7 years, and hopes to shar...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/parsing-json-the-hard-way">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/parsing-json-the-hard-way">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -113,7 +113,7 @@ character.</p>
 <p>Let’s try it out!  First we’ll create a <code class="highlighter-rouge">StringScanner</code> object, then we’ll scan
 some letters from it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'strscan'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'strscan'</span>
 
 <span class="n">ss</span> <span class="o">=</span> <span class="no">StringScanner</span><span class="p">.</span><span class="nf">new</span> <span class="s1">'aabbbbb'</span> <span class="c1">#=&gt; #&lt;StringScanner 0/7 @ "aabbb..."&gt;</span>
 <span class="n">ss</span><span class="p">.</span><span class="nf">scan</span> <span class="sr">/a/</span> <span class="c1">#=&gt; "a"</span>
@@ -132,7 +132,7 @@ see the position of the scanner (in this case <code class="highlighter-rouge">2/
 <p>We can also move through the scanner character by character using
 <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/strscan/rdoc/StringScanner.html#method-i-getch">StringScanner#getch</a>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">ss</span> <span class="c1">#=&gt; #&lt;StringScanner 2/7 "aa" @ "bbbbb"&gt;</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">ss</span> <span class="c1">#=&gt; #&lt;StringScanner 2/7 "aa" @ "bbbbb"&gt;</span>
 <span class="n">ss</span><span class="p">.</span><span class="nf">getch</span> <span class="c1">#=&gt; "b"</span>
 
 <span class="n">ss</span> <span class="c1">#=&gt; #&lt;StringScanner 3/7 "aab" @ "bbbb"&gt;</span>
@@ -315,7 +315,7 @@ no more tokens left in the tokenizer.</p>
 
 <p>Let’s look at the source for the Tokenizer class and walk through it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RJSON</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RJSON</span>
   <span class="k">class</span> <span class="nc">Tokenizer</span>
     <span class="nc">STRING</span> <span class="o">=</span> <span class="sr">/"(?:[^"\\]|\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4}))*"/</span>
     <span class="no">NUMBER</span> <span class="o">=</span> <span class="sr">/-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/</span>
@@ -363,7 +363,7 @@ token, and the value.</p>
 
 <p>Let’s try feeding the tokenizer a JSON string and see what tokens come out:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">tok</span> <span class="o">=</span> <span class="no">RJSON</span><span class="o">::</span><span class="no">Tokenizer</span><span class="p">.</span><span class="nf">new</span> <span class="no">StringIO</span><span class="p">.</span><span class="nf">new</span> <span class="s1">'{"foo":null}'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">tok</span> <span class="o">=</span> <span class="no">RJSON</span><span class="o">::</span><span class="no">Tokenizer</span><span class="p">.</span><span class="nf">new</span> <span class="no">StringIO</span><span class="p">.</span><span class="nf">new</span> <span class="s1">'{"foo":null}'</span>
 <span class="c1">#=&gt; #&lt;RJSON::Tokenizer:0x007fa8529fbeb8 @ss=#&lt;StringScanner 0/12 @ "{\"foo..."&gt;&gt;</span>
 
 <span class="n">tok</span><span class="p">.</span><span class="nf">next_token</span> <span class="c1">#=&gt; ["{", "{"]</span>
@@ -398,7 +398,7 @@ changes.  A Rake task sounds like the perfect solution.</p>
 <p>The first thing we’ll add to the Rakefile is a rule that says <em>“translate .y files to
 .rb files using the following command”</em>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">rule</span> <span class="s1">'.rb'</span> <span class="o">=&gt;</span> <span class="s1">'.y'</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">rule</span> <span class="s1">'.rb'</span> <span class="o">=&gt;</span> <span class="s1">'.y'</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
   <span class="n">sh</span> <span class="s2">"racc -l -o </span><span class="si">#{</span><span class="n">t</span><span class="p">.</span><span class="nf">name</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">t</span><span class="p">.</span><span class="nf">source</span><span class="si">}</span><span class="s2">"</span>
 <span class="k">end</span>
 </code></pre>
@@ -406,7 +406,7 @@ changes.  A Rake task sounds like the perfect solution.</p>
 
 <p>Then we’ll add a “compile” task that depends on the generated <code class="highlighter-rouge">parser.rb</code> file:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:compile</span> <span class="o">=&gt;</span> <span class="s1">'lib/rjson/parser.rb'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:compile</span> <span class="o">=&gt;</span> <span class="s1">'lib/rjson/parser.rb'</span>
 </code></pre>
 </div>
 
@@ -417,7 +417,7 @@ Racc.</p>
 <p>Finally we make the test task depend on the compile task so that when we run
 <code class="highlighter-rouge">rake test</code>, the compiled file is automatically generated:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:test</span> <span class="o">=&gt;</span> <span class="ss">:compile</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">task</span> <span class="ss">:test</span> <span class="o">=&gt;</span> <span class="ss">:compile</span>
 </code></pre>
 </div>
 
@@ -565,7 +565,7 @@ object we are parsing.</p>
 <p>The handler we build will simply keep track of events sent to us by the parser.
 This creates tree-like data structure that we’ll use to convert JSON to Ruby.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RJSON</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RJSON</span>
   <span class="k">class</span> <span class="nc">Handler</span>
     <span class="k">def</span> <span class="nf">initialize</span>
       <span class="vi">@stack</span> <span class="o">=</span> <span class="p">[[</span><span class="ss">:root</span><span class="p">]]</span>
@@ -608,7 +608,7 @@ encountered the parent is popped off the stack.</p>
 parse this JSON: <code class="highlighter-rouge"><span class="p">{</span><span class="nt">"foo"</span><span class="p">:{</span><span class="nt">"bar"</span><span class="p">:</span><span class="kc">null</span><span class="p">}}</span></code>, then the <code class="highlighter-rouge">@stack</code> variable will look
 like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">[[</span><span class="ss">:root</span><span class="p">,</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">[[</span><span class="ss">:root</span><span class="p">,</span>
   <span class="p">[</span><span class="ss">:hash</span><span class="p">,</span>
     <span class="p">[</span><span class="ss">:scalar</span><span class="p">,</span> <span class="s2">"foo"</span><span class="p">],</span>
     <span class="p">[</span><span class="ss">:hash</span><span class="p">,</span>
@@ -620,7 +620,7 @@ like this:</p>
 <p>If we parse a JSON array, like this JSON: <code class="highlighter-rouge">["foo",null,true]</code>, the <code class="highlighter-rouge">@stack</code>
 variable will look like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">[[</span><span class="ss">:root</span><span class="p">,</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">[[</span><span class="ss">:root</span><span class="p">,</span>
   <span class="p">[</span><span class="ss">:array</span><span class="p">,</span>
     <span class="p">[</span><span class="ss">:scalar</span><span class="p">,</span> <span class="s2">"foo"</span><span class="p">],</span>
     <span class="p">[</span><span class="ss">:scalar</span><span class="p">,</span> <span class="kp">nil</span><span class="p">],</span>
@@ -634,7 +634,7 @@ variable will look like this:</p>
 a Ruby data structure.  To convert to a Ruby data structure, we can just write a
 recursive function to process the tree:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">result</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">result</span>
   <span class="n">root</span> <span class="o">=</span> <span class="vi">@stack</span><span class="p">.</span><span class="nf">first</span><span class="p">.</span><span class="nf">last</span>
   <span class="n">process</span> <span class="n">root</span><span class="p">.</span><span class="nf">first</span><span class="p">,</span> <span class="n">root</span><span class="p">.</span><span class="nf">drop</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="k">end</span>
@@ -664,7 +664,7 @@ call <code class="highlighter-rouge">result</code> on our handler, we can get th
 
 <p>Let’s see it in action:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'rjson'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'rjson'</span>
 
 <span class="n">input</span>   <span class="o">=</span> <span class="no">StringIO</span><span class="p">.</span><span class="nf">new</span> <span class="s1">'{"foo":"bar"}'</span>
 <span class="n">tok</span>     <span class="o">=</span> <span class="no">RJSON</span><span class="o">::</span><span class="no">Tokenizer</span><span class="p">.</span><span class="nf">new</span> <span class="n">input</span>
@@ -679,7 +679,7 @@ call <code class="highlighter-rouge">result</code> on our handler, we can get th
 <p>We have a fully function JSON parser.  Unfortunately, the API is not very
 friendly.  Let’s take the previous example, and package it up in a method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RJSON</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RJSON</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">load</span><span class="p">(</span><span class="n">json</span><span class="p">)</span>
     <span class="n">input</span>   <span class="o">=</span> <span class="no">StringIO</span><span class="p">.</span><span class="nf">new</span> <span class="n">json</span>
     <span class="n">tok</span>     <span class="o">=</span> <span class="no">RJSON</span><span class="o">::</span><span class="no">Tokenizer</span><span class="p">.</span><span class="nf">new</span> <span class="n">input</span>
@@ -694,7 +694,7 @@ friendly.  Let’s take the previous example, and package it up in a method:</p>
 <p>Since we built our JSON parser to deal with IO from the start, we can add
 another method for people who would like to pass a socket or file handle:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RJSON</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">RJSON</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">load_io</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
     <span class="n">tok</span>     <span class="o">=</span> <span class="no">RJSON</span><span class="o">::</span><span class="no">Tokenizer</span><span class="p">.</span><span class="nf">new</span> <span class="n">input</span>
     <span class="n">parser</span>  <span class="o">=</span> <span class="no">RJSON</span><span class="o">::</span><span class="no">Parser</span><span class="p">.</span><span class="nf">new</span> <span class="n">tok</span>
@@ -711,7 +711,7 @@ another method for people who would like to pass a socket or file handle:</p>
 
 <p>Now the interface is a bit more friendly:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'rjson'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'rjson'</span>
 <span class="nb">require</span> <span class="s1">'open-uri'</span>
 
 <span class="no">RJSON</span><span class="p">.</span><span class="nf">load</span> <span class="s1">'{"foo":"bar"}'</span> <span class="c1"># =&gt; {"foo"=&gt;"bar"}</span>

@@ -10,8 +10,8 @@
   <meta name="description" content="In Issue #1 we discussed Ruby’s lookuppath and proved by example that class inheritance is only a small part of the picture. To recap, Ruby methods are looke...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/method-lookup-2">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/method-lookup-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -83,7 +83,7 @@ picture. To recap, Ruby methods are looked up in the following order:</p>
 
 <p>The following code implements a simple timer that can write out a timestamp to a file and read it back later to determine elapsed time. Study it and consider its design.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Timer</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Timer</span>
   <span class="nc">MissingTimestampError</span> <span class="o">=</span> <span class="no">Class</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">StandardError</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">dir</span><span class="o">=</span><span class="no">Turbine</span><span class="o">::</span><span class="no">Application</span><span class="p">.</span><span class="nf">config_dir</span><span class="p">)</span>
@@ -150,7 +150,7 @@ picture. To recap, Ruby methods are looked up in the following order:</p>
 
 <p>Consider the typical ActiveRecord model, which is often extremely simple:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span> 
   <span class="n">has_many</span> <span class="ss">:comments</span>
 
   <span class="n">validates_presence_of</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:email</span>
@@ -190,7 +190,7 @@ including <code class="highlighter-rouge">map</code>, <code class="highlighter-r
 <code class="highlighter-rouge">Enumerable</code>. It is a simple file-backed numerical queue, from the same project 
 our <code class="highlighter-rouge">Timer</code> came from.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Queue</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Queue</span> 
   <span class="kp">include</span> <span class="no">Enumerable</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
@@ -223,7 +223,7 @@ our <code class="highlighter-rouge">Timer</code> came from.</p>
 
 <p>Given a properly formatted input file, it’s possible to interact with the <code class="highlighter-rouge">Queue</code> like any other <code class="highlighter-rouge">Enumerable</code> object.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">queue</span> <span class="o">=</span> <span class="no">Queue</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"queue.txt"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">queue</span> <span class="o">=</span> <span class="no">Queue</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"queue.txt"</span><span class="p">)</span>
 <span class="nb">p</span> <span class="n">queue</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span> <span class="s2">"Amount: </span><span class="si">#{</span><span class="n">x</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
 <span class="nb">p</span> <span class="n">queue</span><span class="p">.</span><span class="nf">inject</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="p">}</span>
 </code></pre>
@@ -231,7 +231,7 @@ our <code class="highlighter-rouge">Timer</code> came from.</p>
 
 <p>If you go ahead and try this yourself, you’ll find that it will work identically if you simply replace the first line with an array, as shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">queue</span> <span class="o">=</span> <span class="p">[</span><span class="mi">125</span><span class="o">.</span><span class="mi">75</span><span class="p">,</span> <span class="mi">100</span><span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="mi">300</span><span class="o">.</span><span class="mi">50</span><span class="p">,</span> <span class="mi">700</span><span class="p">]</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">queue</span> <span class="o">=</span> <span class="p">[</span><span class="mi">125</span><span class="o">.</span><span class="mi">75</span><span class="p">,</span> <span class="mi">100</span><span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="mi">300</span><span class="o">.</span><span class="mi">50</span><span class="p">,</span> <span class="mi">700</span><span class="p">]</span>
 <span class="nb">p</span> <span class="n">queue</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span> <span class="s2">"Amount: </span><span class="si">#{</span><span class="n">x</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
 <span class="nb">p</span> <span class="n">queue</span><span class="p">.</span><span class="nf">inject</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="p">}</span>
 </code></pre>
@@ -247,7 +247,7 @@ our <code class="highlighter-rouge">Timer</code> came from.</p>
 
 <p>Below is the code that Rubygems uses to patch <code class="highlighter-rouge">require</code> to add in gem loading functionality. Since <code class="highlighter-rouge">require</code> is just a method in Ruby, and not a keyword, the patch is relatively straightforward in pure Ruby.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Kernel</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Kernel</span>
   <span class="k">alias</span> <span class="n">gem_original_require</span> <span class="nb">require</span>
 
   <span class="k">def</span> <span class="nf">require</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="c1"># :doc:</span>
@@ -269,7 +269,7 @@ our <code class="highlighter-rouge">Timer</code> came from.</p>
 
 <p>Taking advantage of Ruby’s method lookup order in modules, we can get around the issues with aliasing by writing a patch similar to the one shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">GemCustomRequire</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">GemCustomRequire</span>
   <span class="k">def</span> <span class="nf">require</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="c1"># :doc:</span>
     <span class="k">super</span>
   <span class="k">rescue</span> <span class="no">LoadError</span> <span class="o">=&gt;</span> <span class="n">load_error</span>
@@ -303,7 +303,7 @@ our <code class="highlighter-rouge">Timer</code> came from.</p>
 
 <p>1) Rather than using a framework for testing stubs, experiment with something like the code below next time you’re writing tests.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
 
 <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="n">obj</span>
   <span class="k">def</span> <span class="nf">my_stubbed_method</span>
@@ -315,7 +315,7 @@ our <code class="highlighter-rouge">Timer</code> came from.</p>
 
 <p>2) Rather than re-opening a class to add some extra behavior, experiment with mixing modules into individual objects to get the extra features you need.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MathHelpers</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MathHelpers</span>
   <span class="k">def</span> <span class="nf">sum</span>
     <span class="n">inject</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="p">}</span>
   <span class="k">end</span>

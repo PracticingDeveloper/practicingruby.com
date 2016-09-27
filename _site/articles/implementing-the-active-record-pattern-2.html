@@ -10,8 +10,8 @@
   <meta name="description" content="  This two part article explores the challenges involved inbuilding a minimal implementation of the Active Record pattern. Part 1 (Issue 4.8) providessome ba...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/implementing-the-active-record-pattern-2">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/implementing-the-active-record-pattern-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -88,7 +88,7 @@ solving an easier problem first. For example, suppose that you have the followin
 <code class="highlighter-rouge">Stack</code> object and you want to extend it with some <code class="highlighter-rouge">Enumerable</code>-like
 functionality without mixing <code class="highlighter-rouge">Enumerable</code> directly into the <code class="highlighter-rouge">Stack</code> object:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Stack</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Stack</span>
   <span class="k">def</span> <span class="nf">initialize</span>
     <span class="vi">@data</span> <span class="o">=</span> <span class="p">[]</span>
   <span class="k">end</span>
@@ -119,7 +119,7 @@ functionality without mixing <code class="highlighter-rouge">Enumerable</code> d
 <p>You could use an <code class="highlighter-rouge">Enumerator</code> for this purpose, as shown in the following
 example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">stack</span> <span class="o">=</span> <span class="no">Stack</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">stack</span> <span class="o">=</span> <span class="no">Stack</span><span class="p">.</span><span class="nf">new</span>
 
 <span class="n">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
@@ -136,7 +136,7 @@ both a <code class="highlighter-rouge">Stack</code> object and an <code class="h
 little effort, the two could be unified under a single interface while keeping
 their variables and internal method calls separated:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EnumerableStack</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EnumerableStack</span>
   <span class="k">def</span> <span class="nf">initialize</span>
     <span class="vi">@stack</span> <span class="o">=</span> <span class="no">Stack</span><span class="p">.</span><span class="nf">new</span>
     <span class="vi">@enum</span>  <span class="o">=</span> <span class="no">Enumerator</span><span class="p">.</span><span class="nf">new</span> <span class="p">{</span> <span class="o">|</span><span class="n">y</span><span class="o">|</span> <span class="vi">@stack</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">y</span><span class="p">.</span><span class="nf">yield</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>       
@@ -159,7 +159,7 @@ their variables and internal method calls separated:</p>
 <p>From the external perspective, <code class="highlighter-rouge">EnumerableStack</code> still looks and 
 feels like an ordinary <code class="highlighter-rouge">Enumerable</code> object:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">stack</span> <span class="o">=</span> <span class="no">EnumerableStack</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">stack</span> <span class="o">=</span> <span class="no">EnumerableStack</span><span class="p">.</span><span class="nf">new</span>
 
 <span class="n">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
@@ -177,7 +177,7 @@ sort of abstraction, you would end up having to write a ton of very boring
 an object that knows how to delegate methods automatically, such as 
 the <code class="highlighter-rouge">Composite</code> object in the following example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EnumerableStack</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EnumerableStack</span>
   <span class="k">def</span> <span class="nf">initialize</span>
     <span class="n">stack</span> <span class="o">=</span> <span class="no">Stack</span><span class="p">.</span><span class="nf">new</span>
     <span class="n">enum</span>  <span class="o">=</span> <span class="no">Enumerator</span><span class="p">.</span><span class="nf">new</span> <span class="p">{</span> <span class="o">|</span><span class="n">y</span><span class="o">|</span> <span class="n">stack</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">y</span><span class="p">.</span><span class="nf">yield</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>      
@@ -202,7 +202,7 @@ object now only needs to keep track of a single variable, even though it is
 delegating to multiple objects. This makes it safe to extract some
 of the functionality into a mix-in without the code becoming too brittle:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EnumerableStack</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EnumerableStack</span>
   <span class="kp">include</span> <span class="no">Composable</span>
 
   <span class="k">def</span> <span class="nf">initialize</span>
@@ -233,7 +233,7 @@ following code and see if you can figure out how it works. Don’t worry about
 the exact implementation details, just compare the following code to the other
 examples in this section and think about what the purpose of this module is:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
   <span class="k">module</span> <span class="nn">Mapping</span>
     <span class="kp">include</span> <span class="no">Composable</span>
 
@@ -265,7 +265,7 @@ level and to <code class="highlighter-rouge">BrokenRecord::Record</code> at the 
 correctly! If you’re still stuck, it might help to recall how this mixin 
 is used:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
   <span class="kp">include</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">Mapping</span>
 
   <span class="n">map_to_table</span> <span class="ss">:articles</span>
@@ -302,7 +302,7 @@ entry point and digging deeper from there.</p>
 <p>In the case of BrokenRecord, a good place to start is with a somewhat trivial
 model definition:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
   <span class="kp">include</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">Mapping</span>
 
   <span class="n">map_to_table</span> <span class="ss">:articles</span>
@@ -322,7 +322,7 @@ instance level. Because <code class="highlighter-rouge">BrokenRecord::Mapping</c
 created by factory methods rather than instantiated directly. The following 
 code demonstrates how that works:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Article</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:title</span>  <span class="o">=&gt;</span> <span class="s2">"A great article"</span><span class="p">,</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Article</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:title</span>  <span class="o">=&gt;</span> <span class="s2">"A great article"</span><span class="p">,</span>
                <span class="ss">:body</span>   <span class="o">=&gt;</span> <span class="s2">"The rain in Spain..."</span><span class="p">,</span>
                <span class="ss">:status</span> <span class="o">=&gt;</span> <span class="s2">"draft"</span><span class="p">)</span>
 
@@ -352,7 +352,7 @@ class-level method calls on <code class="highlighter-rouge">Article</code> are f
 handle them itself. But before you do that, keep in mind that this is how
 that object gets created in the first place:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">map_to_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">map_to_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
     <span class="n">features</span> <span class="o">&lt;&lt;</span> <span class="no">Relation</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:name</span>         <span class="o">=&gt;</span> <span class="n">table_name</span><span class="p">,</span>
                              <span class="ss">:db</span>           <span class="o">=&gt;</span> <span class="no">BrokenRecord</span><span class="p">.</span><span class="nf">database</span><span class="p">,</span>
                              <span class="ss">:record_class</span> <span class="o">=&gt;</span> <span class="nb">self</span><span class="p">)</span>
@@ -364,7 +364,7 @@ that object gets created in the first place:</p>
 class, you can visualize the call to <code class="highlighter-rouge">Relation.new</code> in the previous example as
 being essentially the same as what you see below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">features</span> <span class="o">&lt;&lt;</span> <span class="no">Relation</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:name</span>          <span class="o">=&gt;</span> <span class="ss">:articles</span><span class="p">,</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">features</span> <span class="o">&lt;&lt;</span> <span class="no">Relation</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:name</span>          <span class="o">=&gt;</span> <span class="ss">:articles</span><span class="p">,</span>
                          <span class="ss">:db</span>            <span class="o">=&gt;</span> <span class="no">BrokenRecord</span><span class="p">.</span><span class="nf">database</span><span class="p">,</span>
                          <span class="ss">:record_class</span>  <span class="o">=&gt;</span> <span class="no">Article</span><span class="p">)</span>
 </code></pre>
@@ -375,7 +375,7 @@ being essentially the same as what you see below:</p>
 particular attention to the <code class="highlighter-rouge">initialize</code> method, and just skim the rest of the
 method definitions; it isn’t important to fully understand them until later.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
   <span class="k">class</span> <span class="nc">Relation</span>
     <span class="kp">include</span> <span class="no">Composable</span>
 
@@ -421,7 +421,7 @@ rest of its functionality is provided by the <code class="highlighter-rouge">Rel
 <code class="highlighter-rouge">Article.create</code> are both easily identifiable as CRUD operations, the <code class="highlighter-rouge">Relation::CRUD</code> 
 object is the next stop on your tour:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
   <span class="k">class</span> <span class="nc">Relation</span>
     <span class="k">class</span> <span class="nc">CRUD</span>
       <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">relation</span><span class="p">)</span>
@@ -469,7 +469,7 @@ that they both interact with the <code class="highlighter-rouge">Table</code> ob
 they both call <code class="highlighter-rouge">Relation#new_record</code>, and they don’t do much more than that. 
 To keep things simple, we’ll follow the path that <code class="highlighter-rouge">Relation::CRUD#all</code> takes:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">all</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">all</span>
   <span class="n">table</span><span class="p">.</span><span class="nf">all</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">values</span><span class="o">|</span> <span class="n">relation</span><span class="p">.</span><span class="nf">new_record</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
@@ -482,7 +482,7 @@ database when a trivial <code class="highlighter-rouge">select * from articles</
 For this particular data set, the following results get 
 returned:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">[</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="p">[</span>
  <span class="p">{</span> <span class="ss">:id</span>     <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> 
    <span class="ss">:title</span>  <span class="o">=&gt;</span> <span class="s2">"A great article"</span><span class="p">,</span> 
    <span class="ss">:body</span>   <span class="o">=&gt;</span> <span class="s2">"The rain in Spain..."</span><span class="p">,</span> 
@@ -507,7 +507,7 @@ these hashes to <code class="highlighter-rouge">Relation#new_record</code>. I ha
 method earlier, but now would be a good time to take a second look at its
 definition:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
   <span class="k">class</span> <span class="nc">Relation</span>
     <span class="k">def</span> <span class="nf">new_record</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
       <span class="n">record_class</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:relation</span> <span class="o">=&gt;</span> <span class="nb">self</span><span class="p">,</span>
@@ -523,7 +523,7 @@ definition:</p>
 it becomes easy to visualize this call as something similar to what is 
 shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">values</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:id</span>     <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">values</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:id</span>     <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> 
            <span class="ss">:title</span>  <span class="o">=&gt;</span> <span class="s2">"A great article"</span><span class="p">,</span> 
            <span class="ss">:body</span>   <span class="o">=&gt;</span> <span class="s2">"The rain in Spain..."</span><span class="p">,</span> 
            <span class="ss">:status</span> <span class="o">=&gt;</span> <span class="s2">"draft"</span> <span class="p">}</span>
@@ -538,7 +538,7 @@ shown below:</p>
 method, and instead inherits the definition provided by 
 <code class="highlighter-rouge">BrokenRecord::Mapping#initialize</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Mapping</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Mapping</span>
   <span class="kp">include</span> <span class="no">Composable</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
@@ -568,7 +568,7 @@ complete the journey. Using the same code reading strategy as what you used
 before, you can start with the <code class="highlighter-rouge">Article#published?</code> and <code class="highlighter-rouge">Article#title</code> 
 calls in the following example and see where they take you:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Article</span><span class="p">.</span><span class="nf">all</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">article</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Article</span><span class="p">.</span><span class="nf">all</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">article</span><span class="o">|</span>
   <span class="k">if</span> <span class="n">article</span><span class="p">.</span><span class="nf">published?</span>
     <span class="nb">puts</span> <span class="s2">"PUBLISHED: </span><span class="si">#{</span><span class="n">article</span><span class="p">.</span><span class="nf">title</span><span class="si">}</span><span class="s2">"</span>
   <span class="k">else</span>
@@ -583,7 +583,7 @@ the <code class="highlighter-rouge">published?</code> method but does not implem
 passed along to <code class="highlighter-rouge">BrokenRecord::Record</code> automatically. Similarly, the internal call 
 to <code class="highlighter-rouge">status</code> gets delegated as well:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
   <span class="kp">include</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">Mapping</span>
 
   <span class="n">map_to_table</span> <span class="ss">:articles</span>
@@ -597,7 +597,7 @@ to <code class="highlighter-rouge">status</code> gets delegated as well:</p>
 
 <p>To understand what happens next, take a look at how the <code class="highlighter-rouge">BrokenRecord::Record</code> class works:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
   <span class="k">class</span> <span class="nc">Record</span>
     <span class="kp">include</span> <span class="no">Composable</span>
 
@@ -626,7 +626,7 @@ news is that you already know how <code class="highlighter-rouge">FieldSet</code
 detail in <a href="http://practicingruby.com/articles/60">Issue 4.8</a>. But if you need a
 refresher, check out the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">values</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:id</span>     <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">values</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:id</span>     <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> 
            <span class="ss">:title</span>  <span class="o">=&gt;</span> <span class="s2">"A great article"</span><span class="p">,</span> 
            <span class="ss">:body</span>   <span class="o">=&gt;</span> <span class="s2">"The rain in Spain..."</span><span class="p">,</span> 
            <span class="ss">:status</span> <span class="o">=&gt;</span> <span class="s2">"draft"</span> <span class="p">}</span>
@@ -649,7 +649,7 @@ messages are handled.</p>
 original example, so it is definitely a reasonable question to ask. To find your
 answer, consider the following example of updating database records:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">articles</span> <span class="o">=</span> <span class="no">Article</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">:status</span> <span class="o">=&gt;</span> <span class="s2">"draft"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">articles</span> <span class="o">=</span> <span class="no">Article</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">:status</span> <span class="o">=&gt;</span> <span class="s2">"draft"</span><span class="p">)</span>
 
 <span class="n">articles</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">article</span><span class="o">|</span>
   <span class="n">article</span><span class="p">.</span><span class="nf">status</span> <span class="o">=</span> <span class="s2">"published"</span>
@@ -666,7 +666,7 @@ reference to a <code class="highlighter-rouge">Relation</code> object. While <co
 <code class="highlighter-rouge">FieldSet</code>, the <code class="highlighter-rouge">Article#save</code> method is provided by <code class="highlighter-rouge">Record</code>, and is defined as
 follows:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
   <span class="k">class</span> <span class="nc">Record</span>
     
     <span class="c1"># ... other details omitted ...</span>
@@ -698,7 +698,7 @@ trying to work your way through BrokenRecord’s implementation of associations
 and see if you can make sense of it. The following example should serve as a
 good starting point:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
   <span class="kp">include</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">Mapping</span>
 
   <span class="n">map_to_table</span> <span class="ss">:articles</span>

@@ -10,8 +10,8 @@
   <meta name="description" content="Type systems are a fundamental part of every programming language. In fact, the way a language designer approaches typing goes a long way towards outlining t...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/duck-typing-in-practice-1">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/duck-typing-in-practice-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -75,7 +75,7 @@
 duck typing, and one that does not. Here’s an example of the approach 
 that does <em>not</em> involve duck typing.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
   <span class="k">case</span> <span class="n">source</span>
   <span class="k">when</span> <span class="no">String</span>
     <span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
@@ -91,7 +91,7 @@ did type checking in this fashion. Ruby’s case statement is powerful, and
 makes this sort of logic easy to write. Our <code class="highlighter-rouge">read_data()</code> function works as
 expected in the following common scenarios:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">filename</span> <span class="o">=</span> <span class="s2">"foo.txt"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">filename</span> <span class="o">=</span> <span class="s2">"foo.txt"</span>
 <span class="n">read_data</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="c1">#=&gt; reads the contents of foo.txt by calling </span>
                     <span class="c1">#   File.read()</span>
 
@@ -106,7 +106,7 @@ expected in the following common scenarios:</p>
 work with a <code class="highlighter-rouge">Tempfile</code>, or with a <code class="highlighter-rouge">StringIO</code> object, or perhaps with a mock
 object we’ve defined in our tests. We have baked into our logic the assumption that the input is always either a descendent of <code class="highlighter-rouge">String</code> or a descendent of <code class="highlighter-rouge">IO</code>. The purpose of duck typing is to remove these restrictions by focusing only on the messages that are being passed back and forth between objects rather than what class they belong to. The code below demonstrates one way you can do that.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">source</span><span class="p">.</span><span class="nf">read</span> <span class="k">if</span> <span class="n">source</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:read</span><span class="p">)</span>
   <span class="k">return</span> <span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="n">source</span><span class="p">.</span><span class="nf">to_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">source</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:to_str</span><span class="p">)</span>
   <span class="k">raise</span> <span class="no">ArgumentError</span>
@@ -121,7 +121,7 @@ this new approach gives us access to many useful standin objects, including: <co
 
 <p>However, the following contrived example illustrates a final corner case that calls for a bit of extreme duck typing to resolve. Try to spot the problem before reading about how to solve it.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FileProxy</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FileProxy</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tempfile</span><span class="p">)</span>
     <span class="vi">@tempfile</span> <span class="o">=</span> <span class="n">tempfile</span>
   <span class="k">end</span>
@@ -135,7 +135,7 @@ this new approach gives us access to many useful standin objects, including: <co
 
 <p>This code implements a proxy which forwards all of its messages to the wrapped <code class="highlighter-rouge">tempfile</code> object. However, like many hastily coded proxy objects in Ruby, it does not properly forward <code class="highlighter-rouge">respond_to?()</code> calls to the object it wraps. The irb session below illustrates the resulting false negative in our test.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># Populate our tempfile through the proxy</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># Populate our tempfile through the proxy</span>
 
 <span class="o">&gt;&gt;</span> <span class="n">proxy</span> <span class="o">=</span> <span class="no">FileProxy</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">Tempfile</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"foo.txt"</span><span class="p">))</span>
 <span class="o">=&gt;</span> <span class="c1">#&lt;FileProxy:0x39461c @tempfile=#&lt;File:/var/f..foo.txt.7910.3&gt;&gt;</span>
@@ -158,7 +158,7 @@ this new approach gives us access to many useful standin objects, including: <co
 
 <p>This issue will cause <code class="highlighter-rouge">read_data()</code> to raise an <code class="highlighter-rouge">ArgumentError</code> when passed a <code class="highlighter-rouge">FileProxy</code>. In this case, the best solution is to fix <code class="highlighter-rouge">respond_to?()</code> so that it works as expected, but since you may often encounter libraries with bad behaviors like this, it’s worth knowing what the duck typing fundamentalist would do in this situation.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
   <span class="k">begin</span> 
     <span class="k">return</span> <span class="n">source</span><span class="p">.</span><span class="nf">read</span> 
   <span class="k">rescue</span> <span class="no">NoMethodError</span>

@@ -10,8 +10,8 @@
   <meta name="description" content="  This issue of Practicing Ruby was directly inspired by Nick Morgan’sEasy 6502 tutorial. Whilethe Ruby code in this article is my own, the bytecode for theS...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/low-level-computing">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/low-level-computing">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -215,7 +215,7 @@ address, the operations themselves do not care about how you computed it.
 Once you sweep all that stuff under the rug, you can end up with clean
 operation definitions like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># NOTE: 'e' refers to the address that was computed from the instruction's</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># NOTE: 'e' refers to the address that was computed from the instruction's</span>
 <span class="c1"># operand and addressing mode.</span>
 
 <span class="no">LDA</span> <span class="p">{</span> <span class="n">cpu</span><span class="p">[</span><span class="ss">:a</span><span class="p">]</span> <span class="o">=</span> <span class="n">mem</span><span class="p">[</span><span class="n">e</span><span class="p">]</span>  <span class="p">}</span> 
@@ -242,7 +242,7 @@ write safe programs, but the tradeoff is that the storage model itself is very
 simple. Conceptually, the memory module is nothing more than a mapping 
 between 16-bit addresses and 8-bit values:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"Storage"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"Storage"</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:mem</span><span class="p">)</span> <span class="p">{</span> <span class="no">Vintage</span><span class="o">::</span><span class="no">Storage</span><span class="p">.</span><span class="nf">new</span> <span class="p">}</span>
 
   <span class="n">it</span> <span class="s2">"can get and set values"</span> <span class="k">do</span>
@@ -273,7 +273,7 @@ the <code class="highlighter-rouge">Storage#next</code> method.</p>
 
 <p>The following test shows how to load a program and then walk its code one byte at a time:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can load a bytecode sequence into memory and traverse it"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can load a bytecode sequence into memory and traverse it"</span> <span class="k">do</span>
   <span class="n">bytes</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x20</span><span class="p">,</span> <span class="mh">0x06</span><span class="p">,</span> <span class="mh">0x06</span><span class="p">]</span>
 
   <span class="n">mem</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">bytes</span><span class="p">)</span>
@@ -290,7 +290,7 @@ the <code class="highlighter-rouge">Storage#next</code> method.</p>
 to maintain compatibility with the simulator from the Easy6502 tutorial, we
 initialize the program counter to <code class="highlighter-rouge">0x600</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">let</span><span class="p">(</span><span class="ss">:program_offset</span><span class="p">)</span> <span class="p">{</span> <span class="no">Vintage</span><span class="o">::</span><span class="no">Storage</span><span class="o">::</span><span class="no">PROGRAM_OFFSET</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">let</span><span class="p">(</span><span class="ss">:program_offset</span><span class="p">)</span> <span class="p">{</span> <span class="no">Vintage</span><span class="o">::</span><span class="no">Storage</span><span class="o">::</span><span class="no">PROGRAM_OFFSET</span> <span class="p">}</span>
 
 <span class="n">it</span> <span class="s2">"sets an initial position of $0600"</span> <span class="k">do</span>
   <span class="n">program_offset</span><span class="p">.</span><span class="nf">must_equal</span><span class="p">(</span><span class="mh">0x0600</span><span class="p">)</span>
@@ -306,7 +306,7 @@ initialize the program counter to <code class="highlighter-rouge">0x600</code>:<
 program counter to a particular address, which causes the 
 processor to <code class="highlighter-rouge">jump</code> to the instruction at that address:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"implements jump"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"implements jump"</span> <span class="k">do</span>
   <span class="n">mem</span><span class="p">.</span><span class="nf">jump</span><span class="p">(</span><span class="n">program_offset</span> <span class="o">+</span> <span class="mh">0xAB</span><span class="p">)</span>
 
   <span class="n">mem</span><span class="p">.</span><span class="nf">pc</span><span class="p">.</span><span class="nf">must_equal</span><span class="p">(</span><span class="n">program_offset</span> <span class="o">+</span> <span class="mh">0xAB</span><span class="p">)</span>
@@ -317,7 +317,7 @@ processor to <code class="highlighter-rouge">jump</code> to the instruction at t
 <p>Branching can be implemented by only calling <code class="highlighter-rouge">jump</code> when a
 condition is met:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"implements conditional branching"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"implements conditional branching"</span> <span class="k">do</span>
   <span class="n">big</span>   <span class="o">=</span> <span class="mh">0xAB</span>
   <span class="n">small</span> <span class="o">=</span> <span class="mh">0x01</span>
 
@@ -366,7 +366,7 @@ that know how to return to where they’ve been called from. And to implement
 
 <p>Here are the tests for how we’d like our stack to behave:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">let</span><span class="p">(</span><span class="ss">:stack_origin</span><span class="p">)</span> <span class="p">{</span> <span class="no">Vintage</span><span class="o">::</span><span class="no">Storage</span><span class="o">::</span><span class="no">STACK_ORIGIN</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">let</span><span class="p">(</span><span class="ss">:stack_origin</span><span class="p">)</span> <span class="p">{</span> <span class="no">Vintage</span><span class="o">::</span><span class="no">Storage</span><span class="o">::</span><span class="no">STACK_ORIGIN</span> <span class="p">}</span>
 <span class="n">let</span><span class="p">(</span><span class="ss">:stack_offset</span><span class="p">)</span> <span class="p">{</span> <span class="no">Vintage</span><span class="o">::</span><span class="no">Storage</span><span class="o">::</span><span class="no">STACK_OFFSET</span> <span class="p">}</span>
 
 <span class="n">it</span> <span class="s2">"has a 256 element stack between 0x0100-0x01ff"</span> <span class="k">do</span>
@@ -406,7 +406,7 @@ pointer always tells you where the “top of the stack” is.</p>
 functionality. The behavior of these features will end up 
 looking something like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"implements jsr/rts"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"implements jsr/rts"</span> <span class="k">do</span>
   <span class="n">mem</span><span class="p">.</span><span class="nf">jsr</span><span class="p">(</span><span class="mh">0x0606</span><span class="p">)</span>
   <span class="n">mem</span><span class="p">.</span><span class="nf">jsr</span><span class="p">(</span><span class="mh">0x060d</span><span class="p">)</span>
 
@@ -434,7 +434,7 @@ stack entries are limited to single byte values. To get around
 this problem, we need a couple helper functions to convert
 a 16-bit number into two bytes, and vice-versa:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can convert two bytes into a 16 bit integer"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can convert two bytes into a 16 bit integer"</span> <span class="k">do</span>
   <span class="n">mem</span><span class="p">.</span><span class="nf">int16</span><span class="p">([</span><span class="mh">0x37</span><span class="p">,</span> <span class="mh">0x13</span><span class="p">]).</span><span class="nf">must_equal</span><span class="p">(</span><span class="mh">0x1337</span><span class="p">)</span>
 <span class="k">end</span>
 
@@ -458,7 +458,7 @@ infinite flexibility is desireable.</p>
 implement. In fact, it takes less than 80 lines of code if you don’t
 worry about validations and robustness:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Vintage</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Vintage</span>
   <span class="k">class</span> <span class="nc">Storage</span>
     <span class="nc">PROGRAM_OFFSET</span> <span class="o">=</span> <span class="mh">0x0600</span>
     <span class="no">STACK_OFFSET</span>   <span class="o">=</span> <span class="mh">0x0100</span>
@@ -578,7 +578,7 @@ feel a bit awkward to clutter up a generic module with some very specific edge
 cases. For that reason, it is probably better to implement them as a module
 mixin:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Vintage</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Vintage</span>
   <span class="k">module</span> <span class="nn">MemoryMap</span>
     <span class="no">RANDOMIZER</span>  <span class="o">=</span> <span class="mh">0xfe</span>
     <span class="no">KEY_PRESS</span>   <span class="o">=</span> <span class="mh">0xff</span>
@@ -615,7 +615,7 @@ used before we move on. Here’s how to display a single pixel on the
 screen, randomly varying its color until the spacebar (ASCII code 0x20) 
 is pressed:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">mem</span> <span class="o">=</span> <span class="no">Vintage</span><span class="o">::</span><span class="no">Storage</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">mem</span> <span class="o">=</span> <span class="no">Vintage</span><span class="o">::</span><span class="no">Storage</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">mem</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Vintage</span><span class="o">::</span><span class="no">MemoryMap</span><span class="p">)</span>
 
 <span class="n">mem</span><span class="p">.</span><span class="nf">ui</span> <span class="o">=</span> <span class="no">Vintage</span><span class="o">::</span><span class="no">Display</span><span class="p">.</span><span class="nf">new</span> 
@@ -662,7 +662,7 @@ how this model ought to behave. For starters, we’ll be building a <code class=
 that implements three registers and three flags, initializing them all to 
 zero by default:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"CPU"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"CPU"</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:cpu</span><span class="p">)</span> <span class="p">{</span> <span class="no">Vintage</span><span class="o">::</span><span class="no">CPU</span><span class="p">.</span><span class="nf">new</span> <span class="p">}</span>
 
   <span class="n">let</span><span class="p">(</span><span class="ss">:registers</span><span class="p">)</span> <span class="p">{</span> <span class="p">[</span><span class="ss">:a</span><span class="p">,</span> <span class="ss">:x</span><span class="p">,</span> <span class="ss">:y</span><span class="p">]</span> <span class="p">}</span>
@@ -680,7 +680,7 @@ zero by default:</p>
 <p>It will be possible to directly set registers via the <code class="highlighter-rouge">#[]=</code> method, because
 the behavior will be the same for all three registers:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"allows directly setting registers"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"allows directly setting registers"</span> <span class="k">do</span>
   <span class="n">registers</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
     <span class="n">value</span>  <span class="o">=</span> <span class="nb">rand</span><span class="p">(</span><span class="mh">0xff</span><span class="p">)</span>
 
@@ -694,7 +694,7 @@ the behavior will be the same for all three registers:</p>
 <p>However, because flags don’t have the same update semantics as registers, we 
 will not allow directly setting them via <code class="highlighter-rouge">#[]=</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"does not allow directly setting flags"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"does not allow directly setting flags"</span> <span class="k">do</span>
   <span class="n">flags</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
     <span class="n">value</span>  <span class="o">=</span> <span class="nb">rand</span><span class="p">(</span><span class="mh">0xff</span><span class="p">)</span>
 
@@ -710,7 +710,7 @@ methods. We’ll need this later for getting the <code class="highlighter-rouge"
 a clean state whenever we do addition and subtraction 
 operations:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"allows setting the c flag via set_carry and clear_carry"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"allows setting the c flag via set_carry and clear_carry"</span> <span class="k">do</span>
   <span class="n">cpu</span><span class="p">.</span><span class="nf">set_carry</span>
   <span class="n">expect_flags</span><span class="p">(</span><span class="ss">:c</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">)</span>
 
@@ -723,7 +723,7 @@ operations:</p>
 <p>Some other instructions will require us to set the carry flag
 based on arbitrary conditions, so we’ll need support for that as well:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"allows conditionally setting the c flag via carry_if"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"allows conditionally setting the c flag via carry_if"</span> <span class="k">do</span>
   <span class="c1"># true condition</span>
   <span class="n">x</span> <span class="o">=</span> <span class="mi">3</span>
   <span class="n">cpu</span><span class="p">.</span><span class="nf">carry_if</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
@@ -741,7 +741,7 @@ based on arbitrary conditions, so we’ll need support for that as well:</p>
 
 <p>The N and Z flags are set based on whatever result the <code class="highlighter-rouge">CPU</code> last processed:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"sets z=1 when a result is zero, sets z=0 otherwise"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"sets z=1 when a result is zero, sets z=0 otherwise"</span> <span class="k">do</span>
   <span class="n">cpu</span><span class="p">.</span><span class="nf">result</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
   <span class="n">expect_flags</span><span class="p">(</span><span class="ss">:z</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">)</span>
 
@@ -763,7 +763,7 @@ based on arbitrary conditions, so we’ll need support for that as well:</p>
 because pretty much every place we could store a number in this system
 expects 8-bit integers:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"truncates results to fit in a single byte"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"truncates results to fit in a single byte"</span> <span class="k">do</span>
   <span class="n">cpu</span><span class="p">.</span><span class="nf">result</span><span class="p">(</span><span class="mh">0x1337</span><span class="p">).</span><span class="nf">must_equal</span><span class="p">(</span><span class="mh">0x37</span><span class="p">)</span>
 <span class="k">end</span>  
 </code></pre>
@@ -774,7 +774,7 @@ involved in many of the 6502 instructions, we automatically call <code class="hi
 whenever a register is set via <code class="highlighter-rouge">CPU#[]=</code>. The tests below show the 
 the effects of that behavior:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="n">it</span> <span class="s2">"implicitly calls result() when registers are set"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="n">it</span> <span class="s2">"implicitly calls result() when registers are set"</span> <span class="k">do</span>
     <span class="n">registers</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
       <span class="n">cpu</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0x100</span>
       
@@ -792,7 +792,7 @@ the effects of that behavior:</p>
 
 <p>Here’s an implementation that satisfies all of the tests we’ve seen so far:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Vintage</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Vintage</span>
   <span class="k">class</span> <span class="nc">CPU</span>
     <span class="k">def</span> <span class="nf">initialize</span>
       <span class="vi">@registers</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:a</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="ss">:x</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="ss">:y</span> <span class="o">=&gt;</span> <span class="mi">0</span> <span class="p">}</span>
@@ -850,7 +850,7 @@ $0651    f0 0d     BEQ $0660    # if so, jump forward to $0660
 <p>Using a combination of the <code class="highlighter-rouge">CPU</code> and <code class="highlighter-rouge">Storage</code> objects we’ve already built, we’d
 be able to define the <code class="highlighter-rouge">CMP</code> and <code class="highlighter-rouge">BEQ</code> operations as shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">CMP</span> <span class="k">do</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">CMP</span> <span class="k">do</span> 
   <span class="n">cpu</span><span class="p">.</span><span class="nf">carry_if</span><span class="p">(</span><span class="n">cpu</span><span class="p">[</span><span class="ss">:a</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">mem</span><span class="p">[</span><span class="n">e</span><span class="p">])</span>
 
   <span class="n">cpu</span><span class="p">.</span><span class="nf">result</span><span class="p">(</span> <span class="n">cpu</span><span class="p">[</span><span class="ss">:a</span><span class="p">]</span> <span class="o">-</span> <span class="n">mem</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="p">)</span>
@@ -901,7 +901,7 @@ a direct representation in machine code.</p>
 Snake6502 below, which probably won’t make much sense at first glance. But try
 to see if you can figure out what some of this code doing:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Vintage</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Vintage</span>
   <span class="k">module</span> <span class="nn">Operand</span>
     <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">read</span><span class="p">(</span><span class="n">mem</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
       <span class="k">case</span> <span class="n">mode</span>
@@ -1083,7 +1083,7 @@ F0,BEQ,@
 operand and turn it into an address (denoted by <code class="highlighter-rouge">e</code>). And once we have <em>that</em>, 
 we can execute the commands that are defined in following DSL:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># NOTE: This file contains definitions for every instruction used </span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># NOTE: This file contains definitions for every instruction used </span>
 <span class="c1"># by Snake6502. Most of the functionality here is a direct result</span>
 <span class="c1"># of simple calls to Vintage::Storage and Vintage::CPU instances.</span>
 
@@ -1172,7 +1172,7 @@ we can execute the commands that are defined in following DSL:</p>
 as configuration files, to be loaded into the configuration object 
 shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"csv"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"csv"</span>
 
 <span class="k">module</span> <span class="nn">Vintage</span>
   <span class="k">class</span> <span class="nc">Config</span>
@@ -1213,7 +1213,7 @@ shown below:</p>
 <p>Then finally, we can tie everything together with a <code class="highlighter-rouge">Simulator</code> object that
 instantiates all the objects we need, and kicks off a program execution loop:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Vintage</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Vintage</span>
   <span class="k">class</span> <span class="nc">Simulator</span>
     <span class="nc">EvaluationContext</span> <span class="o">=</span> <span class="no">Struct</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:mem</span><span class="p">,</span> <span class="ss">:cpu</span><span class="p">,</span> <span class="ss">:e</span><span class="p">)</span>
       

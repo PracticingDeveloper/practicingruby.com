@@ -10,8 +10,8 @@
   <meta name="description" content="Software projects need to evolve over time, but they also need to avoidcollapsing under their own weight. This balancingact is something that most programmer...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/growing-a-stable-codebase">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/growing-a-stable-codebase">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -460,7 +460,7 @@ back in <a href="http://practicingruby.com/articles/66">Issue 4.12.1</a>: applic
 end-to-end testing. We eventually ended up with tests that look something like
 the following example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ProfileTest</span> <span class="o">&lt;</span> <span class="no">ActionDispatch</span><span class="o">::</span><span class="no">IntegrationTest</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ProfileTest</span> <span class="o">&lt;</span> <span class="no">ActionDispatch</span><span class="o">::</span><span class="no">IntegrationTest</span>
   <span class="nb">test</span> <span class="s2">"contact email is validated"</span> <span class="k">do</span>
     <span class="n">simulate_user</span> <span class="k">do</span>
       <span class="n">register</span><span class="p">(</span><span class="no">Support</span><span class="o">::</span><span class="no">SimulatedUser</span><span class="p">.</span><span class="nf">default</span><span class="p">)</span>
@@ -478,7 +478,7 @@ the following example:</p>
 <p>If you strip away the syntactic sugar that the <code class="highlighter-rouge">simulate_user</code> method provides,
 you’ll find that this is what is really going on under the hood:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"contact email is validated"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"contact email is validated"</span> <span class="k">do</span>
   <span class="n">user</span> <span class="o">=</span> <span class="no">Support</span><span class="o">::</span><span class="no">SimulatedUser</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
 
   <span class="n">user</span><span class="p">.</span><span class="nf">register</span><span class="p">(</span><span class="no">Support</span><span class="o">::</span><span class="no">SimulatedUser</span><span class="p">.</span><span class="nf">default</span><span class="p">)</span>

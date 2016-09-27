@@ -10,8 +10,8 @@
   <meta name="description" content="  Note: This article series on modules is also available as a PDF download. ThePDF version has been revised and is more up-to-date than what you see here.Tod...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/uses-for-modules-4">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/uses-for-modules-4">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -76,7 +76,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>The original author of the library had a patch laying around that inserted a hook which did some caching that greatly reduced the memory consumption, but he had not tested it extensively and did not want to want to cut a release. I had talked to him about possibly monkey patching <code class="highlighter-rouge">PDF::Document</code> in Ruport’s code to add this patch, but together, we came up with a better solution: wrap the patch in a module.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">PDFWriterMemoryPatch</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">PDFWriterMemoryPatch</span>
   <span class="k">unless</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">instance_methods</span><span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="s2">"_post_transaction_rewind"</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_post_transaction_rewind</span>
       <span class="vi">@objects</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">instance_variable_set</span><span class="p">(</span><span class="ss">:@parent</span><span class="p">,</span><span class="nb">self</span><span class="p">)</span> <span class="p">}</span>
@@ -88,7 +88,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>In Ruport’s PDF formatter code, we did something like the following to apply our patch:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="vi">@document</span> <span class="o">=</span> <span class="no">PDF</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="vi">@document</span> <span class="o">=</span> <span class="no">PDF</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">new</span>
 <span class="vi">@document</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Ruport</span><span class="o">::</span><span class="no">PDFWriterMemoryPatch</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -106,7 +106,7 @@ without the disadvantages. For example, suppose you want to add the <code class=
 <code class="highlighter-rouge">average()</code> methods to Array. If we were monkey patching, we’d write something
 like the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Array</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Array</span>
   <span class="k">def</span> <span class="nf">sum</span>
     <span class="n">inject</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="o">|</span> <span class="n">s</span> <span class="o">+</span> <span class="n">e</span> <span class="p">}</span>
   <span class="k">end</span>
@@ -124,7 +124,7 @@ like the following code:</p>
 
 <p>The danger here of course is that you’d be globally stomping anyone else’s definition of <code class="highlighter-rouge">sum()</code> and <code class="highlighter-rouge">average()</code>, which can lead to ugly conflicts. All these problems can be avoided with a minor modification.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">ArrayMathHelpers</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">ArrayMathHelpers</span>
   <span class="k">def</span> <span class="nf">sum</span>
     <span class="n">inject</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">s</span><span class="p">,</span><span class="n">e</span><span class="o">|</span> <span class="n">s</span> <span class="o">+</span> <span class="n">e</span> <span class="p">}</span>
   <span class="k">end</span>
@@ -149,7 +149,7 @@ you can actually use this technique for modifying existing behavior of an object
 The example below demonstrates modifying <code class="highlighter-rouge">&lt;&lt;</code> on strings so that it allows appending 
 arbitrary objects to a string through coercion.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">LooseStringAppend</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">LooseStringAppend</span>
   <span class="k">def</span> <span class="nf">&lt;&lt;</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">super</span>
   <span class="k">rescue</span> <span class="no">TypeError</span>
@@ -165,7 +165,7 @@ arbitrary objects to a string through coercion.</p>
 
 <p>Of course this (like most core modifications), is a horrible idea. But speaking as a pure technique, this is far better than the alternative global monkey patch shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">String</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">String</span>
   <span class="kp">alias_method</span> <span class="ss">:old_append</span><span class="p">,</span> <span class="ss">:&lt;&lt;</span>
   
   <span class="k">def</span> <span class="nf">&lt;&lt;</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -191,14 +191,14 @@ arbitrary objects to a string through coercion.</p>
 
 <p>Today, I want to show how we implemented commands for it. Essentially, I want to walk through what happens when someone types the following command into their console:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">turbine</span> <span class="n">start</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">turbine</span> <span class="n">start</span>
 <span class="no">Timer</span> <span class="n">started</span> <span class="n">at</span> <span class="no">Wed</span> <span class="no">Dec</span> <span class="mi">15</span> <span class="mi">17</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">37</span> <span class="o">-</span><span class="mo">0500</span> <span class="mi">2010</span>
 </code></pre>
 </div>
 
 <p>Because we knew this tool would evolve over time, we wanted to make it as hackable as possible. To do this, we set up a system in which commands get installed into a hidden folder in each project, making it trivial to modify existing commands or add new ones. Here’s a quick directory listing to show what that structure looks like:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">ls</span> <span class="p">.</span><span class="nf">turbine</span><span class="o">/</span><span class="n">commands</span><span class="o">/</span><span class="n">standard</span><span class="o">/</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">ls</span> <span class="p">.</span><span class="nf">turbine</span><span class="o">/</span><span class="n">commands</span><span class="o">/</span><span class="n">standard</span><span class="o">/</span>
 <span class="n">add</span><span class="p">.</span><span class="nf">rb</span>		<span class="n">project</span><span class="p">.</span><span class="nf">rb</span>	<span class="n">rewind</span><span class="p">.</span><span class="nf">rb</span>	<span class="n">status</span><span class="p">.</span><span class="nf">rb</span> <span class="n">commit</span><span class="p">.</span><span class="nf">rb</span> <span class="n">push</span><span class="p">.</span><span class="nf">rb</span>		
 <span class="n">staged</span><span class="p">.</span><span class="nf">rb</span>	<span class="n">stop</span><span class="p">.</span><span class="nf">rb</span> <span class="n">drop</span><span class="p">.</span><span class="nf">rb</span>	<span class="n">reset</span><span class="p">.</span><span class="nf">rb</span> <span class="n">start</span><span class="p">.</span><span class="nf">rb</span>
 </code></pre>
@@ -207,7 +207,7 @@ arbitrary objects to a string through coercion.</p>
 <p>As you might expect, start.rb defines the start command. Here’s what its source
 looks like:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Turbine</span><span class="o">::</span><span class="no">Application</span><span class="p">.</span><span class="nf">extension</span><span class="p">(</span><span class="ss">:start_command</span><span class="p">)</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Turbine</span><span class="o">::</span><span class="no">Application</span><span class="p">.</span><span class="nf">extension</span><span class="p">(</span><span class="ss">:start_command</span><span class="p">)</span> <span class="k">do</span>
   <span class="k">def</span> <span class="nf">start</span>
     <span class="n">timer</span> <span class="o">=</span> <span class="no">Turbine</span><span class="o">::</span><span class="no">Timer</span><span class="p">.</span><span class="nf">new</span>
     <span class="k">if</span> <span class="n">timer</span><span class="p">.</span><span class="nf">running?</span>
@@ -227,7 +227,7 @@ following definition to remove some domain specific callbacks and options
 parsing, the following example shows the basic harness which registers 
 Turbine’s commands:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Turbine</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Turbine</span>
   <span class="k">class</span> <span class="nc">Application</span>
     <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">extensions</span>
       <span class="vi">@extensions</span> <span class="o">||=</span> <span class="p">{}</span>
@@ -260,7 +260,7 @@ with alternative implementations.</p>
 
 <p>For example, consider a custom command that gets loaded after the standard commands, which is implemented like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Turbine</span><span class="o">::</span><span class="no">Application</span><span class="p">.</span><span class="nf">extension</span><span class="p">(</span><span class="ss">:start_command</span><span class="p">)</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Turbine</span><span class="o">::</span><span class="no">Application</span><span class="p">.</span><span class="nf">extension</span><span class="p">(</span><span class="ss">:start_command</span><span class="p">)</span> <span class="k">do</span>
   <span class="k">def</span> <span class="nf">go</span>
     <span class="nb">puts</span> <span class="s2">"Let's go!"</span>
   <span class="k">end</span>

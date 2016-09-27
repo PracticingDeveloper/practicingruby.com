@@ -10,8 +10,8 @@
   <meta name="description" content="Inheritance is a key concept in most object-oriented languages, but applying it skillfully can be challenging in practice. Back in 1989, M. Sakkinen wrote a ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/disciplined-inheritance-1">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/disciplined-inheritance-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -100,7 +100,7 @@
 
 <p>The classical approach of using a class hierarchy for code sharing is worth looking at, even if most practicing Rubyists would quickly identify this as the wrong approach to this particular problem. It serves as a good baseline for identifying the problems introduced by inheritance and how to overcome them. As you read through the following code, think of its strengths and weaknesses, as well as any alternative ways to model this scenario that you can come up with.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EnumerableCollection</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EnumerableCollection</span>
   <span class="k">def</span> <span class="nf">count</span>
     <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span> <span class="p">}</span>
@@ -171,7 +171,7 @@
 
 <p>At least some of these issues can be resolved through the use of Ruby’s module-based mixin functionality. The following example shows how our class-based code can be trivially refactored to use modules instead. Once again, as you read through the code, think of its strengths and weaknesses as well as how you might approach the problem differently if it were up to you to design this system.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimplifiedEnumerable</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimplifiedEnumerable</span>
   <span class="k">def</span> <span class="nf">count</span>
     <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span> <span class="p">}</span>
@@ -234,7 +234,7 @@
 
 <p>All the problems discussed so far with inheritance can be solved via simple aggregation techniques. For strong evidence of that claim, take a look at the refactored code shown here. As in the previous examples, keep an eye out for the pros and cons of this modeling strategy, and think about what you might do differently.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">StatisticalCollection</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">StatisticalCollection</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="nb">self</span><span class="p">.</span><span class="nf">data</span> <span class="o">=</span> <span class="n">data</span>
   <span class="k">end</span>
@@ -280,7 +280,7 @@
 
 <p>The first thing you’ll notice is that the code is much shorter, as if by magic, but really it’s because I completely cheated here and got rid of my counterfeit <code class="highlighter-rouge">Enumerable</code> object so that I could expose a potentially good idiom for dealing with iteration in an aggregation-friendly way. Feel free to mentally replace the object passed to <code class="highlighter-rouge">StatisticalCollection</code>’s constructor with something like the code shown here if you don’t want me to get away with parlor tricks:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"forwardable"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"forwardable"</span>
 
 <span class="k">class</span> <span class="nc">EnumerableCollection</span>
   <span class="kp">extend</span> <span class="no">Forwardable</span>

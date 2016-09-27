@@ -10,8 +10,8 @@
   <meta name="description" content="  NOTE: This is one of four lessons learned from my 90 day self-study on test-driven development. If this topic interests you,  be sure to check out the othe...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/refactoring-is-not-redesign">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/refactoring-is-not-redesign">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -92,7 +92,7 @@ and almost trivial, you can apply them whenever you feel that they will make lif
  easier for you down the road. For example, it is rarely a bad idea to clean up messy
  code by introducing a couple helper methods:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>       def belongs_to(parent, params)
+<div class="language-diff highlighter-rouge"><pre class="highlight"><code>       def belongs_to(parent, params)
 <span class="gd">-        mapper.record_class.send(:define_method, parent) do
 -          Object.const_get(params[:class]).find(send(params[:key]))
 </span><span class="gi">+        define_association(parent) do
@@ -253,7 +253,7 @@ added a new feature which provided information about the columns
 in a given table. You can get a rough idea for how I sketched out that
 feature by checking out the following test:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="n">it</span> <span class="s2">"must be able to retrieve column information"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="n">it</span> <span class="s2">"must be able to retrieve column information"</span> <span class="k">do</span>
     <span class="n">columns</span> <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="nf">columns</span>
 
     <span class="n">columns</span><span class="p">.</span><span class="nf">count</span><span class="p">.</span><span class="nf">must_equal</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>

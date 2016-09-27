@@ -10,8 +10,8 @@
   <meta name="description" content="Even if we rarely give them much thought, binary file formats are everywhere.Ranging from images to audio files to nearly every other sort of media you canim...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/binary-file-formats">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/binary-file-formats">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -88,7 +88,7 @@ writing a BMP file are pretty much the same as any other file format you’ll en
 The example below demonstrates that even if you break the sequence up into its different parts, it would still be a real 
 challenge to understand without any documentation handy:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># coding: binary</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># coding: binary</span>
 
 <span class="n">hex_data</span> <span class="o">=</span> <span class="sx">%w[
   42 4D 
@@ -155,7 +155,7 @@ in a much more convenient way. In particular, I’m going to show what I did to
 get the following code to output the same image that we rendered via a raw
 sequence of bytes earlier:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">bmp</span> <span class="o">=</span> <span class="no">BMP</span><span class="o">::</span><span class="no">Writer</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">bmp</span> <span class="o">=</span> <span class="no">BMP</span><span class="o">::</span><span class="no">Writer</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="c1"># NOTE: Bitmap encodes pixels in BGR format, not RGB!</span>
 <span class="n">bmp</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"ff0000"</span>
@@ -179,7 +179,7 @@ structure of the <code class="highlighter-rouge">BMP::Writer</code> class. Pixel
 array, and all the interesting things happen at the time you write the image out
 to file:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
   <span class="k">class</span> <span class="nc">Writer</span>
     <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
       <span class="vi">@width</span><span class="p">,</span> <span class="vi">@height</span> <span class="o">=</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span>
@@ -218,7 +218,7 @@ following things:</p>
 <p>The following code shows how <code class="highlighter-rouge">BMP::Writer</code> builds up this header and writes it
 to file:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
   <span class="k">class</span> <span class="nc">Writer</span>
     <span class="nc">PIXEL_ARRAY_OFFSET</span> <span class="o">=</span> <span class="mi">54</span>
     <span class="no">BITS_PER_PIXEL</span>     <span class="o">=</span> <span class="mi">24</span>
@@ -253,7 +253,7 @@ reference image is 2x2 bitmap is 70 bytes, it becomes clear what <code class="hi
 is actually doing for us when we examine the byte by byte values 
 in the following example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"BM"</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">54</span><span class="p">].</span><span class="nf">pack</span><span class="p">(</span><span class="s2">"A2Vv2V"</span><span class="p">)</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"BM"</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">54</span><span class="p">].</span><span class="nf">pack</span><span class="p">(</span><span class="s2">"A2Vv2V"</span><span class="p">)</span> 
 <span class="nb">p</span> <span class="n">header</span><span class="p">.</span><span class="nf">bytes</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="s2">"%.2x"</span> <span class="o">%</span> <span class="n">e</span> <span class="p">}</span>
 
 <span class="cm">=begin expected output (NOTE: reformatted below for easier reading)
@@ -287,7 +287,7 @@ code is actually working.</p>
 the DIB header, which includes some metadata about the image and how it should
 be displayed on the screen:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
   <span class="k">class</span> <span class="nc">Writer</span>
     <span class="nc">DIB_HEADER_SIZE</span>    <span class="o">=</span> <span class="mi">40</span>
     <span class="no">PIXELS_PER_METER</span>   <span class="o">=</span> <span class="mi">2835</span> <span class="c1"># 2835 pixels per meter is basically 72dpi</span>
@@ -321,7 +321,7 @@ specified. Because our goal is to learn about binary file processing and not
 image format esoterica, it’s fine to treat that design decision as a black
 box for now and move on to looking at how the pixel array is processed.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
   <span class="k">class</span> <span class="nc">Writer</span>
     <span class="c1"># .. other code as before ...</span>
 
@@ -369,7 +369,7 @@ generalize this computation to an arbitrary amount of bits per pixel.</p>
 
 <p>While the padding code is definitely the most interesting aspect of the pixel array, there are a couple other details about this implementation worth discussing. In particular, we should take a closer look at the <code class="highlighter-rouge">pixel_binstring</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pixel_binstring</span><span class="p">(</span><span class="n">rgb_string</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pixel_binstring</span><span class="p">(</span><span class="n">rgb_string</span><span class="p">)</span>
   <span class="k">raise</span> <span class="no">ArgumentError</span> <span class="k">unless</span> <span class="n">rgb_string</span> <span class="o">=~</span> <span class="sr">/\A\h{6}\z/</span>
   <span class="p">[</span><span class="n">rgb_string</span><span class="p">].</span><span class="nf">pack</span><span class="p">(</span><span class="s2">"H6"</span><span class="p">)</span>
 <span class="k">end</span>
@@ -394,7 +394,7 @@ check out the <a href="https://gist.github.com/1351737">source code for BMP::Wri
 
 <p>As you might expect, there is a nice symmetry between encoding and decoding binary files. To show just to what extent this is the case, I will walk you through the code which makes the following example run:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">bmp</span> <span class="o">=</span> <span class="no">BMP</span><span class="o">::</span><span class="no">Reader</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"example1.bmp"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">bmp</span> <span class="o">=</span> <span class="no">BMP</span><span class="o">::</span><span class="no">Reader</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"example1.bmp"</span><span class="p">)</span>
 <span class="nb">p</span> <span class="n">bmp</span><span class="p">.</span><span class="nf">width</span>  <span class="c1">#=&gt; 2</span>
 <span class="nb">p</span> <span class="n">bmp</span><span class="p">.</span><span class="nf">height</span> <span class="c1">#=&gt; 2</span>
 
@@ -407,7 +407,7 @@ check out the <a href="https://gist.github.com/1351737">source code for BMP::Wri
 
 <p>The general structure of <code class="highlighter-rouge">BMP::Reader</code> ended up being quite similar to what I did for <code class="highlighter-rouge">BMP::Writer</code>. The code below shows the methods which define the public interface:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span>
   <span class="k">class</span> <span class="nc">Reader</span>
     <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">bmp_filename</span><span class="p">)</span> 
       <span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="n">bmp_filename</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
@@ -434,7 +434,7 @@ work of reading the headers is just for validation purposes. In fact, the
 <code class="highlighter-rouge">read_bmp_header</code> method does nothing more than some basic sanity checking, as
 shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span>
   <span class="k">class</span> <span class="nc">Reader</span>
     <span class="nc">PIXEL_ARRAY_OFFSET</span> <span class="o">=</span> <span class="mi">54</span>
 
@@ -476,7 +476,7 @@ the same sort of extractions and validations. It also sets the <code class="high
 <code class="highlighter-rouge">@height</code> variables, which we use later to determine how to traverse the encoded
 pixel array.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
   <span class="k">class</span> <span class="nc">Reader</span>
     <span class="c1"># ... other code as before ...</span>
 
@@ -519,7 +519,7 @@ pixel array.</p>
 
 <p>Beyond what has already been said about this example and the DIB header itself, there isn’t much more to discuss about this particular method. That means we can finally take a look at how <code class="highlighter-rouge">BMP::Reader</code> converts the encoded pixel array into a nested Ruby array structure.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BMP</span> 
   <span class="k">class</span> <span class="nc">Reader</span>
     <span class="k">def</span> <span class="nf">read_pixels</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
       <span class="vi">@pixels</span> <span class="o">=</span> <span class="no">Array</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="vi">@height</span><span class="p">)</span> <span class="p">{</span> <span class="no">Array</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="vi">@width</span><span class="p">)</span> <span class="p">}</span>

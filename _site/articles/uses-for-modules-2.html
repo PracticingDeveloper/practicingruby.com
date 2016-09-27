@@ -10,8 +10,8 @@
   <meta name="description" content="  Note: This article series on modules is also available as a PDF download. ThePDF version has been revised and is more up-to-date than what you see here.Usi...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/uses-for-modules-2">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/uses-for-modules-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -74,7 +74,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 refer to some core Ruby mixins to illustrate their power before moving on to more 
 subtle points. For example, consider the following bit of code which implements lazily evaluated computations:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Computation</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Computation</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
     <span class="vi">@action</span> <span class="o">=</span> <span class="n">block</span>
@@ -120,7 +120,7 @@ subtle points. For example, consider the following bit of code which implements 
 
 <p>While Ruby makes defining custom operators easy, there is a lot more code here than there needs to be. We can easily clean it up by mixing in Ruby’s built in <code class="highlighter-rouge">Comparable</code> module.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Computation</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Computation</span>
   <span class="kp">include</span> <span class="no">Comparable</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
@@ -156,7 +156,7 @@ subtle points. For example, consider the following bit of code which implements 
 
 <p>If you’re still scratching your head a bit, pretend that rather than being a core Ruby object, that we’ve implemented <code class="highlighter-rouge">Comparable</code> ourselves by writing the following code.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Comparable</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Comparable</span>
   <span class="k">def</span> <span class="nf">==</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
     <span class="p">(</span><span class="nb">self</span> <span class="o">&lt;=&gt;</span> <span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
   <span class="k">end</span>
@@ -187,7 +187,7 @@ without using it in its own structures. Because Ruby’s numeric classes
 all implement <code class="highlighter-rouge">&lt;=&gt;</code>, we are able to simply delegate our <code class="highlighter-rouge">&lt;=&gt;</code> call to the 
 result of the computations.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Computation</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Computation</span>
   <span class="kp">include</span> <span class="no">Comparable</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
@@ -211,7 +211,7 @@ result of the computations.</p>
 
 <p>We can also invert this relationship by having our class define a template, and then relying on the module that we mix in to provide the necessary details. If we look back at a previous example <code class="highlighter-rouge">TicTacToe</code>, we can see a practical example of this technique by looking at the play method in our <code class="highlighter-rouge">TicTacToe::Game</code> class.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">TicTacToe</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">TicTacToe</span>
   <span class="k">class</span> <span class="nc">Game</span>
     <span class="k">def</span> <span class="nf">play</span>
       <span class="kp">catch</span><span class="p">(</span><span class="ss">:finished</span><span class="p">)</span> <span class="k">do</span>
@@ -234,7 +234,7 @@ result of the computations.</p>
 
 <p>In this code, we wanted to keep our event loop abstract, and rely on a mixed in module to provide the logic for executing and validating a move as well as checking end game conditions. As a result, we ended up with the <code class="highlighter-rouge">TicTacToe::Rules</code> module shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">TicTacToe</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">TicTacToe</span>
   <span class="k">module</span> <span class="nn">Rules</span>
     <span class="k">def</span> <span class="nf">check_move</span>
       <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">move_input</span>
@@ -276,7 +276,7 @@ result of the computations.</p>
 
 <p>As you may already know, Ruby’s mixin capability is not limited to simply including new behavior into a class definition. You can also extend the behavior of a class itself, through the use of the <code class="highlighter-rouge">extend()</code> method. We can look to the Ruby standard library <i>forwardable</i> for a nice example of how this is used. Consider the following trivial <code class="highlighter-rouge">Stack</code> implementation.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"forwardable"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"forwardable"</span>
 
 <span class="k">class</span> <span class="nc">Stack</span>
   <span class="kp">extend</span> <span class="no">Forwardable</span>
@@ -292,7 +292,7 @@ result of the computations.</p>
 
 <p>In this example, we can see that after we extend our <code class="highlighter-rouge">Stack</code> class with the <code class="highlighter-rouge">Forwardable</code> module, we are provided with a class level method called <code class="highlighter-rouge">def_delegators</code> which allows us to easily define methods which delegate to an object stored in the specified instance variable. Playing around with the <code class="highlighter-rouge">Stack</code> object a bit should illustrate what this code has done for us.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">stack</span> <span class="o">=</span> <span class="no">Stack</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">stack</span> <span class="o">=</span> <span class="no">Stack</span><span class="p">.</span><span class="nf">new</span>
 <span class="o">=&gt;</span> <span class="c1">#&lt;Stack:0x4f09c @data=[]&gt;</span>
 <span class="o">&gt;&gt;</span> <span class="n">stack</span><span class="p">.</span><span class="nf">push</span> <span class="mi">1</span>
 <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -313,7 +313,7 @@ result of the computations.</p>
 
 <p>As before, it may be helpful to think about how we might implement <code class="highlighter-rouge">Forwardable</code> ourselves. The following bit of code shows one way to approach the problem.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MyForwardable</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MyForwardable</span>
   <span class="k">def</span> <span class="nf">def_delegators</span><span class="p">(</span><span class="n">ivar</span><span class="p">,</span> <span class="o">*</span><span class="n">delegated_methods</span><span class="p">)</span>
     <span class="n">delegated_methods</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">m</span><span class="o">|</span>
       <span class="n">define_method</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">do</span> <span class="o">|*</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="o">|</span>
@@ -338,7 +338,7 @@ result of the computations.</p>
 
 <p>Let’s explore a few different possibilities using a somewhat contrived example so that we can focus on the mixin mechanics. First, we start with an ordinary module, which is somewhat useless on its own.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
   <span class="k">def</span> <span class="nf">hello</span>
     <span class="s2">"hi"</span>
   <span class="k">end</span>
@@ -348,7 +348,7 @@ result of the computations.</p>
 
 <p>By including <code class="highlighter-rouge">Greeter</code> into <code class="highlighter-rouge">SomeClass</code>, we make it so that we can now call <code class="highlighter-rouge">hello()</code> on instances of <code class="highlighter-rouge">SomeClass</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SomeClass</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SomeClass</span>
   <span class="kp">include</span> <span class="no">Greeter</span>
 <span class="k">end</span>
 
@@ -358,7 +358,7 @@ result of the computations.</p>
 
 <p>But as we saw in the <code class="highlighter-rouge">Forwardable</code> example, extending <code class="highlighter-rouge">AnotherClass</code> with <code class="highlighter-rouge">Greeter</code> would allow us to call the hello method directly at the class level, as in the example below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">AnotherClass</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">AnotherClass</span>
   <span class="kp">extend</span> <span class="no">Greeter</span>
 <span class="k">end</span>
 
@@ -373,7 +373,7 @@ could not call <code class="highlighter-rouge">SomeClass.hello()</code>. Similar
 
 <p>From the examples so far, it might seem as if <code class="highlighter-rouge">include()</code> is for defining instance methods, and <code class="highlighter-rouge">extend()</code> is for class methods. But that is not quite accurate, and the next bit of code illustrates just how much deeper the rabbit hole goes.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">obj</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Greeter</span><span class="p">)</span>
 <span class="n">obj</span><span class="p">.</span><span class="nf">hello</span> <span class="c1">#=&gt; "hi"</span>
 </code></pre>
@@ -385,7 +385,7 @@ could not call <code class="highlighter-rouge">SomeClass.hello()</code>. Similar
 
 <p>Let’s try to bring the two <code class="highlighter-rouge">extend()</code> examples closer together with the following little snippet:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">MyClass</span> <span class="o">=</span> <span class="no">Class</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">MyClass</span> <span class="o">=</span> <span class="no">Class</span><span class="p">.</span><span class="nf">new</span>
 <span class="no">MyClass</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">Greeter</span><span class="p">)</span>
 <span class="no">MyClass</span><span class="p">.</span><span class="nf">hello</span> <span class="c1">#=&gt; "hi"</span>
 </code></pre>

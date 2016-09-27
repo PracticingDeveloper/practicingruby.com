@@ -10,8 +10,8 @@
   <meta name="description" content="As a Ruby programmer, you almost certainly make use of inheritance-based objectmodeling on a daily basis. In fact, extending base classes and mixingmodules i...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/hidden-costs-of-inheritance">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/hidden-costs-of-inheritance">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -95,7 +95,7 @@ inheritance relationship can easily bite you.</p>
 <p>To test your understanding of this problem, see if you can spot the bug in the
 following example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"prawn"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"prawn"</span>
 
 <span class="k">class</span> <span class="nc">StyledDocument</span> <span class="o">&lt;</span> <span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span>
   <span class="k">def</span> <span class="nf">style</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
@@ -164,7 +164,7 @@ about for a moment before you read on.</p>
 leave it up to you to figure out <em>why</em> this can be a source of maintenance
 headaches, but please share your thoughts in the comments:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="p">(</span><span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">instance_methods</span> <span class="o">|</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="p">(</span><span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">instance_methods</span> <span class="o">|</span> 
     <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">private_instance_methods</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:logger</span><span class="p">,</span> <span class="ss">:configurations</span><span class="p">,</span> <span class="ss">:default_timezone</span><span class="p">,</span> <span class="ss">:schema_format</span><span class="p">,</span>
 <span class="ss">:timestamped_migrations</span><span class="p">,</span> <span class="ss">:init_with</span><span class="p">,</span> <span class="ss">:initialize_dup</span><span class="p">,</span> <span class="ss">:encode_with</span><span class="p">,</span> <span class="ss">:==</span><span class="p">,</span> <span class="ss">:eql?</span><span class="p">,</span>
@@ -304,7 +304,7 @@ limitations.</p>
 one in Ruby itself. Start by considering the following trivial code, paying
 particular attention to its output:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
     <span class="vi">@name</span>  <span class="o">=</span> <span class="nb">name</span>
     <span class="vi">@email</span> <span class="o">=</span> <span class="n">email</span>
@@ -330,7 +330,7 @@ more of a template method that needs to be overridden in order to be useful. The
 following code shows how easy to customize things by simply adding your own <code class="highlighter-rouge">to_s</code>
 definition:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
     <span class="vi">@name</span>  <span class="o">=</span> <span class="nb">name</span>
     <span class="vi">@email</span> <span class="o">=</span> <span class="n">email</span>
@@ -352,7 +352,7 @@ template-method based extension mechanism should look like. However, due to the
 weird way that <code class="highlighter-rouge">Object#inspect</code> works in Ruby 1.9, defining your own <code class="highlighter-rouge">to_s</code>
 implementation has some unpleasant side effects that are likely to surprise you:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">p</span> <span class="n">person</span> <span class="c1">#=~ Gregory Brown &lt;gregory@practicingruby.com&gt;  </span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">p</span> <span class="n">person</span> <span class="c1">#=~ Gregory Brown &lt;gregory@practicingruby.com&gt;  </span>
 </code></pre>
 </div>
 
@@ -372,7 +372,7 @@ specifically related to inheritance, the problem is compounded by
 inheritance-based modeling. For example, suppose the <code class="highlighter-rouge">Person</code> class was defined
 as shown above, and you decided to subclass it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">Person</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="no">Person</span> 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
     <span class="k">super</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
     <span class="vi">@role</span> <span class="o">=</span> <span class="n">role</span>

@@ -10,8 +10,8 @@
   <meta name="description" content="Many design patterns that originated in other object-oriented languages have elegant Ruby translations. However, the Singleton stands out as a construct that...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/ruby-and-the-singleton-pattern-dont-get-along">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/ruby-and-the-singleton-pattern-dont-get-along">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -71,7 +71,7 @@
 
 <p>Ruby provides a standard library to assist in implementing the singleton pattern. The following code (originally from Practicing Ruby 1.25) illustrates how you can use this library to build a simple logger object.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"singleton"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"singleton"</span>
 
 <span class="k">class</span> <span class="nc">SimpleLogger</span>
   <span class="kp">include</span> <span class="no">Singleton</span>
@@ -113,7 +113,7 @@ NoMethodError: private method `new' called for SimpleLogger:Class
 
 <p>This behavior makes sense, because the point of the singleton pattern is to prevent multiple instances of a given object from being created. This example code shows how to get at a <code class="highlighter-rouge">SimpleLogger</code> instance in a way that guarantees that only one will be created.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">logger</span> <span class="o">=</span> <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">instance</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">logger</span> <span class="o">=</span> <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">instance</span>
 
 <span class="n">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
 <span class="n">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">"Something you might want to know"</span><span class="p">)</span>
@@ -137,7 +137,7 @@ NoMethodError: private method `new' called for SimpleLogger:Class
 
 <p>The following code uses ordinary class methods as an alternative to the previous approach. We explicitly call <code class="highlighter-rouge">undef_method</code> to make it so that instances of this class cannot be created, but otherwise this code is a vanilla Ruby class definition.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SimpleLogger</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SimpleLogger</span>
   <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
     <span class="n">undef_method</span> <span class="ss">:new</span>
 
@@ -169,7 +169,7 @@ NoMethodError: private method `new' called for SimpleLogger:Class
 
 <p>Using this class is very simple, as the entire API consists of class method calls.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
 <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">"Something you might want to know"</span><span class="p">)</span>
 <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s2">"log.txt"</span><span class="p">)</span>
 </code></pre>
@@ -183,7 +183,7 @@ NoMethodError: private method `new' called for SimpleLogger:Class
 
 <p>Every module is an object that cannot exist in a hierarchy and cannot be instantiated but otherwise holds similar properties of <code class="highlighter-rouge">Class</code> objects. Note how similar this code is to our previous example.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimpleLogger</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimpleLogger</span>
   <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
     <span class="k">def</span> <span class="nf">output</span>
       <span class="vi">@output</span> <span class="o">||=</span> <span class="p">[]</span>
@@ -213,7 +213,7 @@ NoMethodError: private method `new' called for SimpleLogger:Class
 
 <p>The two approaches are so similar that they look identical from the end user’s perspective:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
 <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">"Something you might want to know"</span><span class="p">)</span>
 <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s2">"log.txt"</span><span class="p">)</span>
 </code></pre>
@@ -231,7 +231,7 @@ NoMethodError: private method `new' called for SimpleLogger:Class
 
 <p>This example code demonstrates directly calling methods on the <code class="highlighter-rouge">Math</code> module, which looks similar to our previous module-based singleton pattern example.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Point</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Point</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
     <span class="vi">@x</span> <span class="o">=</span> <span class="n">x</span>
     <span class="vi">@y</span> <span class="o">=</span> <span class="n">y</span>
@@ -253,7 +253,7 @@ NoMethodError: private method `new' called for SimpleLogger:Class
 
 <p>If we instead include the <code class="highlighter-rouge">Math</code> module into the <code class="highlighter-rouge">Point</code> class, we see that the behavior is different than defining methods directly on the <code class="highlighter-rouge">Math</code> module because its functionality does get mixed into <code class="highlighter-rouge">Point</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Point</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Point</span>
   <span class="kp">include</span> <span class="no">Math</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
@@ -286,7 +286,7 @@ NoMethodError: private method `hypot' called for #&lt;Point:0x0000010083bd68 @x=
 
 <p>Though this is potentially a useful feature, we now must keep in mind that modules that utilize <code class="highlighter-rouge">module_function</code> do not have ordinary mixin behavior. However, this is not the main reason why I said that <code class="highlighter-rouge">module_function</code> is confusing. To generate our proper “WTF?” moment, we can attempt to use <code class="highlighter-rouge">module_function</code> to implement our <code class="highlighter-rouge">SimpleLogger</code> object.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimpleLogger</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimpleLogger</span>
   <span class="kp">module_function</span>
   
   <span class="k">def</span> <span class="nf">output</span>
@@ -328,7 +328,7 @@ NoMethodError: undefined method `formatted_message' for SimpleLogger:Module
 
 <p>If you made it through the previous example without becoming incredibly confused, try guessing what this code will do before running it, and then prepare to be surprised.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">A</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">A</span>
   <span class="k">def</span> <span class="nf">x</span>
     <span class="mi">10</span>
   <span class="k">end</span>
@@ -358,7 +358,7 @@ NoMethodError: undefined method `formatted_message' for SimpleLogger:Module
 
 <p>We can start by exploring a contrived example that demonstrates what happens when you use <code class="highlighter-rouge">extend</code> to mix a module into itself. If it’s not immediately obvious what the <code class="highlighter-rouge">extend self</code> line does, treat it as a black box for now and focus on how the objects behave as we call methods on them.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">A</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">A</span>
   <span class="kp">extend</span> <span class="nb">self</span>
 
   <span class="k">def</span> <span class="nf">x</span>
@@ -385,7 +385,7 @@ NoMethodError: undefined method `formatted_message' for SimpleLogger:Module
 
 <p>Speaking purely from the perspective of the externally visible behavior, we see that the key difference between <code class="highlighter-rouge">module_function</code> and <code class="highlighter-rouge">extend self</code> is that <code class="highlighter-rouge">extend self</code> results in identical behavior at both the module level and the mixin level when it comes to access control. Both private methods and public methods get mixed into the target object, and their access control is kept the same as whatever it was in the module definition. This is good because it means that your module can actually define private methods without any consequences. The main technical downside of this approach is that if <code class="highlighter-rouge">Math</code> were implemented in this way, including the <code class="highlighter-rouge">Math</code> module in a given object would add all the functions that can be called on the <code class="highlighter-rouge">Math</code> module to the public API of that object. There are workarounds to get that sort of behavior without <code class="highlighter-rouge">module_function</code>, but they’re cumbersome and not really worth talking about. Assuming that we don’t care about this subtle distinction, the following code will implement a working <code class="highlighter-rouge">SimpleLogger</code> singleton object that’s a bit easier to reason about than the <code class="highlighter-rouge">module_function</code> version:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimpleLogger</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimpleLogger</span>
   <span class="kp">extend</span> <span class="nb">self</span>
 
   <span class="k">def</span> <span class="nf">output</span>
@@ -421,7 +421,7 @@ NoMethodError: undefined method `formatted_message' for SimpleLogger:Module
 
 <p>The following code shows how to implement the singleton pattern by adding methods to a bare instance of <code class="highlighter-rouge">Object</code>. This code may look a bit strange at first but is at its core the same as defining methods on any other Ruby object, including instances of the <code class="highlighter-rouge">Module</code> and <code class="highlighter-rouge">Class</code> classes.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">SimpleLogger</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">SimpleLogger</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
 <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="no">SimpleLogger</span>
   <span class="k">def</span> <span class="nf">output</span>
     <span class="vi">@output</span> <span class="o">||=</span> <span class="p">[]</span>
@@ -450,7 +450,7 @@ NoMethodError: undefined method `formatted_message' for SimpleLogger:Module
 
 <p>Although we didn’t have to store the object in the <code class="highlighter-rouge">SimpleLogger</code> constant, doing so makes the familiar runner code we’ve been using over and over work exactly as expected.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
 <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">"Something you might want to know"</span><span class="p">)</span>
 <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s2">"log.txt"</span><span class="p">)</span>
 </code></pre>
@@ -481,7 +481,7 @@ val v = Universe.contains(42)
 
 <p>Now, there is a big difference between having built-in support for something in a language and building some sort of hand-rolled approximation. However, I couldn’t resist implementing a construct in Ruby that works roughly the same way as this Scala code. After some tinkering, I settled on this syntax:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">object</span> <span class="s2">"Universe"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">object</span> <span class="s2">"Universe"</span> <span class="k">do</span>
   <span class="k">def</span> <span class="nf">contains?</span><span class="p">(</span><span class="n">anything</span><span class="p">)</span>
     <span class="kp">true</span>
   <span class="k">end</span>
@@ -496,7 +496,7 @@ val v = Universe.contains(42)
 
 <p>Looking back on this code, I like the way the experiment went, but I am stuck wondering whether it makes sense to take it any farther. Without first-order support in the Ruby language for this construct, documentation would still be a struggle. Also, the awkward syntax breaks consistency with <code class="highlighter-rouge">Class</code> and <code class="highlighter-rouge">Module</code>. What we’d really want to be able to type is something like the following definition:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">object</span> <span class="no">Universe</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">object</span> <span class="no">Universe</span> 
   <span class="k">def</span> <span class="nf">contains?</span><span class="p">(</span><span class="n">anything</span><span class="p">)</span>
     <span class="kp">true</span>
   <span class="k">end</span>
@@ -506,7 +506,7 @@ val v = Universe.contains(42)
 
 <p>Although the previous example is syntactically pleasing to me, I wonder if encouraging us to use more global functionality (and on a related note, more constants) is a good idea. At a minimum, such a change would need to also be mirrored in <code class="highlighter-rouge">Object.new</code> by adding a block form similar to the way that <code class="highlighter-rouge">Module</code> and <code class="highlighter-rouge">Class</code> work. This approach would end up looking something like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">universe</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">universe</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span>
   <span class="k">def</span> <span class="nf">contains?</span><span class="p">(</span><span class="n">anything</span><span class="p">)</span>
     <span class="kp">true</span>
   <span class="k">end</span>

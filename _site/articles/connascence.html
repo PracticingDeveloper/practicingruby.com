@@ -10,8 +10,8 @@
   <meta name="description" content="My article on the SOLID designprinciples was inspired by a great talkI saw by Sandi Metz at GoRuCo 2009. Coincidentally, this  article is inspired byanother ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/connascence">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/connascence">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -127,7 +127,7 @@ the most common. Every module, class, method and variable we create introduces
 connascence of name, assuming it is actually used for something. As an example,
 consider the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">mailer</span> <span class="o">=</span> <span class="no">Mailer</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">mailer</span> <span class="o">=</span> <span class="no">Mailer</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">mailer</span><span class="p">.</span><span class="nf">deliver</span><span class="p">(</span><span class="ss">:to</span>      <span class="o">=&gt;</span> <span class="s2">"gregory.t.brown@gmail.com"</span><span class="p">,</span> 
                <span class="ss">:from</span>    <span class="o">=&gt;</span> <span class="s2">"fake@fake.com"</span><span class="p">,</span>
                <span class="ss">:subject</span> <span class="o">=&gt;</span> <span class="s2">"You have won a lifetime supply of..."</span><span class="p">,</span>
@@ -163,7 +163,7 @@ complex.</p>
 that comes along with it. For example, consider this way of defining class
 methods in Ruby:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Mailer</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Mailer</span>
   <span class="k">def</span> <span class="nc">Mailer</span><span class="o">.</span><span class="nf">configure</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
     <span class="c1">#...</span>
   <span class="k">end</span>
@@ -176,7 +176,7 @@ first, in which if the first line changes, so too must the second line. We can
 rewrite this to avoid that coupling, if we just take advantage of Ruby’s <code class="highlighter-rouge">self</code>
 keyword here:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Mailer</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Mailer</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">configure</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
     <span class="c1">#...</span>
   <span class="k">end</span>
@@ -197,7 +197,7 @@ a look at the other forms of connascence to see why that is the case.</p>
 assumption is often far too optimistic. The following code is a 
 direct example of Connascence of Type:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
    <span class="k">raise</span> <span class="no">ArgumentError</span> <span class="k">unless</span> <span class="n">values</span><span class="p">.</span><span class="nf">kind_of?</span><span class="p">(</span><span class="no">Array</span><span class="p">)</span>
 
    <span class="n">values</span><span class="p">.</span><span class="nf">inject</span><span class="p">(:</span><span class="o">+</span><span class="p">)</span> <span class="o">/</span> <span class="n">values</span><span class="p">.</span><span class="nf">size</span><span class="p">.</span><span class="nf">to_f</span>
@@ -208,7 +208,7 @@ direct example of Connascence of Type:</p>
 <p>One might attempt to resolve the problem by moving away from strict class
 checking and instead use a <code class="highlighter-rouge">respond_to?()</code> check:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
    <span class="k">unless</span> <span class="n">values</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:inject</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">values</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:size</span><span class="p">)</span>
      <span class="k">raise</span> <span class="no">ArgumentError</span> 
    <span class="k">end</span>
@@ -233,7 +233,7 @@ work as our code expects them to. But sometimes, we want to make sure our
 debugging isn’t harder than it needs to be. Here’s an alternative that preserves
 the error handling in a way that is free of type dependencies:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
    <span class="n">values</span><span class="p">.</span><span class="nf">inject</span><span class="p">(:</span><span class="o">+</span><span class="p">)</span> <span class="o">/</span> <span class="n">values</span><span class="p">.</span><span class="nf">size</span><span class="p">.</span><span class="nf">to_f</span>
 <span class="k">rescue</span> <span class="no">NoMethodError</span>
    <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">"The average() function can only "</span> <span class="o">+</span>
@@ -256,7 +256,7 @@ example, consider a legacy access control system in
 which an admin is given the value 0, a manager 1, and an ordinary user 2. You
 could end up writing code like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">access_level</span> <span class="o">==</span> <span class="mi">0</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">access_level</span> <span class="o">==</span> <span class="mi">0</span>
   <span class="n">shoot_nukes_at_moon</span>
 <span class="k">else</span>
   <span class="k">raise</span> <span class="no">AccessDeniedError</span>
@@ -269,7 +269,7 @@ you will have a hard time remembering what they do, and will have a hard time
 hunting them down when they need to be changed. To fix this issue, we can modify
 our hypothetical <code class="highlighter-rouge">User</code> object:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">User</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">User</span>
   <span class="nc">ACCESS_LEVELS</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="o">=&gt;</span> <span class="ss">:admin</span><span class="p">,</span> <span class="mi">1</span> <span class="o">=&gt;</span> <span class="ss">:manager</span><span class="p">,</span> <span class="mi">2</span> <span class="o">=&gt;</span> <span class="ss">:user</span> <span class="p">}</span>
 
   <span class="k">def</span> <span class="nf">admin?</span>
@@ -284,7 +284,7 @@ of the <code class="highlighter-rouge">User</code> class by storing the actual r
 provide a convenience method <code class="highlighter-rouge">User#admin?</code> to be used externally, resulting in
 newly minted caller code that looks like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">admin?</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">admin?</span>
   <span class="n">shoot_nukes_at_moon</span>
 <span class="k">else</span>
   <span class="k">raise</span> <span class="no">AccessDeniedError</span>
@@ -306,7 +306,7 @@ method parameters are ordered. If we go to our mailer example, we could have
 just as easily written the <code class="highlighter-rouge">Mailer#deliver()</code> method to use explicitly ordered
 parameters, similar to what is shown in the example below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Mailer</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Mailer</span>
   <span class="k">def</span> <span class="nf">deliver</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">from</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
     <span class="c1"># ...</span>
   <span class="k">end</span>
@@ -319,7 +319,7 @@ doesn’t give any hints at why the arguments are specified in a particular orde
 Take a look at how opaque things get when we just try to reproduce our previous
 example using this slightly different API:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">mailer</span><span class="p">.</span><span class="nf">deliver</span><span class="p">(</span><span class="s2">"gregory.t.brown@gmail.com"</span><span class="p">,</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">mailer</span><span class="p">.</span><span class="nf">deliver</span><span class="p">(</span><span class="s2">"gregory.t.brown@gmail.com"</span><span class="p">,</span> 
                <span class="s2">"fake@fake.com"</span><span class="p">,</span>
                <span class="s2">"You have won a lifetime supply of..."</span><span class="p">,</span>
                <span class="s2">"Dear Sir, I am pleased to inform..."</span><span class="p">)</span>
@@ -339,7 +339,7 @@ simply create objects that provide all the necessary attributes that you would
 typically use a hash for. In this case, we can envision a simple <code class="highlighter-rouge">Message</code>
 object being introduced:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">message</span> <span class="o">=</span> <span class="no">Message</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">message</span> <span class="o">=</span> <span class="no">Message</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">message</span><span class="p">.</span><span class="nf">to</span>      <span class="o">=</span> <span class="s2">"gregory.t.brown@gmail.com"</span>
 <span class="n">message</span><span class="p">.</span><span class="nf">from</span>    <span class="o">=</span> <span class="s2">"fake@fake.com"</span>
 <span class="n">message</span><span class="p">.</span><span class="nf">subject</span> <span class="o">=</span> <span class="s2">"You have won a lifetime supply of..."</span>
@@ -358,7 +358,7 @@ a parameters hash into a more local setting. With a little creativity, it’s
 relatively easy to make the API look a little nicer by letting <code class="highlighter-rouge">Mailer#deliver</code>
 create the message object for you.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">mailer</span><span class="p">.</span><span class="nf">deliver</span> <span class="k">do</span> <span class="o">|</span><span class="n">message</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">mailer</span><span class="p">.</span><span class="nf">deliver</span> <span class="k">do</span> <span class="o">|</span><span class="n">message</span><span class="o">|</span>
   <span class="n">message</span><span class="p">.</span><span class="nf">to</span>      <span class="o">=</span> <span class="s2">"gregory.t.brown@gmail.com"</span>
   <span class="n">message</span><span class="p">.</span><span class="nf">from</span>    <span class="o">=</span> <span class="s2">"fake@fake.com"</span>
   <span class="n">message</span><span class="p">.</span><span class="nf">subject</span> <span class="o">=</span> <span class="s2">"You have won a lifetime supply of..."</span>
@@ -389,7 +389,7 @@ site that we’re working on as part of Mendicant University’s admission proce
 First, you can see a fairly DRY model which is meant to compare uploaded
 solutions to the actual answer for a given puzzle.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Puzzle</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Puzzle</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
   <span class="k">def</span> <span class="nf">file</span><span class="o">=</span><span class="p">(</span><span class="n">tempfile</span><span class="p">)</span>
     <span class="n">write_attribute</span> <span class="ss">:fingerprint</span><span class="p">,</span> <span class="n">sha1</span><span class="p">(</span><span class="n">tempfile</span><span class="p">)</span>
   <span class="k">end</span>
@@ -413,7 +413,7 @@ But because this is a private method, I ended up with tests that explicitly do
 the hashing themselves to verify that the <code class="highlighter-rouge">Puzzle#file=()</code> method is working as
 expected.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"must be able to create a fingerprint for a file"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"must be able to create a fingerprint for a file"</span> <span class="k">do</span>
   <span class="n">tempfile</span> <span class="o">=</span> <span class="no">Tempfile</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"puzzle_sample"</span><span class="p">)</span>
   <span class="n">tempfile</span> <span class="o">&lt;&lt;</span> <span class="s2">"Sample Text"</span>
   <span class="n">tempfile</span><span class="p">.</span><span class="nf">rewind</span>
@@ -434,7 +434,7 @@ more on ensuring that a hash was generated rather than the way it was generated,
 we might be able to improve this by extracting the fingerprinting code into its
 own module.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Fingerprint</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Fingerprint</span>
   <span class="kp">extend</span> <span class="nb">self</span>
 
   <span class="k">def</span> <span class="nf">[]</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
@@ -446,7 +446,7 @@ own module.</p>
 
 <p>Then, I could rewrite the code and tests to look like they do below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Puzzle</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Puzzle</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
   <span class="k">def</span> <span class="nf">file</span><span class="o">=</span><span class="p">(</span><span class="n">tempfile</span><span class="p">)</span>
     <span class="n">write_attribute</span> <span class="ss">:fingerprint</span><span class="p">,</span> <span class="no">Fingerprint</span><span class="p">[</span><span class="n">tempfile</span><span class="p">]</span>
   <span class="k">end</span>
@@ -458,7 +458,7 @@ own module.</p>
 </code></pre>
 </div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"must be able to create a fingerprint for a file"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"must be able to create a fingerprint for a file"</span> <span class="k">do</span>
   <span class="n">tempfile</span> <span class="o">=</span> <span class="no">Tempfile</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"puzzle_sample"</span><span class="p">)</span>
   <span class="n">tempfile</span> <span class="o">&lt;&lt;</span> <span class="s2">"Sample Text"</span>
   <span class="n">tempfile</span><span class="p">.</span><span class="nf">rewind</span>

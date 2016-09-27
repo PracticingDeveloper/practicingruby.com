@@ -10,8 +10,8 @@
   <meta name="description" content="Ruby developers tend to prefer convention over configuration, but that doesn’t mean our applications are configuration-free.  If you’re doing serious softwar...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/configurable-applications-1">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/configurable-applications-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -69,7 +69,7 @@
 
 <p>The worst way to work with configuration data is to embed it directly within your application. The simple Sinatra application shown below is a nice example of what <em>not</em> to do.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"rubygems"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"rubygems"</span>
 <span class="nb">require</span> <span class="s2">"sinatra"</span>
 <span class="nb">require</span> <span class="s2">"active_record"</span>
 
@@ -127,7 +127,7 @@
 
 <p>If we compare this output to our original example of calling <code class="highlighter-rouge">establish_connection()</code> directly with an explicit configuration hash, the following code should be very easy to follow.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"rubygems"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"rubygems"</span>
 <span class="nb">require</span> <span class="s2">"yaml"</span>
 <span class="nb">require</span> <span class="s2">"sinatra"</span>
 <span class="nb">require</span> <span class="s2">"active_record"</span>

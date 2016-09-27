@@ -10,8 +10,8 @@
   <meta name="description" content="When you look at this photograph of highway construction, what do you see?If your answer was “ugly urban decay”, then you are absolutely right! But because t...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/improving-legacy-systems">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/improving-legacy-systems">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -153,7 +153,7 @@ visiting it.</p>
 
 <p>Although that wouldn’t be quite as nice as getting free access to an article that someone wanted to share with them, it would at least avoid any confusion about what had just happened. My first attempt at introducing this kind of behavior into the system looked like what you see below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span><span class="o">::</span><span class="no">Base</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span><span class="o">::</span><span class="no">Base</span>
   <span class="c1"># ...</span>
   
   <span class="k">def</span> <span class="nf">authenticate</span>
@@ -173,7 +173,7 @@ visiting it.</p>
 
 <p>Upon hearing that bad news, I immediately pulled this code out of production after writing a test that proved this problem existed on my feature branch but not in master. A few days later, I put together a quick fix that got my tests passing. My solution was to extract a helper method that decided how to handle authorization failures. The default behavior would be to redirect to the root page and display an error message as we did above, but during registrations, we would automatically initiate a Github authentication as we had done in the past:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span><span class="o">::</span><span class="no">Base</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span><span class="o">::</span><span class="no">Base</span>
   <span class="c1"># ...</span>
   
   <span class="k">def</span> <span class="nf">authenticate</span>
@@ -219,7 +219,7 @@ visiting it.</p>
 
 <p>Because we knew article slugs would be easy to implement, we decided to build and ship them before moving on to the more complicated changes we had planned to make. The pair of methods below are the most interesting implementation details from this changeset:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
   <span class="c1"># ...</span>
 
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">[]</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -259,7 +259,7 @@ visiting it.</p>
 
 <p>We were unable to find an elegant solution to this problem, but eventually settled on a compromise. We built a low level object for generating the URLs with subscriber tokens, as shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ArticleLink</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ArticleLink</span>
   <span class="kp">include</span> <span class="no">Rails</span><span class="p">.</span><span class="nf">application</span><span class="p">.</span><span class="nf">routes</span><span class="p">.</span><span class="nf">url_helpers</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
@@ -288,7 +288,7 @@ visiting it.</p>
 
 <p>Then in our <code class="highlighter-rouge">ApplicationHelper</code>, we added the following bits of glue code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">ApplicationHelper</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">ApplicationHelper</span>
   <span class="k">def</span> <span class="nf">article_url</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{})</span>
     <span class="k">return</span> <span class="k">super</span> <span class="k">unless</span> <span class="n">current_user</span>
 
@@ -318,7 +318,7 @@ visiting it.</p>
 
 <p>I use a very basic web form in our admin panel to send email announcements out to Practicing Ruby subscribers. Originally, this feature relied on sending messages in batches, which was the simple thing to do when we assumed we’d be sending an identical message to everyone:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BroadcastMailer</span> <span class="o">&lt;</span> <span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BroadcastMailer</span> <span class="o">&lt;</span> <span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span>
   <span class="k">def</span> <span class="nf">deliver_broadcast</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="p">{})</span>
     <span class="vi">@body</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="ss">:body</span><span class="p">]</span>
 
@@ -349,7 +349,7 @@ visiting it.</p>
 
 <p>I don’t want to get too bogged down in details here, but this changeset turned out to be far more complicated than I expected. For starters, the way we were using <code class="highlighter-rouge">ActionMailer</code> in our original code was incorrect, and we were relying on undefined behavior without realizing it. Because the <code class="highlighter-rouge">BroadcastMailer</code> had been working fine for us in production and its (admittedly mediocre) tests were passing, we didn’t notice the problem until we attempted to change its behavior. After attempting to introduce code that looked like this, I started to get all sorts of confusing test failures:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BroadcastMailer</span> <span class="o">&lt;</span> <span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BroadcastMailer</span> <span class="o">&lt;</span> <span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span>
   <span class="c1"># NOTE: this is an approximation, but it captures the basic idea...</span>
   <span class="k">def</span> <span class="nf">deliver_broadcast</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="p">{})</span>
     <span class="vi">@body</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="ss">:body</span><span class="p">]</span>
@@ -366,7 +366,7 @@ visiting it.</p>
 
 <p>Because I didn’t want that logic to trickle up into the controller, and because I expected things might get more complicated as we kept adding more features to this object, I decided to introduce an intermediate service object to handle some of the work for us, and then greatly simplify the mailer object. I also wanted to make the distinction between sending a test message and sending a message to everyone more explicit, so I took the opportunity to do that as well. The resulting code ended up looking something similar to what you see below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Broadcaster</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Broadcaster</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">notify_subscribers</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
     <span class="no">BroadcastMailer</span><span class="p">.</span><span class="nf">recipients</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">email</span><span class="o">|</span>
       <span class="no">BroadcastMailer</span><span class="p">.</span><span class="nf">broadcast</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">email</span><span class="p">).</span><span class="nf">deliver</span>
@@ -409,7 +409,7 @@ http://practicingruby.com/articles/improving-legacy-systems?u=dc20f9bb
 
 <p>As a proof of concept, I wrote a bit of code that handled the article link expansion, but didn’t handle share tokens yet. It only took two extra lines in <code class="highlighter-rouge">BroadcastMailer#broadcast</code> to add this support:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BroadcastMailer</span> <span class="o">&lt;</span> <span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BroadcastMailer</span> <span class="o">&lt;</span> <span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span>
   <span class="c1"># ...</span>
   
   <span class="k">def</span> <span class="nf">broadcast</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
@@ -467,7 +467,7 @@ a Rails <code class="highlighter-rouge">params</code> hash. Constructing our own
 <code class="highlighter-rouge">Broadcaster.notify_subscribers</code> method resolved those issues, and we ended up
 with the following code in <code class="highlighter-rouge">BroadcastsController</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Admin</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Admin</span>
   <span class="k">class</span> <span class="nc">BroadcastsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
     <span class="k">def</span> <span class="nf">create</span>
       <span class="c1"># ...</span>
@@ -528,7 +528,7 @@ then merged the following day.</p>
 
 <p>The changes to <code class="highlighter-rouge">BroadcastMailer</code> were fairly straightforward: pass a <code class="highlighter-rouge">User</code> rather than an email address into the <code class="highlighter-rouge">broadcast</code> method, and then use <code class="highlighter-rouge">ArticleLink</code> to generate a customized link based on the subscriber’s share token:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BroadcastMailer</span> <span class="o">&lt;</span> <span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BroadcastMailer</span> <span class="o">&lt;</span> <span class="no">ActionMailer</span><span class="o">::</span><span class="no">Base</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">recipients</span>
     <span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">:notify_updates</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">).</span><span class="nf">to_notify</span>
   <span class="k">end</span>
@@ -549,7 +549,7 @@ then merged the following day.</p>
 
 <p>The only complication of rewiring <code class="highlighter-rouge">BroadcastMailer</code> this way is that it broke our test mailer functionality. Because the test mailer could send a message to any email address (whether there was an account associated with it or not), we wouldn’t be able to look up a valid <code class="highlighter-rouge">User</code> record to pass to the <code class="highlighter-rouge">BroadcastMailer</code>. The code below shows my temporary solution to this API compatibility problem:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Broadcaster</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Broadcaster</span>
    <span class="c1"># ...</span>
    
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">notify_testers</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
@@ -588,7 +588,7 @@ then merged the following day.</p>
 
 <p>The changes that needed to be made to support these behaviors were not that hard to make, but I did feel concerned about how complicated our <code class="highlighter-rouge">ArticlesController#show</code> action was getting. Including the relevant filters, here is what it looked like after all the changes were made (skim it, but don’t bother trying to understand it!):</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ArticlesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ArticlesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
   <span class="n">before_filter</span> <span class="ss">:find_article</span><span class="p">,</span> <span class="ss">:only</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:show</span><span class="p">,</span> <span class="ss">:edit</span><span class="p">,</span> <span class="ss">:update</span><span class="p">,</span> <span class="ss">:share</span><span class="p">]</span>
   <span class="n">before_filter</span> <span class="ss">:update_url</span><span class="p">,</span> <span class="ss">:only</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:show</span><span class="p">]</span>
   <span class="n">before_filter</span> <span class="ss">:validate_token</span><span class="p">,</span> <span class="ss">:only</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:show</span><span class="p">]</span>

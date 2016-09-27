@@ -10,8 +10,8 @@
   <meta name="description" content="  NOTE: This is one of four lessonslearned from my 90 day self-study ontest-driven development. If this topic interests you, be sure to check out the other l...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/end-to-end-testing-is-essential">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/end-to-end-testing-is-essential">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -90,7 +90,7 @@ this feature</a>
 to see its implementation details, but the important thing to note
 is that its delivery mechanism was tiny and almost completely logic-free:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Ray</span><span class="p">.</span><span class="nf">game</span> <span class="s2">"Blind"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Ray</span><span class="p">.</span><span class="nf">game</span> <span class="s2">"Blind"</span> <span class="k">do</span>
   <span class="n">register</span> <span class="p">{</span> <span class="n">add_hook</span> <span class="ss">:quit</span><span class="p">,</span> <span class="nb">method</span><span class="p">(</span><span class="ss">:exit!</span><span class="p">)</span> <span class="p">}</span>
 
   <span class="n">scene</span> <span class="ss">:main</span> <span class="k">do</span>
@@ -138,7 +138,7 @@ triggering each of its edge cases. The following example shows one
 of the many “oops” changesets that the projects accumulated in a very short
 period of time:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>sounds[:siren].volume = 
+<div class="language-diff highlighter-rouge"><pre class="highlight"><code>sounds[:siren].volume = 
 <span class="gd">-  ((world.distance(world.center_position) - min) / max.to_f) * 100
 </span><span class="gi">+  ((world.distance(world.center_point) - min) / max.to_f) * 100
 </span></code></pre>
@@ -158,7 +158,7 @@ to introduce a change without accidentally breaking something.</p>
 testing, I finally decided that I needed to implement a player simulator 
 which would allow me write tests similar to the one shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"should result in a loss on entering deep space"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"should result in a loss on entering deep space"</span> <span class="k">do</span>
   <span class="n">world</span>  <span class="o">=</span> <span class="no">Blind</span><span class="o">::</span><span class="no">Worlds</span><span class="p">.</span><span class="nf">original</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
   <span class="n">levels</span> <span class="o">=</span> <span class="p">[</span><span class="no">Blind</span><span class="o">::</span><span class="no">Level</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">)]</span>
 
@@ -205,7 +205,7 @@ underlying application and its delivery mechanism. To try out these ideas,
 I built a small <a href="https://github.com/elm-city-craftworks/ruby-examples/tree/master/tic_tac_toe">tic-tac-toe game</a> 
 using Ray, writing my first end-to-end test before writing any other code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A tic tac toe game"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A tic tac toe game"</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"alternates between X and O"</span> <span class="k">do</span>
     <span class="n">run_game</span> <span class="k">do</span> <span class="o">|</span><span class="n">runner</span><span class="o">|</span>
       <span class="n">runner</span><span class="p">.</span><span class="nf">message</span><span class="p">.</span><span class="nf">must_equal</span><span class="p">(</span><span class="s2">"It's your turn, X"</span><span class="p">)</span>
@@ -236,7 +236,7 @@ learned to a traditional Rails application. For example, if I were to build a
 blog and wanted to write my first test for it, I might start with something like
 this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A post"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A post"</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:blogger</span><span class="p">)</span> <span class="p">{</span> <span class="no">SimulatedBlogger</span><span class="p">.</span><span class="nf">new</span> <span class="p">}</span>
 
   <span class="n">it</span> <span class="s2">"can be created by a logged in blogger"</span> <span class="k">do</span>

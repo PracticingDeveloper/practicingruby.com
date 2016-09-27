@@ -10,8 +10,8 @@
   <meta name="description" content="Good code examples are the secret sauce that makes Practicing Ruby a high-quality learning resource. That said, the art of building excellent examples is one...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/patterns-for-building-excellent-examples">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/patterns-for-building-excellent-examples">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -71,7 +71,7 @@
 
 <p>For any given programming language or software library, the odds are pretty good that the first example you’ll run is a contrived “Hello World” program. The following example is taken from the Sinatra web framework but is similar in spirit to pretty much every other “Hello World” application out there:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'sinatra'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'sinatra'</span>
 
 <span class="n">get</span> <span class="s1">'/hi'</span> <span class="k">do</span>
   <span class="s2">"Hello World!"</span>
@@ -85,7 +85,7 @@
 
 <p>Although the most common use case for contrived examples is to construct “Hello World” applications, there are other use cases for this technique as well. In particular, contrived examples are a good fit for discussions about syntactic or structural differences between two pieces of code. As an example, consider a short tutorial that explains why a user might want to use Ruby’s <code class="highlighter-rouge">attr_reader</code> functionality. It could start by showing a <code class="highlighter-rouge">Person</code> class that implements accessors explicitly:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
     <span class="vi">@name</span>  <span class="o">=</span> <span class="nb">name</span>
     <span class="vi">@email</span> <span class="o">=</span> <span class="n">email</span>
@@ -104,7 +104,7 @@
 
 <p>A followup example could then be provided to show how to simplify the code via <code class="highlighter-rouge">attr_reader</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
     <span class="vi">@name</span>  <span class="o">=</span> <span class="nb">name</span>
     <span class="vi">@email</span> <span class="o">=</span> <span class="n">email</span>
@@ -131,7 +131,7 @@
 
 <p>The purpose of building a cheap counterfeit is not to gain a deep understanding of how a certain construct actually works. Instead, the purpose of a counterfeit is to teach people how to steal ideas from other interesting bits of code for their own needs. For example, take the previous <code class="highlighter-rouge">attr_reader</code> example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Person</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
     <span class="vi">@name</span>  <span class="o">=</span> <span class="nb">name</span>
     <span class="vi">@email</span> <span class="o">=</span> <span class="n">email</span>
@@ -144,7 +144,7 @@
 
 <p>This is a great feature, because it replaces tedious boilerplate methods with a concise declarative statement. But without some sort of explanation as to how it works, <code class="highlighter-rouge">attr_reader</code> feels pretty magical and might be perceived as a special case that the Ruby internals are responsible for handling. This misconception can easily be cleared up by showing how to implement a cheap counterfeit version of <code class="highlighter-rouge">attr_reader</code> in application code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Module</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Module</span>
   <span class="k">def</span> <span class="nf">my_attr_reader</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
     <span class="n">args</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">a</span><span class="o">|</span>
       <span class="n">define_method</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="p">{</span> <span class="nb">instance_variable_get</span><span class="p">(</span><span class="s2">"@</span><span class="si">#{</span><span class="n">a</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="p">}</span>
@@ -165,7 +165,7 @@
 
 <p>If teaching programmers how to use <code class="highlighter-rouge">attr_reader</code> is like treating them to a nice fish dinner, teaching them how to implement it is like giving them a fishing pole and showing them how to catch their own meals. Seeing a practical use of <code class="highlighter-rouge">define_method</code> opens the doors for a huge range of other applications, all of which hinge on the simple concept of dynamic method definition. For example, a similar technique could be used to convert hideous method names like <code class="highlighter-rouge">test_a_user_must_be_able_to_log_in</code> into the elegant syntax shown here:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"A user must be able to log in"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"A user must be able to log in"</span> <span class="k">do</span>
   <span class="c1"># your test code here</span>
 <span class="k">end</span>
 </code></pre>
@@ -181,7 +181,7 @@
 
 <p>Suppose I want to do a lightning talk about how <a href="https://github.com/seattlerb/minitest">MiniTest</a> is implemented, with the goal of attracting new contributors to the project. In a talk like that, I’d definitely need to discuss a bit about how assertions work. A logical place to start might be the <code class="highlighter-rouge">Assertions#assert</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">assert</span> <span class="nb">test</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="kp">nil</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">assert</span> <span class="nb">test</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="kp">nil</span>
   <span class="n">msg</span> <span class="o">||=</span> <span class="s2">"Failed assertion, no message given."</span>
   <span class="nb">self</span><span class="p">.</span><span class="nf">_assertions</span> <span class="o">+=</span> <span class="mi">1</span>
   <span class="k">unless</span> <span class="nb">test</span> <span class="k">then</span>
@@ -195,7 +195,7 @@
 
 <p>The implementation of <code class="highlighter-rouge">assert</code> is simple enough that I could probably show it as-is without losing my audience. But if I keep in mind that this code is going to be shown on a slide for just a few seconds, I might show the following simplified example instead:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">assert</span><span class="p">(</span><span class="nb">test</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">assert</span><span class="p">(</span><span class="nb">test</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
   <span class="n">msg</span> <span class="o">||=</span> <span class="s2">"Failed assertion, no message given."</span>
 
   <span class="k">raise</span><span class="p">(</span><span class="no">MiniTest</span><span class="o">::</span><span class="no">Assertion</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">test</span>
@@ -218,7 +218,7 @@
 
 <p>A developer sent us the following bug report to demonstrate that our code for generating fixed-width columns of text had a problem that was causing page breaks to be inserted unnecessarily:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="s2">"span.pdf"</span><span class="p">)</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="s2">"span.pdf"</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">span</span><span class="p">(</span><span class="mi">350</span><span class="p">,</span> <span class="ss">:position</span> <span class="o">=&gt;</span> <span class="ss">:center</span><span class="p">)</span> <span class="k">do</span> 
     <span class="n">text</span> <span class="s2">"Here's some centered text in a 350 point column. "</span> <span class="o">*</span> <span class="mi">100</span>
   <span class="k">end</span>
@@ -243,7 +243,7 @@
 
 <p>That having been said, an understanding of how Prawn works under the hood made it possible to simplify this example quite a bit, even before investigating further. Because the default page boundaries in Prawn are implemented in terms of bounding boxes and the <code class="highlighter-rouge">bounding_box</code> method just temporarily swaps those dimensions with new ones, the second part of this report was superfluous. Removing it got the reproducible sample down to the example shown here:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="s2">"span.pdf"</span><span class="p">)</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="s2">"span.pdf"</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">span</span><span class="p">(</span><span class="mi">350</span><span class="p">)</span> <span class="k">do</span> 
     <span class="n">text</span> <span class="s2">"Here's some text in a 350pt wide column. "</span> <span class="o">*</span> <span class="mi">20</span>
   <span class="k">end</span>
@@ -259,7 +259,7 @@
 
 <p>The purpose of <code class="highlighter-rouge">canvas</code> is  to execute the contents of a block while ignoring all document margins and bounding boxes in place, essentially converting everything to absolute coordinates on the page. After the block is executed, it is supposed to keep the text pointer wherever it left off, which means that it should not trigger a pagebreak unless the text flows beyond the bottom of the page. To test this behavior, we coded up the following example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="s2">"canvas_sets_y_to_0.pdf"</span><span class="p">)</span> <span class="k">do</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="s2">"canvas_sets_y_to_0.pdf"</span><span class="p">)</span> <span class="k">do</span> 
   <span class="n">canvas</span> <span class="p">{</span> <span class="n">text</span> <span class="s2">"Some text at the absolute top left of the page"</span> <span class="p">}</span>
   <span class="n">text</span> <span class="s2">"This text should not be after a pagebreak"</span> 
 <span class="k">end</span>
@@ -268,7 +268,7 @@
 
 <p>After running this example, we noticed that it exhibited the same defect that we saw in the user’s bug report. Because this method is almost as deep down the Prawn call chain as you can go, it became clear that at this point we had our reduced example. The benefit of drilling down like this became apparent when we converted our sample code into a regression test:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">CanvasTest</span> <span class="o">&lt;</span> <span class="no">Test</span><span class="o">::</span><span class="no">Unit</span><span class="o">::</span><span class="no">TestCase</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">CanvasTest</span> <span class="o">&lt;</span> <span class="no">Test</span><span class="o">::</span><span class="no">Unit</span><span class="o">::</span><span class="no">TestCase</span>
   <span class="k">def</span> <span class="nf">setup</span> 
     <span class="vi">@pdf</span> <span class="o">=</span> <span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">new</span>
   <span class="k">end</span>

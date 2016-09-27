@@ -10,8 +10,8 @@
   <meta name="description" content="This article is written by Piotr Szotkowski. Greg invited Piotr to contributeto Practicing Ruby after seeing his RubyConf 2011 talk _PersistingRelations Acro...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/persisting-relations-in-a-polyglot-world">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/persisting-relations-in-a-polyglot-world">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -89,7 +89,7 @@ persistence is conveniently taken care of by ActiveRecord, and we often actually
 <em>start</em> writing the application by defining database-oriented models of our
 objects:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>rails generate model person name bio:text height:float born:date vip:boolean
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>rails generate model person name bio:text height:float born:date vip:boolean
 <span class="gp">$ </span>rake db:migrate
 </code></pre>
 </div>
@@ -198,7 +198,7 @@ simplicity can be quite a benefit.</p>
 handling quotes</a>: what would be the
 simplest way to persist them? See for yourself:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'yaml/store'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'yaml/store'</span>
 <span class="n">store</span> <span class="o">=</span> <span class="no">YAML</span><span class="o">::</span><span class="no">Store</span><span class="p">.</span><span class="nf">new</span> <span class="s1">'quotes.yml'</span>
 
 <span class="c1"># quotes are author + text structures</span>

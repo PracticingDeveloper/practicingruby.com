@@ -10,8 +10,8 @@
   <meta name="description" content="Rather than always focusing on SERIOUS BUSINESS, I’d like share something a little more light hearted today. Whether you celebrate Christmas or not, I think ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/obfuscations-of-christmas-past">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/obfuscations-of-christmas-past">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -69,7 +69,7 @@
 
 <p>One of my favorites was <a href="http://twitter.com/#!/chneukirchen">Christian Neukirchen</a>’s obfuscated Christmas message to the Ruby community in 2004. I’ve copied the source code below, and I encourage you to run it and see that it is indeed a valid Ruby program!</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">s</span><span class="o">=</span><span class="s2">"IyBUaGFua3MgZm9yIGxvb2tpbmcgYXQgbXkgY29kZ
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">s</span><span class="o">=</span><span class="s2">"IyBUaGFua3MgZm9yIGxvb2tpbmcgYXQgbXkgY29kZ
 S4KIwojIENvcHlyaWdodCAoQykgMjAwMiAgQ2hyaXN0a
 WFuI      E       5       l       d     Wtpc                                
 mNoZ  W       4      gP       G       N obmV
@@ -123,7 +123,7 @@ yMK"</span><span class="p">;</span><span class="nb">eval</span> <span class="n">
 
 <p>The following small snippet should clear things up a bit.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">source</span> <span class="o">=</span> <span class="s2">"puts 'hello world'"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">source</span> <span class="o">=</span> <span class="s2">"puts 'hello world'"</span>
 <span class="o">=&gt;</span> <span class="s2">"puts 'hello world'"</span>
 <span class="o">&gt;&gt;</span> <span class="n">encoded_source</span> <span class="o">=</span> <span class="no">Base64</span><span class="p">.</span><span class="nf">encode64</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="s2">"cHV0cyAnaGVsbG8gd29ybGQn</span><span class="se">\n</span><span class="s2">"</span>
@@ -137,7 +137,7 @@ yMK"</span><span class="p">;</span><span class="nb">eval</span> <span class="n">
 
 <p>Another way of decoding <code class="highlighter-rouge">Base64</code> encoded strings is via the <code class="highlighter-rouge">String#unpack</code> method, using the template <code class="highlighter-rouge">"m*"</code>. You can see this in Christian’s code, which is what tipped Michael off in the first place. With that in mind, we can build a tiny obfuscated “Hello World” program.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">s</span> <span class="o">=</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">s</span> <span class="o">=</span> 
 <span class="s2">"c  H   V0cyA 
  n  a     G
  VsbG     8

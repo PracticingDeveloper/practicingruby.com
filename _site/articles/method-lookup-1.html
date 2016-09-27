@@ -10,8 +10,8 @@
   <meta name="description" content="I decided to start off this newsletter with one of the most basic but essential pieces of knowledge you can have about Ruby’s object model: the way it looks ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/method-lookup-1">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/method-lookup-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -65,7 +65,7 @@
 
 <p>Below we have a simple report class tasked with performing some basic data manipulations and then producing some text output.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Report</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Report</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">ledger</span><span class="p">)</span>
     <span class="vi">@balance</span>          <span class="o">=</span> <span class="n">ledger</span><span class="p">.</span><span class="nf">inject</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">sum</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span><span class="o">|</span> <span class="n">sum</span> <span class="o">+</span> <span class="n">v</span> <span class="p">}</span>
     <span class="vi">@credits</span><span class="p">,</span> <span class="vi">@debits</span> <span class="o">=</span> <span class="n">ledger</span><span class="p">.</span><span class="nf">partition</span> <span class="p">{</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="o">|</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">}</span>
@@ -88,7 +88,7 @@
 
 <p>The following example demonstrates how we’d make use of this class.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">ledger</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="s2">"Deposit Check #123"</span><span class="p">,</span> <span class="mi">500</span><span class="o">.</span><span class="mi">15</span><span class="p">],</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">ledger</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="s2">"Deposit Check #123"</span><span class="p">,</span> <span class="mi">500</span><span class="o">.</span><span class="mi">15</span><span class="p">],</span>
            <span class="p">[</span><span class="s2">"Fancy Shoes"</span><span class="p">,</span>       <span class="o">-</span><span class="mi">200</span><span class="o">.</span><span class="mi">25</span><span class="p">],</span>
            <span class="p">[</span><span class="s2">"Fancy Hat"</span><span class="p">,</span>          <span class="o">-</span><span class="mi">54</span><span class="o">.</span><span class="mi">40</span><span class="p">],</span>
            <span class="p">[</span><span class="s2">"ATM Deposit"</span><span class="p">,</span>       <span class="mi">1200</span><span class="o">.</span><span class="mo">00</span><span class="p">],</span>
@@ -118,7 +118,7 @@ Kitteh Litteh: 5.00
 
 <p>While not particularly pretty, this report is mostly what we’d expect to see. You can probably imagine how this information might be embedded within another report, such as an email-based form letter with some header and footer information. One possible way to do this would be through class inheritance, as in the example below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"date"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"date"</span>
 
 <span class="k">class</span> <span class="nc">EmailReport</span> <span class="o">&lt;</span> <span class="no">Report</span>
   <span class="k">def</span> <span class="nf">header</span>
@@ -143,7 +143,7 @@ Kitteh Litteh: 5.00
 
 <p>We only need to make a minor change to our calling code to make use of this new class.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">ledger</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="s2">"Deposit Check #123"</span><span class="p">,</span> <span class="mi">500</span><span class="o">.</span><span class="mi">15</span><span class="p">],</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">ledger</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="s2">"Deposit Check #123"</span><span class="p">,</span> <span class="mi">500</span><span class="o">.</span><span class="mi">15</span><span class="p">],</span>
            <span class="p">[</span><span class="s2">"Fancy Shoes"</span><span class="p">,</span>       <span class="o">-</span><span class="mi">200</span><span class="o">.</span><span class="mi">25</span><span class="p">],</span>
            <span class="p">[</span><span class="s2">"Fancy Hat"</span><span class="p">,</span>          <span class="o">-</span><span class="mi">54</span><span class="o">.</span><span class="mi">40</span><span class="p">],</span>
            <span class="p">[</span><span class="s2">"ATM Deposit"</span><span class="p">,</span>       <span class="mi">1200</span><span class="o">.</span><span class="mo">00</span><span class="p">],</span>
@@ -186,7 +186,7 @@ Your Faceless Banking Institution
 
 <p>Because Ruby allows for module mixins and per-object behavior, the <code class="highlighter-rouge">super</code> keyword takes on a whole new life in which an object’s superclass is the last stop on a five part journey through Ruby’s object model. The following example proves the point by composing a simple string which demonstrates the order in which methods are resolved in Ruby.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">W</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">W</span>
   <span class="k">def</span> <span class="nf">foo</span>
     <span class="s2">"- Mixed in method defined by W</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="k">super</span>
   <span class="k">end</span>

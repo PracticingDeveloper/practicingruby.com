@@ -10,8 +10,8 @@
   <meta name="description" content="This article was contributed by Carol Nichols(@carols10cents,carols10cents@rstat.us), one of theactive maintainers of rstat.us. Carol is also involved inthe ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/debugging-without-doom-and-gloom">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/debugging-without-doom-and-gloom">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -204,7 +204,7 @@ from the Dining Philosopher’s problem from <a href="https://practicingruby.com
 Here’s how we would inspect what’s happening in the <code class="highlighter-rouge">Waiter#request_to_eat</code>
 method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"pry"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"pry"</span>
 
 <span class="k">class</span> <span class="nc">Waiter</span>
   <span class="c1"># ...</span>
@@ -224,7 +224,7 @@ method:</p>
 sequence, but they will be queued up asynchronously. As soon as one is
 actually executed, we will be dropped into a Pry session:</p>
 
-<pre><code class="language-console">From: (..)/dining_philosophers.rb @ line 61 Waiter#request_to_eat:
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>From: (..)/dining_philosophers.rb @ line 61 Waiter#request_to_eat:
 
     60: def request_to_eat(philosopher)
  =&gt; 61:   binding.pry
@@ -236,6 +236,7 @@ actually executed, we will be dropped into a Pry session:</p>
 
 [1] pry(#&lt;Waiter&gt;)&gt;
 </code></pre>
+</div>
 
 <p>From here, we can deeply interrogate the current state of our program,
 revealing that the <code class="highlighter-rouge">philosopher</code> references an <code class="highlighter-rouge">Actor::Proxy</code> 
@@ -329,7 +330,7 @@ For a real example of this kind of over-specification, here is a test that I
 added to <a href="https://github.com/hotsh/rstat.us/commit/26444ea95ec8da12d4e74764bf52bdaad18e7776">rstat.us’ codebase</a>
 a while ago:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"lets you update your profile even if you use a different case in the url"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"lets you update your profile even if you use a different case in the url"</span> <span class="k">do</span>
   <span class="n">u</span> <span class="o">=</span> <span class="no">Factory</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">:username</span> <span class="o">=&gt;</span> <span class="s2">"LADY_GAGA"</span><span class="p">)</span>
   <span class="n">a</span> <span class="o">=</span> <span class="no">Factory</span><span class="p">(</span><span class="ss">:authorization</span><span class="p">,</span> <span class="ss">:user</span> <span class="o">=&gt;</span> <span class="n">u</span><span class="p">)</span>
   <span class="n">log_in</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">a</span><span class="p">.</span><span class="nf">uid</span><span class="p">)</span>

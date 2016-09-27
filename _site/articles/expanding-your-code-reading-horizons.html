@@ -10,8 +10,8 @@
   <meta name="description" content="An interesting thing about learning new programming languages is that it takesmuch less time to learn how to read programs than it does to write them. Whileb...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/expanding-your-code-reading-horizons">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/expanding-your-code-reading-horizons">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -199,7 +199,7 @@ features.</p>
 <p>The following code is responsible for creating a blank slate world with 80x80
 dimensions:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="k">defstruct</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="no">:food</span><span class="w"> </span><span class="no">:pher</span><span class="p">)</span><span class="w"> </span><span class="c1">;may also have :ant and :home
+<div class="language-clojure highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="k">defstruct</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="no">:food</span><span class="w"> </span><span class="no">:pher</span><span class="p">)</span><span class="w"> </span><span class="c1">;may also have :ant and :home
 </span><span class="w">
 </span><span class="c1">;dimensions of square world
 </span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="mi">80</span><span class="p">)</span><span class="w">
@@ -220,7 +220,7 @@ dimensions:</p>
 <p>Even if this is the first time you’ve ever seen a Clojure program, you could take an
 educated guess at what is going on in at least a few of these lines of code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="k">defstruct</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="no">:food</span><span class="w"> </span><span class="no">:pher</span><span class="p">)</span><span class="w">      </span><span class="c1">; this defines a Struct-like thing
+<div class="language-clojure highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="k">defstruct</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="no">:food</span><span class="w"> </span><span class="no">:pher</span><span class="p">)</span><span class="w">      </span><span class="c1">; this defines a Struct-like thing
 </span><span class="w">
 </span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="mi">80</span><span class="p">)</span><span class="w">                      </span><span class="c1">; this defines a named value, setting dim=80
 </span><span class="w">
@@ -276,7 +276,7 @@ with <code class="highlighter-rouge">irb</code> in Ruby. Once again using the co
 exploration such as the one that follows can go a long way towards 
 verifying our understanding of what we learned from the documentation:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">user=&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">defstruct</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="no">:food</span><span class="w"> </span><span class="no">:pher</span><span class="p">)</span><span class="w">
+<div class="language-clojure highlighter-rouge"><pre class="highlight"><code><span class="n">user=&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">defstruct</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="no">:food</span><span class="w"> </span><span class="no">:pher</span><span class="p">)</span><span class="w">
 </span><span class="c1">; #'user/cell
 </span><span class="n">user=&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">struct</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w">
 </span><span class="c1">; {:food 1, :pher 4}
@@ -336,7 +336,7 @@ of our methods rather than their signatures.</p>
 <p>Keeping these points in mind, here’s a semi-literal translation of Clojure code
 to Ruby:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">DIM</span>    <span class="o">=</span> <span class="mi">80</span>                                          
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">DIM</span>    <span class="o">=</span> <span class="mi">80</span>                                          
 <span class="no">WORLD</span>  <span class="o">=</span> <span class="no">DIM</span><span class="p">.</span><span class="nf">times</span><span class="p">.</span><span class="nf">map</span> <span class="k">do</span>                                 <span class="c1"># 1</span>
            <span class="no">DIM</span><span class="p">.</span><span class="nf">times</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="no">Ref</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">Cell</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="p">}</span>      <span class="c1"># 2,3</span>
          <span class="k">end</span>
@@ -372,7 +372,7 @@ moving!</p>
 <p>The following code is responsible for initializing an ant at a 
 given location within the world:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="k">defstruct</span><span class="w"> </span><span class="n">ant</span><span class="w"> </span><span class="no">:dir</span><span class="p">)</span><span class="w"> </span><span class="c1">;may also have :food
+<div class="language-clojure highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="k">defstruct</span><span class="w"> </span><span class="n">ant</span><span class="w"> </span><span class="no">:dir</span><span class="p">)</span><span class="w"> </span><span class="c1">;may also have :food
 </span><span class="w">
 </span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">create-ant</span><span class="w"> 
   </span><span class="s">"create an ant at the location, returning an ant agent on the location"</span><span class="w">
@@ -389,7 +389,7 @@ given location within the world:</p>
 and how to define functions, we can skip over some of the boilerplate
 and get right to the good stuff:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="nb">dosync</span><span class="w">                               </span><span class="c1">; 1
+<div class="language-clojure highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="nb">dosync</span><span class="w">                               </span><span class="c1">; 1
 </span><span class="w">  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">p</span><span class="w"> </span><span class="p">(</span><span class="nf">place</span><span class="w"> </span><span class="n">loc</span><span class="p">)</span><span class="w">                 </span><span class="c1">; 2
 </span><span class="w">        </span><span class="n">a</span><span class="w"> </span><span class="p">(</span><span class="nb">struct</span><span class="w"> </span><span class="n">ant</span><span class="w"> </span><span class="n">dir</span><span class="p">)]</span><span class="w">
     </span><span class="p">(</span><span class="nb">alter</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="nb">assoc</span><span class="w"> </span><span class="no">:ant</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w">            </span><span class="c1">; 3
@@ -427,7 +427,7 @@ behaviors.</p>
 <p>Of course, in order to verify that we understand what the documentation is
 telling us, nothing beats a bit of casual experimentation in the REPL:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">user=&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="mi">20</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">+</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">y</span><span class="p">))</span><span class="w">
+<div class="language-clojure highlighter-rouge"><pre class="highlight"><code><span class="n">user=&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="mi">20</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">+</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">y</span><span class="p">))</span><span class="w">
 </span><span class="c1">; 30
 </span><span class="n">user=&gt;</span><span class="w"> </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="mi">10</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="mi">20</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">+</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">y</span><span class="p">)))</span><span class="w">
 </span><span class="c1">; 30
@@ -474,7 +474,7 @@ Ruby, so a direct translation isn’t possible. However, it doesn’t hurt to
 imagine what the syntax for these features might look like in Ruby if we did
 have Clojure’s concurrency primitives:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">create_ant</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="n">dir</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">create_ant</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="n">dir</span><span class="p">)</span>
     <span class="no">Ref</span><span class="p">.</span><span class="nf">transaction</span> <span class="k">do</span> 
       <span class="nb">p</span> <span class="o">=</span> <span class="n">place</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span>
       <span class="n">a</span> <span class="o">=</span> <span class="no">Ant</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">dir</span><span class="p">)</span>
@@ -498,7 +498,7 @@ adopting them in the future.</p>
 
 <p>The following code populates the initial state of the world with ants and food:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1">;number of ants = nants-sqrt^2
+<div class="language-clojure highlighter-rouge"><pre class="highlight"><code><span class="c1">;number of ants = nants-sqrt^2
 </span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">nants-sqrt</span><span class="w"> </span><span class="mi">7</span><span class="p">)</span><span class="w">
 </span><span class="c1">;number of places with food
 </span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">food-places</span><span class="w"> </span><span class="mi">35</span><span class="p">)</span><span class="w">
@@ -528,7 +528,7 @@ adopting them in the future.</p>
 concepts and old ones. If we focus on the body of the <code class="highlighter-rouge">setup</code> definition, there
 are five new things for us to learn:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="nb">dosync</span><span class="w">
+<div class="language-clojure highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="nb">dosync</span><span class="w">
     </span><span class="p">(</span><span class="nb">dotimes</span><span class="w"> </span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="n">food-places</span><span class="p">]</span><span class="w">                             </span><span class="c1">;1
 </span><span class="w">      </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">p</span><span class="w"> </span><span class="p">(</span><span class="nf">place</span><span class="w"> </span><span class="p">[(</span><span class="nb">rand-int</span><span class="w"> </span><span class="n">dim</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">rand-int</span><span class="w"> </span><span class="n">dim</span><span class="p">)])]</span><span class="w">   </span><span class="c1">;2
 </span><span class="w">        </span><span class="p">(</span><span class="nb">alter</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="nb">assoc</span><span class="w"> </span><span class="no">:food</span><span class="w"> </span><span class="p">(</span><span class="nb">rand-int</span><span class="w"> </span><span class="n">food-range</span><span class="p">))))</span><span class="w">
@@ -569,7 +569,7 @@ returns the result of the last expression. This is roughly equivalent to Ruby’
 <p>One last trip back to the REPL is needed to confirm that once again, the
 documentation is not lying, and we have not misunderstood its explanations:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">user=&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">dotimes</span><span class="w"> </span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="mi">5</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">println</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w">
+<div class="language-clojure highlighter-rouge"><pre class="highlight"><code><span class="n">user=&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">dotimes</span><span class="w"> </span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="mi">5</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">println</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w">
 </span><span class="c1">; 0
 ; 1
 ; 2
@@ -608,7 +608,7 @@ noticeable thing that is lost in translation is the conciseness
 of Clojure’s list comprehensions. But in this particular use case,
 <code class="highlighter-rouge">Array#product</code> gets us part of the way there:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">NANTS_SQRT</span>  <span class="o">=</span> <span class="mi">7</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">NANTS_SQRT</span>  <span class="o">=</span> <span class="mi">7</span>
 <span class="no">FOOD_PLACES</span> <span class="o">=</span> <span class="mi">35</span>
 <span class="no">FOOD_RANGE</span>  <span class="o">=</span> <span class="mi">100</span>
 

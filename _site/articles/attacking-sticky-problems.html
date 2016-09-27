@@ -10,8 +10,8 @@
   <meta name="description" content="One project that I’ve always wanted to work on is the creation of a generic table datastructure for Ruby. I’ve partially solved this problem in a dozen conte...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/attacking-sticky-problems">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/attacking-sticky-problems">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -124,7 +124,7 @@ p row[1] #=&gt; "2"
 
 <p>Whenever I think of good APIs that I’ve seen for table interactions, the approach ActiveRecord 3 takes always comes to mind. It seemed to fit this particular problem well, so I cautiously asked the judge for his opinion on the following code.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">table</span> <span class="o">=</span> <span class="no">Table</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">table</span> <span class="o">=</span> <span class="no">Table</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="n">row</span>   <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s2">"Date"</span> <span class="o">=&gt;</span> <span class="s2">"6/14/2011"</span><span class="p">).</span><span class="nf">first</span>
 
 <span class="nb">p</span> <span class="n">row</span><span class="p">[</span><span class="s2">"Payments Received"</span><span class="p">]</span> <span class="c1">#=&gt; "2"</span>
@@ -135,7 +135,7 @@ p row[1] #=&gt; "2"
 
 <p>His point about headers was a good one, so—knowing that this was the closest thing I could get to approval from the judge—I started writing some tests that took his suggestion into account.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"Table"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"Table"</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"must be able to search for matching records"</span> <span class="k">do</span>
     <span class="n">fixture_dir</span> <span class="o">=</span> <span class="s2">"</span><span class="si">#{</span><span class="no">File</span><span class="p">.</span><span class="nf">dirname</span><span class="p">(</span><span class="kp">__FILE__</span><span class="p">)</span><span class="si">}</span><span class="s2">/fixtures"</span>
     <span class="n">json_data</span>   <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="s2">"</span><span class="si">#{</span><span class="n">fixture_dir</span><span class="si">}</span><span class="s2">/sales.json"</span><span class="p">)</span>
@@ -158,7 +158,7 @@ p row[1] #=&gt; "2"
 
 <p>He was right, of course, so I opened up my test helper file and wrote a little method to hide the messy code and isolate it to one place:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">json_fixture</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">json_fixture</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
   <span class="n">test_dir</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">dirname</span><span class="p">(</span><span class="kp">__FILE__</span><span class="p">)</span>
   <span class="no">JSON</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="s2">"</span><span class="si">#{</span><span class="n">test_dir</span><span class="si">}</span><span class="s2">/fixtures/</span><span class="si">#{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.json"</span><span class="p">))</span>
 <span class="k">end</span>
@@ -167,7 +167,7 @@ p row[1] #=&gt; "2"
 
 <p>Using this helper file, I was able to make my tests look a whole lot better.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"Table"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"Table"</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"must be able to search for matching records"</span> <span class="k">do</span>
     <span class="n">names</span><span class="p">,</span> <span class="o">*</span><span class="n">data</span>  <span class="o">=</span> <span class="n">json_fixture</span><span class="p">(</span><span class="s2">"sales"</span><span class="p">)</span>
     <span class="n">table</span>         <span class="o">=</span> <span class="no">Table</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
@@ -183,7 +183,7 @@ p row[1] #=&gt; "2"
 
 <p>I looked to the judge for approval and got a half-hearted shrug, which was good enough for me. By the time I finished writing these tests, I already had an idea in mind for how to implement a solution.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Table</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Table</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">attribute_names</span><span class="p">)</span>
     <span class="vi">@data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="no">Hash</span><span class="p">[</span><span class="n">attribute_names</span><span class="p">.</span><span class="nf">zip</span><span class="p">(</span><span class="n">e</span><span class="p">)]</span> <span class="p">}</span>
   <span class="k">end</span>
@@ -207,7 +207,7 @@ p row[1] #=&gt; "2"
 
 <p>After catching my breath, I realized that I could address many of the judge’s points without actually making any major decisions about implementation details. I could do this by introducing a <code class="highlighter-rouge">Record</code> object. This object would initially have a core implementation similar to my previous example but would make it much easier to introduce changes down the line. The following test describes what I was shooting for:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"Record"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"Record"</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"must allow access to attributes by name"</span> <span class="k">do</span>
     <span class="n">data</span>       <span class="o">=</span> <span class="p">[</span><span class="s2">"6/14/2011"</span><span class="p">,</span> <span class="s2">"2"</span><span class="p">,</span> <span class="s2">"36.00"</span><span class="p">,</span> <span class="s2">"-1.69"</span><span class="p">,</span> <span class="s2">"34.31"</span><span class="p">]</span>
     <span class="n">names</span>      <span class="o">=</span> <span class="p">[</span><span class="s2">"Date"</span><span class="p">,</span> <span class="s2">"Payments Received"</span><span class="p">,</span> <span class="s2">"Amount Received"</span><span class="p">,</span> 
@@ -235,7 +235,7 @@ p row[1] #=&gt; "2"
 
 <p>To pass these tests, I pushed logic down from the <code class="highlighter-rouge">Table</code> class into a newly created <code class="highlighter-rouge">Record</code> class:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Record</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Record</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">attribute_names</span><span class="p">)</span>
     <span class="vi">@data</span> <span class="o">=</span> <span class="no">Hash</span><span class="p">[</span><span class="n">attribute_names</span><span class="p">.</span><span class="nf">zip</span><span class="p">(</span><span class="n">values</span><span class="p">)]</span>
   <span class="k">end</span>
@@ -253,7 +253,7 @@ p row[1] #=&gt; "2"
 
 <p>The judge was eerily silent as this test went green. Perhaps he was waiting to see what my next move would be, or maybe he had just run out of jokes about my mom. Nonetheless, I took this as my cue to go update my <code class="highlighter-rouge">Table</code> code so that it would use <code class="highlighter-rouge">Record</code> objects instead of hashes:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Table</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Table</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">attribute_names</span><span class="p">)</span>
     <span class="vi">@data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="no">Record</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">attribute_names</span><span class="p">)</span> <span class="p">}</span>
   <span class="k">end</span>

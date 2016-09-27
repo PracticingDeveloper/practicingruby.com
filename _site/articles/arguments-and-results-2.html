@@ -10,8 +10,8 @@
   <meta name="description" content="Back in 1997, James Noble published a paper called Arguments and Results which outlined several useful patterns for designing better object protocols. Despit...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/arguments-and-results-2">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/arguments-and-results-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -71,7 +71,7 @@
 
 <p>Results objects are similar to argument objects in that they simplify the interface of one object at the cost of introducing new objects into the system. The <code class="highlighter-rouge">Report</code> class I built for <a href="http://practicingruby.com/articles/13">Issue 2.13</a> is a good example of this sort of object. If we start with its class definition and work our way backwards to what the code would have looked like without it, we will be able to see the reason why this object was introduced in the first place.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SubscriptionCounter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SubscriptionCounter</span>
   <span class="k">class</span> <span class="nc">Report</span>
     <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
       <span class="vi">@series</span> <span class="o">=</span> <span class="n">series</span>
@@ -95,7 +95,7 @@
 
 <p>The following code outlines how <code class="highlighter-rouge">Report</code> is actually used by client code. It essentally serves as a bridge between <code class="highlighter-rouge">Series</code> and <code class="highlighter-rouge">Report::PDF</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">campaigns</span> <span class="o">=</span> <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">Campaign</span><span class="p">.</span><span class="nf">all</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">campaigns</span> <span class="o">=</span> <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">Campaign</span><span class="p">.</span><span class="nf">all</span>
 <span class="n">series</span>    <span class="o">=</span> <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">DataSeries</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">campaigns</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="n">report</span>    <span class="o">=</span> <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">Report</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
 
@@ -105,7 +105,7 @@
 
 <p>If we pretend that <code class="highlighter-rouge">Report</code> never existed and that its methods were implemented directly on <code class="highlighter-rouge">DataSeries</code>, we would end up with something similar to the following client code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">campaigns</span> <span class="o">=</span> <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">Campaign</span><span class="p">.</span><span class="nf">all</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">campaigns</span> <span class="o">=</span> <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">Campaign</span><span class="p">.</span><span class="nf">all</span>
 <span class="n">series</span>    <span class="o">=</span> <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">DataSeries</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">campaigns</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
 <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">Report</span><span class="o">::</span><span class="no">PDF</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">series</span><span class="p">).</span><span class="nf">save_as</span><span class="p">(</span><span class="s2">"pr-subscribers.pdf"</span><span class="p">)</span>
@@ -118,7 +118,7 @@
 
 <p>These downsides are why I introduced the <code class="highlighter-rouge">Report</code> object in the first place, and they make the case for using an object that exists simply to aggregate some results based on the data contained in another object. If I wanted to make the integration of this results object a bit tighter and simplify the client code, I could have introduced a <code class="highlighter-rouge">DataSeries#report</code> method such as the one shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SubscriptionCounter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SubscriptionCounter</span>
   <span class="k">class</span> <span class="nc">DataSeries</span>
     <span class="k">def</span> <span class="nf">report</span>
       <span class="no">Report</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
@@ -130,7 +130,7 @@
 
 <p>With this method added, I could either have the <code class="highlighter-rouge">Report::PDF</code> accept an object that responds to <code class="highlighter-rouge">report</code>, or call the method explicitly in my client code. If I went with the former approach I could use the same client code as shown in the previous example, making the <code class="highlighter-rouge">Report</code> object completely transparent to the end user. However, the latter approach still looks a bit cleaner than what I had originally without introducing too much coupling into the system:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">campaigns</span> <span class="o">=</span> <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">Campaign</span><span class="p">.</span><span class="nf">all</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">campaigns</span> <span class="o">=</span> <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">Campaign</span><span class="p">.</span><span class="nf">all</span>
 <span class="n">series</span>    <span class="o">=</span> <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">DataSeries</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">campaigns</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
 <span class="no">SubscriptionCounter</span><span class="o">::</span><span class="no">Report</span><span class="o">::</span><span class="no">PDF</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">series</span><span class="p">.</span><span class="nf">report</span><span class="p">).</span><span class="nf">save_as</span><span class="p">(</span><span class="s2">"pr-subscribers.pdf"</span><span class="p">)</span>
@@ -143,14 +143,14 @@
 
 <p>One interesting aspect of introducing results objects into a system is that it helps facilitate lazy evaluation. Ruby’s own <code class="highlighter-rouge">Enumerator</code> object provides an excellent example of how powerful this combination can be. Laziness allows <code class="highlighter-rouge">Enumerator</code> objects to efficiently chain different transformations together. This makes it possible to do things like <code class="highlighter-rouge">map.with_index</code> without having to iterate over the collection multiple times or store an intermediate representation of the indexed data:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nf">map</span><span class="p">.</span><span class="nf">with_index</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="p">,</span><span class="n">i</span><span class="o">|</span> <span class="s2">"</span><span class="si">#{</span><span class="n">i</span><span class="si">}</span><span class="s2">. </span><span class="si">#{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nf">map</span><span class="p">.</span><span class="nf">with_index</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="p">,</span><span class="n">i</span><span class="o">|</span> <span class="s2">"</span><span class="si">#{</span><span class="n">i</span><span class="si">}</span><span class="s2">. </span><span class="si">#{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
 <span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"0. 1"</span><span class="p">,</span> <span class="s2">"1. 2"</span><span class="p">,</span> <span class="s2">"2. 3"</span><span class="p">,</span> <span class="s2">"3. 4"</span><span class="p">]</span>
 </code></pre>
 </div>
 
 <p>Lazy objects can also represent infinite or repeating sequences in a very elegant way. The examples below show some bits of functionality baked into <code class="highlighter-rouge">Enumerator</code> that make modeling these kinds of sequences a whole lot easier.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span>  <span class="n">players</span> <span class="o">=</span> <span class="p">[</span><span class="ss">:red</span><span class="p">,</span> <span class="ss">:black</span><span class="p">].</span><span class="nf">cycle</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span>  <span class="n">players</span> <span class="o">=</span> <span class="p">[</span><span class="ss">:red</span><span class="p">,</span> <span class="ss">:black</span><span class="p">].</span><span class="nf">cycle</span>
 <span class="o">=&gt;</span> <span class="c1">#&lt;Enumerator: [:red, :black]:cycle&gt;</span>
 <span class="o">&gt;&gt;</span> <span class="n">players</span><span class="p">.</span><span class="nf">next</span>
 <span class="o">=&gt;</span> <span class="ss">:red</span>
@@ -181,7 +181,7 @@
 
 <p>To implement the map generation code, I put together a simple <code class="highlighter-rouge">Location</code> object which is essentially an infinite two dimensional doubly linked list. Notice how the class definition below makes extensive use of the common <code class="highlighter-rouge">||=</code> idiom to handle the lazy evaluation and caching.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Location</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Location</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">[]</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
     <span class="vi">@locations</span>        <span class="o">||=</span> <span class="p">{}</span>
     <span class="vi">@locations</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]]</span> <span class="o">||=</span> <span class="kp">new</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
@@ -224,7 +224,7 @@
 
 <p>While this technique works fine and is the traditional way to achieve lazy evaluation in Ruby, it feels a bit primitive. Ruby does not provide a general purpose construct for lazy evaluation, but if it did, it would allow us to write code similar to what you see below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Location</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Location</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">[]</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
     <span class="vi">@locations</span>        <span class="o">||=</span> <span class="p">{}</span>
     <span class="vi">@locations</span><span class="p">[[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]]</span> <span class="o">||=</span> <span class="kp">new</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
@@ -256,7 +256,7 @@
 
 <p>Such an object can be implemented as a simple proxy which delays the execution of a callback until the results are actually needed. The following code illustrates one way to do that:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">LazyObject</span> <span class="o">&lt;</span> <span class="no">BasicObject</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">LazyObject</span> <span class="o">&lt;</span> <span class="no">BasicObject</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">callback</span><span class="p">)</span>
     <span class="vi">@callback</span> <span class="o">=</span> <span class="n">callback</span>
   <span class="k">end</span>
@@ -274,7 +274,7 @@
 
 <p>Another option would be to use <a href="http://moonbase.rydia.net/software/lazy.rb/">lazy.rb</a>, which provides similar functionality via <code class="highlighter-rouge">Lazy::Promise</code> objects that get instantiated via the <code class="highlighter-rouge">Lazy.promise</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"lazy"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"lazy"</span>
 
 <span class="k">class</span> <span class="nc">Location</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">[]</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
@@ -310,7 +310,7 @@
 
 <p>In the original example that explictly defines the <code class="highlighter-rouge">north</code>, <code class="highlighter-rouge">south</code>, <code class="highlighter-rouge">east</code>, and <code class="highlighter-rouge">west</code> methods, the first time the <code class="highlighter-rouge">neighbors</code> method is called, four <code class="highlighter-rouge">Location</code> objects are created. This means that the following line of code will generate all four neighboring <code class="highlighter-rouge">Location</code> objects even if not all of them are needed to answer the question it asks:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">green_neighbor</span> <span class="o">=</span> <span class="n">location</span><span class="p">.</span><span class="nf">neighbors</span><span class="p">.</span><span class="nf">find</span> <span class="p">{</span> <span class="o">|</span><span class="n">loc</span><span class="o">|</span> <span class="n">loc</span><span class="p">.</span><span class="nf">color</span> <span class="o">==</span> <span class="ss">:green</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">green_neighbor</span> <span class="o">=</span> <span class="n">location</span><span class="p">.</span><span class="nf">neighbors</span><span class="p">.</span><span class="nf">find</span> <span class="p">{</span> <span class="o">|</span><span class="n">loc</span><span class="o">|</span> <span class="n">loc</span><span class="p">.</span><span class="nf">color</span> <span class="o">==</span> <span class="ss">:green</span> <span class="p">}</span>
 </code></pre>
 </div>
 
@@ -322,7 +322,7 @@
 
 <p>A future object is essentially an object which immediately begins doing some processing in the background but only blocks if the results are demanded before the thread has finished executing. The example below demonstrates how this sort of object can come in handy for building a simple non-blocking download manager:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"open-uri"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"open-uri"</span>
 <span class="nb">require</span> <span class="s2">"lazy"</span>
 
 <span class="k">class</span> <span class="nc">DownloadManager</span>
@@ -358,7 +358,7 @@
 
 <p>In this particular example the callback doesn’t return a meaningful value, and so the <code class="highlighter-rouge">DownloadManager#finish_all_downloads</code> method makes use of <code class="highlighter-rouge">Lazy.demand</code> to force each future to wrap up its computations. However, the following example demonstrates that the future objects that <em>lazy.rb</em> provides can also be used as transparent proxy objects:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"open-uri"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"open-uri"</span>
 <span class="nb">require</span> <span class="s2">"lazy"</span>
 
 <span class="k">class</span> <span class="nc">Download</span>

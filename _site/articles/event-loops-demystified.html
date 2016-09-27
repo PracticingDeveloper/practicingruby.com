@@ -10,8 +10,8 @@
   <meta name="description" content="This issue of Practicing Ruby was contributed by Magnus Holm (@judofyr), a Ruby programmer  from Norway. Magnus works on various open source projects (includ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/event-loops-demystified">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/event-loops-demystified">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -68,7 +68,7 @@ and writes articles over at <a href="http://timelessrepo.com">the timeless repos
 
 <p>Working with network I/O in Ruby is so easy:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'socket'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'socket'</span>
 
 <span class="c1"># Start a server on port 9234</span>
 <span class="n">server</span> <span class="o">=</span> <span class="no">TCPServer</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s1">'0.0.0.0'</span><span class="p">,</span> <span class="mi">9234</span><span class="p">)</span>
@@ -115,7 +115,7 @@ how to build the infrastructure that supports it.</p>
 following example shows a trivial <code class="highlighter-rouge">ChatServer</code> object that uses
 the <code class="highlighter-rouge">IOLoop</code> that we’ll discuss in this article:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ChatServer</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ChatServer</span>
   <span class="k">def</span> <span class="nf">initialize</span>
     <span class="vi">@clients</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="vi">@client_id</span> <span class="o">=</span> <span class="mi">0</span>
@@ -195,7 +195,7 @@ understand <a href="https://gist.githubusercontent.com/practicingruby/3612925/ra
 
 <p>First of all we need, obviously, events! With no further ado:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">EventEmitter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">EventEmitter</span>
   <span class="k">def</span> <span class="nf">_callbacks</span>
     <span class="vi">@_callbacks</span> <span class="o">||=</span> <span class="no">Hash</span><span class="p">.</span><span class="nf">new</span> <span class="p">{</span> <span class="o">|</span><span class="n">h</span><span class="p">,</span> <span class="n">k</span><span class="o">|</span> <span class="n">h</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span> <span class="p">}</span>
   <span class="k">end</span>
@@ -244,7 +244,7 @@ the following code, the general flow of an event loop is simple:
 detect new events, run their associated callbacks, and then repeat
 the whole process again.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">IOLoop</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">IOLoop</span>
   <span class="c1"># List of streams that this IO loop will handle.</span>
   <span class="kp">attr_reader</span> <span class="ss">:streams</span>
 
@@ -309,7 +309,7 @@ the whole process again.</p>
 Everything after <code class="highlighter-rouge">IOLoop#start</code> will happen in callbacks, which means that the
 control flow can be surprising. For example, consider the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">l</span> <span class="o">=</span> <span class="no">IOLoop</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">l</span> <span class="o">=</span> <span class="no">IOLoop</span><span class="p">.</span><span class="nf">new</span>
 
 <span class="n">ruby</span> <span class="o">=</span> <span class="n">i</span><span class="p">.</span><span class="nf">connect</span><span class="p">(</span><span class="s1">'ruby-lang.org'</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>  <span class="c1"># 1</span>
 <span class="n">ruby</span> <span class="o">&lt;&lt;</span> <span class="s2">"GET / HTTP/1.0</span><span class="se">\r\n\r\n</span><span class="s2">"</span>       <span class="c1"># 2</span>
@@ -406,7 +406,7 @@ a bit of effort.</p>
 
 <p>There are various ways to read from an <code class="highlighter-rouge">IO</code> object in Ruby:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">read</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">read</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">readpartial</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">read_nonblock</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
@@ -435,7 +435,7 @@ raises <code class="highlighter-rouge">IO::WaitReadable</code> if the <code clas
 
 <p>For writing, there are two methods:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">length</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">length</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
 <span class="n">length</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nf">write_nonblock</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -479,7 +479,7 @@ nil if the optional timeout (in seconds) was supplied and has elapsed.
 
 <p>With this knowledge, we can write a much better <code class="highlighter-rouge">#tick</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">IOLoop</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">IOLoop</span>
   <span class="k">def</span> <span class="nf">tick</span>
     <span class="n">r</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="no">IO</span><span class="p">.</span><span class="nf">select</span><span class="p">(</span><span class="vi">@streams</span><span class="p">,</span> <span class="vi">@streams</span><span class="p">)</span>
     <span class="n">r</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">stream</span><span class="o">|</span>
@@ -503,7 +503,7 @@ the actual data processing work.</p>
 <p>Now that we’ve used the <code class="highlighter-rouge">Stream</code> object in various examples, you may 
 already have an idea of what its responsibilities are. But let’s first take a look at how it is implemented:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Stream</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Stream</span>
   <span class="c1"># We want to bind/emit events.</span>
   <span class="kp">include</span> <span class="no">EventEmitter</span>
 
@@ -552,7 +552,7 @@ discussed throughout this article. The <code class="highlighter-rouge">Server</c
 in <code class="highlighter-rouge">IOLoop#listen</code> is implemented in a similar fashion but is focused
 on accepting incoming connections instead:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Server</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Server</span>
   <span class="kp">include</span> <span class="no">EventEmitter</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>

@@ -10,8 +10,8 @@
   <meta name="description" content="Back in 1997, James Noble published a paper called Arguments and Results which outlined several useful patterns for designing better object protocols. Despit...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/arguments-and-results-1">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/arguments-and-results-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -73,7 +73,7 @@
 
 <p>I’ve decided to follow in James’s footsteps here and use a trivial <a href="http://www.w3.org/TR/SVG/">SVG</a> generator as the common theme for the examples in this article. The following code illustrates the interface that I started with before applying any special patterns:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># image dimensions are provided to `Drawing` in cm, </span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># image dimensions are provided to `Drawing` in cm, </span>
 <span class="c1"># all other measurements are done in units of 0.01 cm</span>
 
 <span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
@@ -94,7 +94,7 @@
 
 <p>As the number of arguments to a method increase, the amount of code within the method to handle those arguments tends to increase as well. This is because complex protocols typically require  arguments to be validated and transformed before they can be operated on. By introducing new objects to wrap related sets of arguments, it is possible to keep your argument processing logic somewhat separated from your business logic. The following code demonstrates how to use this concept to simplify the interface of the <code class="highlighter-rouge">Drawing#line</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
 
 <span class="n">line1</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Shape</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
 <span class="n">line2</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Shape</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
@@ -111,7 +111,7 @@
 
 <p>This approach takes a single complex method call on a single object and replaces it with several less complex method calls distributed across several objects. In the early stages of development, applying this pattern feels ugly because it involves writing a lot more code for both the library developer and application developer. However, as the complexity of the argument processing increases, the benefits of this approach begin to shine. The following example demonstrates how the newly introduced arguments objects raise the <code class="highlighter-rouge">Drawing#line</code> code up to a higher level of abstraction.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">line</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">line</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
   <span class="k">unless</span> <span class="n">data</span><span class="p">.</span><span class="nf">bounded_by?</span><span class="p">(</span><span class="vi">@viewbox_width</span><span class="p">,</span> <span class="vi">@viewbox_height</span><span class="p">)</span>
     <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">"shape is not within view box"</span>
   <span class="k">end</span>
@@ -125,7 +125,7 @@
 
 <p>The cost of making <code class="highlighter-rouge">Drawing#line</code> so concise is a big chunk of boilerplate code that on the surface feels a bit overkill at this stage in the game. However, it does not take a very wild imagination to see how these new objects set the stage for future extensions:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Point</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Point</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="vi">@x</span><span class="p">,</span> <span class="vi">@y</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
   <span class="k">end</span>
@@ -171,7 +171,7 @@ the color and thickness of the lines drawn to form a shape are universal propert
 
 <p>Sometimes we end up with objects that have many methods that take similar arguments. While these methods may actually do different things, the only difference in the object protocol is the name of the message being sent. After adding a method for rendering polygons to my <code class="highlighter-rouge">Drawing</code> object, I ended up in exactly this situation. The following example shows just how similar the <code class="highlighter-rouge">Drawing#line</code> interface is to the newly created <code class="highlighter-rouge">Drawing#polygon</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
 
 <span class="n">line1</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Shape</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
 <span class="n">line2</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Shape</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
@@ -192,7 +192,7 @@ the color and thickness of the lines drawn to form a shape are universal propert
 
 <p>Taking a look at the implementation of both methods, it is easy to see that there are deep similarities in structure between the two:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
   <span class="c1"># NOTE: other code omitted, not important...</span>
 
   <span class="k">def</span> <span class="nf">line</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
@@ -225,7 +225,7 @@ the color and thickness of the lines drawn to form a shape are universal propert
 
 <p>To simplify and clean up the previous example, I introduced <code class="highlighter-rouge">Line</code> and <code class="highlighter-rouge">Polygon</code> which inherit from <code class="highlighter-rouge">Shape</code>. I then combined the <code class="highlighter-rouge">Drawing#line</code> method and <code class="highlighter-rouge">Drawing#polygon</code> method into a single method called <code class="highlighter-rouge">Drawing#draw</code>. The following example demonstrates what the API ended up looking like as a result of this change:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
 
 <span class="n">line1</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Line</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
 <span class="n">line2</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Line</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
@@ -246,7 +246,7 @@ the color and thickness of the lines drawn to form a shape are universal propert
 
 <p>In order to implement this new interface, some non-trivial changes needed to be made under the hood. You can check out the <a href="https://github.com/elm-city-craftworks/pr-arguments-and-results/commit/47924901552d0509f97a3083737709980139feba">exact commit</a> to see the details about what changed implementation-wise between this example and the last one, but most of the changes were just boring housekeeping. The general idea is that the <code class="highlighter-rouge">Drawing#draw</code> method now simply asks each shape object to represent itself as a hash which ultimately ends up getting converted into an XML tag within the SVG document. As an example, here is what the definition for the <code class="highlighter-rouge">Line</code> object looks like:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
   <span class="k">class</span> <span class="nc">Line</span> <span class="o">&lt;</span> <span class="no">Shape</span>
     <span class="k">def</span> <span class="nf">to_hash</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
       <span class="p">{</span> <span class="ss">:tag_name</span> <span class="o">=&gt;</span> <span class="ss">:line</span><span class="p">,</span>
@@ -269,7 +269,7 @@ the color and thickness of the lines drawn to form a shape are universal propert
 
 <p>James recommends creating a curried object to deal with this sort of problem. The curried object acts as a lightweight proxy over the original object, but keeps the constant data stored in variables so that you do not need to keep repeating it. The following code applies this concept to clean up our previous example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">line1</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Line</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">line1</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Line</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
 <span class="n">line2</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Line</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
 
 <span class="n">triangle</span> <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Polygon</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">350</span><span class="p">,</span> <span class="mi">150</span><span class="p">],</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="p">[</span><span class="mi">150</span><span class="p">,</span><span class="mi">150</span><span class="p">])</span>
@@ -288,7 +288,7 @@ the color and thickness of the lines drawn to form a shape are universal propert
 
 <p>While introducing the new <code class="highlighter-rouge">Pen</code> object requires a change in the calling code so that <code class="highlighter-rouge">Pen#draw</code> gets called instead of <code class="highlighter-rouge">Drawing#draw</code>, no change to the implementation of <code class="highlighter-rouge">Drawing</code> was needed to introduce this new object. The following class definition will do the trick:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
   <span class="k">class</span> <span class="nc">Pen</span>
     <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">drawing</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
       <span class="vi">@drawing</span><span class="p">,</span> <span class="vi">@style</span> <span class="o">=</span> <span class="n">drawing</span><span class="p">,</span> <span class="n">style</span>
@@ -310,7 +310,7 @@ the color and thickness of the lines drawn to form a shape are universal propert
 
 <p>An interesting thing to note is that curried objects are not necessarily limited to arguments that remain constant. This pattern can also be applied in situations where method calls made in sequence have a clear pattern in the way that one or more arguments are varied. The example James gives in his paper describes some logic for a text editor in which lines of text are rendered to the screen with all the same style attributes from line to line, but with the line number incremented as each new line is rendered. Taking inspiration from that example, I decided to build a simple turtle graphics system to demonstrate how curried objects can be used for predictably varying arguments as well as constant arguments. The code below generates an image of an X when run:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="o">=</span> <span class="no">Drawing</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
 <span class="n">style</span>   <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Style</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:stroke_color</span> <span class="o">=&gt;</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="ss">:stroke_width</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">turtle</span>  <span class="o">=</span> <span class="no">Drawing</span><span class="o">::</span><span class="no">Turtle</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">drawing</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
 
@@ -331,7 +331,7 @@ the color and thickness of the lines drawn to form a shape are universal propert
 
 <p>The implementation code to make the previous example work was very easy to write and required no changes to the rest of the system:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Drawing</span>
   <span class="k">class</span> <span class="nc">Turtle</span>
     <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">drawing</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
       <span class="vi">@drawing</span>  <span class="o">=</span> <span class="n">drawing</span>
@@ -377,7 +377,7 @@ the color and thickness of the lines drawn to form a shape are universal propert
 
 <p>No matter what the complexity of the problem I was working on, it’s unlikely that I would make it so that the application developer needed to jump through so many hoops just to use my library. Instead, I would probably build a simple facade or DSL that made their life easier, even if a rich object structure was lurking under the hood. If I were really building an SVG generator, I might end up building a DSL for it that looked something like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">drawing</span> <span class="k">do</span>
   <span class="n">style</span> <span class="ss">:stroke_color</span> <span class="o">=&gt;</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="ss">:stroke_width</span> <span class="o">=&gt;</span> <span class="mi">2</span> <span class="k">do</span>
     <span class="n">line</span>    <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">]</span>
     <span class="n">line</span>    <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">]</span>

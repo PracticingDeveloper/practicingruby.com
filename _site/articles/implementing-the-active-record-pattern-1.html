@@ -10,8 +10,8 @@
   <meta name="description" content="  (ORM) is one of the most complex things you could ever touch, and we choose itover and over again without thinking at all because everybody is doing it. It...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/implementing-the-active-record-pattern-1">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/implementing-the-active-record-pattern-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -144,7 +144,7 @@ an example of how Active Record objects are actually used. The following code
 is a good place to start, because it illustrates some of the most basic 
 features you can expect from an Active Record object.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1">## Create an article with a few positive comments.</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1">## Create an article with a few positive comments.</span>
 
 <span class="n">article1</span> <span class="o">=</span> <span class="no">Article</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:title</span> <span class="o">=&gt;</span> <span class="s2">"A great article"</span><span class="p">,</span>
                           <span class="ss">:body</span>  <span class="o">=&gt;</span> <span class="s2">"Short but sweet!"</span><span class="p">)</span>
@@ -198,7 +198,7 @@ code sample. To gain a better sense of what is happening under
 the hood, take a look at how the <code class="highlighter-rouge">Article</code> and <code class="highlighter-rouge">Comment</code> objects
 are defined:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
   <span class="kp">include</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">Mapping</span>
   
   <span class="n">map_to_table</span> <span class="ss">:articles</span>
@@ -225,7 +225,7 @@ explicit. If you take a look at how the <code class="highlighter-rouge">articles
 tables are defined, it should be straightforward to understand how 
 this all comes together:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code> <span class="k">create</span> <span class="k">table</span> <span class="n">articles</span> <span class="p">(</span> 
+<div class="language-sql highlighter-rouge"><pre class="highlight"><code> <span class="k">create</span> <span class="k">table</span> <span class="n">articles</span> <span class="p">(</span> 
    <span class="n">id</span>     <span class="n">INTEGER</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
    <span class="n">title</span>  <span class="n">TEXT</span><span class="p">,</span>
    <span class="n">body</span>   <span class="n">TEXT</span><span class="p">,</span>
@@ -282,7 +282,7 @@ solve the same problem that was shown earlier. As you read through it, try to
 imagine how the <code class="highlighter-rouge">BrokenRecord::Mapping</code> module might be implemented using this
 object as a foundation.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1">## create a couple table objects</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1">## create a couple table objects</span>
 
 <span class="n">articles</span> <span class="o">=</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">Table</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"articles"</span><span class="p">,</span>
                                    <span class="ss">:db</span>   <span class="o">=&gt;</span> <span class="no">BrokenRecord</span><span class="p">.</span><span class="nf">database</span><span class="p">)</span>
@@ -363,7 +363,7 @@ accessors can be used to retrieve and manipulate its data. As a
 result, basic operations on Active Record objects end up looking like 
 plain old Ruby code, such as in the following example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Article</span><span class="p">.</span><span class="nf">all</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">article</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Article</span><span class="p">.</span><span class="nf">all</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">article</span><span class="o">|</span>
   <span class="nb">puts</span> <span class="sx">%{
     TITLE: #{article.title}
     BODY: #{article.body}
@@ -378,7 +378,7 @@ is that they need to be dynamically generated. To refresh your memory, take a
 second look at the class definition for <code class="highlighter-rouge">Article</code>, and note that it contains
 no explicit definitions for the <code class="highlighter-rouge">Article#title</code> and <code class="highlighter-rouge">Article#body</code> methods.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
   <span class="kp">include</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">Mapping</span>
   
   <span class="n">map_to_table</span> <span class="ss">:articles</span>
@@ -394,7 +394,7 @@ table, and the columns in that table determine what accessors need to
 be defined. Through a low-level call to <code class="highlighter-rouge">BrokenRecord::Table</code>, it 
 is possible to get back an array of column names, as shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="n">table</span><span class="p">.</span><span class="nf">columns</span><span class="p">.</span><span class="nf">keys</span> <span class="c1">#=&gt; [:id, :title, :body]</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="n">table</span><span class="p">.</span><span class="nf">columns</span><span class="p">.</span><span class="nf">keys</span> <span class="c1">#=&gt; [:id, :title, :body]</span>
 </code></pre>
 </div>
 
@@ -403,7 +403,7 @@ delegate to some sort of value object, Ruby’s built in <code class="highlighte
 come to mind as a way to solve this problem. After all, it does make 
 dynamically generating a value object with accessors quite easy:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="n">article_container</span> <span class="o">=</span> <span class="no">Struct</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:id</span><span class="p">,</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="n">article_container</span> <span class="o">=</span> <span class="no">Struct</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:id</span><span class="p">,</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span><span class="p">)</span>
 
   <span class="n">article</span> <span class="o">=</span> <span class="n">article_container</span><span class="p">.</span><span class="nf">new</span>
   <span class="n">article</span><span class="p">.</span><span class="nf">title</span> <span class="o">=</span> <span class="s2">"A fancy article"</span>
@@ -419,7 +419,7 @@ the lesser known features of <code class="highlighter-rouge">Struct</code> objec
 addition to accessors, using a <code class="highlighter-rouge">Struct</code> also gives you all of the 
 following functionality:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="c1"># array-like indexing</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="c1"># array-like indexing</span>
   <span class="n">article</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#=&gt; "A fancy article"</span>
 
   <span class="c1"># hash-like indexing with both symbols and strings</span>
@@ -445,7 +445,7 @@ object with dynamic accessors would be a much better fit. The
 <code class="highlighter-rouge">BrokenRecord::FieldSet</code> class implements such an object while 
 maintaining a minimal API:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">BrokenRecord</span>
   <span class="k">class</span> <span class="nc">FieldSet</span>
     <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
       <span class="nb">self</span><span class="p">.</span><span class="nf">data</span> <span class="o">=</span> <span class="p">{}</span>
@@ -485,7 +485,7 @@ maintaining a minimal API:</p>
  <code class="highlighter-rouge">BrokenRecord::FieldSet</code> makes it just as easy to create 
  a dynamic value object as <code class="highlighter-rouge">Struct</code> does:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">article</span> <span class="o">=</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">FieldSet</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:attributes</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:id</span><span class="p">,</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span><span class="p">])</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">article</span> <span class="o">=</span> <span class="no">BrokenRecord</span><span class="o">::</span><span class="no">FieldSet</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:attributes</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:id</span><span class="p">,</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:body</span><span class="p">])</span>
 <span class="n">article</span><span class="p">.</span><span class="nf">title</span> <span class="o">=</span> <span class="s2">"A fancy article"</span>
 <span class="n">article</span><span class="p">.</span><span class="nf">body</span>  <span class="o">=</span> <span class="s2">"This is so full of class, its silly"</span>
 
@@ -507,7 +507,7 @@ to set  the values of the <code class="highlighter-rouge">FieldSet</code> object
 convert a <code class="highlighter-rouge">FieldSet</code> back into a hash. The following example demonstrates 
 that both of those requirements are handled gracefully:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">article_data</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:id</span>    <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">article_data</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:id</span>    <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
                  <span class="ss">:title</span> <span class="o">=&gt;</span> <span class="s2">"A fancy article"</span><span class="p">,</span>
                  <span class="ss">:body</span>  <span class="o">=&gt;</span> <span class="s2">"This is so full of class, it's silly"</span> <span class="p">}</span>
 

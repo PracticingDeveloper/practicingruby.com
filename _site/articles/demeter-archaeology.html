@@ -10,8 +10,8 @@
   <meta name="description" content="This article was contributed by David A. Black, Lead Developer at Cyrus Innovation. David is a long-time Ruby developer, author, trainer, speaker, and commun...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/demeter-archaeology">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/demeter-archaeology">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -79,8 +79,10 @@ of Demeter at its source, is considering the ways in which they differ.</p>
 
 <p>Both papers posit that there are different versions of the Law of Demeter. But
 the taxonomies they construct for the law differ considerably from each other.
-A lot of further thought and work, evidently, went into the law between 1988 and
-1989.</p>
+A lot of further thought and work, evidently, went into the law between 1988 and</p>
+<ol>
+  <li></li>
+</ol>
 
 <p>I’m going to put the two taxonomies, and the differences between them, under a
 microscope – at least, a medium-powered microscope. I won’t recapitulate
@@ -127,7 +129,7 @@ adherence to the law nonetheless runs contrary to its intended effect. Consider
 a case where there’s a kind of circular structure to the instance variable types
 of a set of classes. The following example is adapted from the article, and while Ruby doesn’t enforce instance variable classes, the code illustrates the basic difficulty the authors identify:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="k">class</span> <span class="nc">A</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">class</span> <span class="nc">A</span>
     <span class="k">def</span> <span class="nf">initialize</span>
       <span class="vi">@b</span><span class="p">,</span> <span class="vi">@c</span><span class="p">,</span> <span class="vi">@d</span><span class="p">,</span> <span class="vi">@e</span> <span class="o">=</span> <span class="no">B</span><span class="p">.</span><span class="nf">new</span><span class="p">,</span> <span class="no">C</span><span class="p">.</span><span class="nf">new</span><span class="p">,</span> <span class="no">D</span><span class="p">.</span><span class="nf">new</span><span class="p">,</span> <span class="no">E</span><span class="p">.</span><span class="nf">new</span>
     <span class="k">end</span>
@@ -351,7 +353,7 @@ example that I find suggestive, and I’ll leave it at that. See what you think.
 <em>lifting</em>. To illustrate lifting, here’s an example of an acquaintance class,
 and a Demeter violation:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="k">class</span> <span class="nc">Plane</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">class</span> <span class="nc">Plane</span>
     <span class="kp">attr_accessor</span> <span class="ss">:name</span>
   <span class="k">end</span>
 
@@ -375,7 +377,7 @@ outside of the Law of Demeter.</p>
 <p>You can fix this Demeter violation by “lifting” the method that provides the
 information into the external class:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="k">class</span> <span class="nc">Plane</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">class</span> <span class="nc">Plane</span>
     <span class="kp">attr_accessor</span> <span class="ss">:name</span>
   <span class="k">end</span>
 
@@ -423,7 +425,7 @@ appearing to share, instance variables.</p>
 
 <p>Consider a view snippet like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="cp">&lt;%</span> <span class="vi">@user</span><span class="p">.</span><span class="nf">friends</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">friend</span><span class="o">|</span> <span class="cp">%&gt;</span>
+<div class="language-erb highlighter-rouge"><pre class="highlight"><code>  <span class="cp">&lt;%</span> <span class="vi">@user</span><span class="p">.</span><span class="nf">friends</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">friend</span><span class="o">|</span> <span class="cp">%&gt;</span>
     <span class="cp">&lt;%</span> <span class="n">friend</span><span class="p">.</span><span class="nf">items</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">iitem</span><span class="o">|</span> <span class="cp">%&gt;</span>
       <span class="cp">&lt;%=</span> <span class="n">friend</span><span class="p">.</span><span class="nf">name</span> <span class="cp">%&gt;</span> has a(n) <span class="cp">&lt;%=</span> <span class="n">item</span><span class="p">.</span><span class="nf">description</span> <span class="cp">%&gt;</span>
     <span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span>
@@ -444,7 +446,7 @@ strongly of Demeter-ish situations. And I would propose a Demeter-ish solution,
 based on the lifting technique: “lift” one of the method calls back into the
 controller. Here’s a simple version:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">show</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">show</span>
     <span class="vi">@user</span> <span class="o">=</span> <span class="n">current_user</span>
     <span class="vi">@friends</span> <span class="o">=</span> <span class="vi">@user</span><span class="p">.</span><span class="nf">friends</span>
   <span class="k">end</span>
@@ -453,7 +455,7 @@ controller. Here’s a simple version:</p>
 
 <p>And then in the view:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="cp">&lt;%</span> <span class="vi">@friends</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">friend</span><span class="o">|</span> <span class="cp">%&gt;</span>
+<div class="language-erb highlighter-rouge"><pre class="highlight"><code>  <span class="cp">&lt;%</span> <span class="vi">@friends</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">friend</span><span class="o">|</span> <span class="cp">%&gt;</span>
     <span class="cp">&lt;%</span> <span class="n">friend</span><span class="p">.</span><span class="nf">items</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">item</span><span class="o">|</span> <span class="cp">%&gt;</span>
       <span class="cp">&lt;%=</span> <span class="n">friend</span><span class="p">.</span><span class="nf">name</span> <span class="cp">%&gt;</span> has a(n) <span class="cp">&lt;%=</span> <span class="n">item</span><span class="p">.</span><span class="nf">description</span> <span class="cp">%&gt;</span>
     <span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span>

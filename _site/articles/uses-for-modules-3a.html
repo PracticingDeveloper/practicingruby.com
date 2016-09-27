@@ -10,8 +10,8 @@
   <meta name="description" content="  Note: This article series on modules is also available as a PDF download. ThePDF version has been revised and is more up-to-date than what you see here.In ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/uses-for-modules-3a">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/uses-for-modules-3a">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -72,7 +72,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>Occasionally folks ask whether mixing a module into itself via <code class="highlighter-rouge">extend()</code> is equivalent to the code shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">hello</span>
     <span class="s2">"hi"</span>
   <span class="k">end</span>
@@ -82,7 +82,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>The short answer to that question is “no”, but it is easy to see where the confusion comes from, because calling <code class="highlighter-rouge">Greeter.hello</code> does indeed work as expected. But the important distinction is that methods defined in this way are simply directly defined on the module itself and so cannot be mixed into anything at all. There is really very little difference between the above code and the example below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
 
 <span class="k">def</span> <span class="nc">obj</span><span class="o">.</span><span class="nf">hello</span>
   <span class="s2">"hi"</span>
@@ -92,7 +92,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>Consider our earlier example of Ruby’s <code class="highlighter-rouge">Math</code> or <code class="highlighter-rouge">FileUtils</code> modules. With both of these modules, you can envision scenarios in which you would call the functions on the modules themselves. But there are also cases where using these modules as mixins would make a lot of sense. For example, Ruby itself ships with a math mode (-m) for irb which mixes in the <code class="highlighter-rouge">Math</code> module at the top level so you can call its functions directly.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">irb</span> <span class="o">-</span><span class="n">m</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">irb</span> <span class="o">-</span><span class="n">m</span>
 <span class="o">&gt;&gt;</span> <span class="n">sin</span><span class="p">(</span><span class="no">Math</span><span class="o">::</span><span class="no">PI</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="mi">1</span><span class="o">.</span><span class="mi">0</span>
 </code></pre>
@@ -108,7 +108,7 @@ modules rather than using the <code class="highlighter-rouge">extend self</code>
 
 <p>Before people got in the habit of mixing modules into themselves, they often relied on a more specialized feature called <code class="highlighter-rouge">module_function</code> to accomplish the same goals.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
   <span class="kp">module_function</span>
 
   <span class="k">def</span> <span class="nf">hello</span>
@@ -123,7 +123,7 @@ modules rather than using the <code class="highlighter-rouge">extend self</code>
 also allows you to choose certain methods to be module functions while 
 leaving others accessible via mixin only:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
   <span class="k">def</span> <span class="nf">hello</span>
     <span class="s2">"hi"</span>
   <span class="k">end</span>
@@ -141,7 +141,7 @@ leaving others accessible via mixin only:</p>
 
 <p>As it turns out, <code class="highlighter-rouge">module_function</code> works very different under the hood than self-mixins do. This is because <code class="highlighter-rouge">module_function</code> actually doesn’t manipulate the method lookup path, but instead, it makes a direct copy of the specified methods and attaches them to the module itself. If that sounds too weird to be true, check out the code below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Greeter</span>
   <span class="k">def</span> <span class="nf">hello</span>
     <span class="s2">"hi"</span>
   <span class="k">end</span>
@@ -165,7 +165,7 @@ leaving others accessible via mixin only:</p>
 
 <p>Pretty weird behavior, right? You may find it interesting to know that I was not actually aware that <code class="highlighter-rouge">module_function</code> made copies of methods until I wrote Issue #10 and was tipped off about this by one of our readers. However, I did know about one of the consequences of <code class="highlighter-rouge">module_function</code> being implemented in this way: private methods cannot be used in conjunction with <code class="highlighter-rouge">module_function</code>. That means that the following example cannot be literally translated to use <code class="highlighter-rouge">module_function</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MinimalAnswer</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MinimalAnswer</span>
   <span class="kp">extend</span> <span class="nb">self</span>
 
   <span class="k">def</span> <span class="nf">match?</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">input</span><span class="p">)</span>

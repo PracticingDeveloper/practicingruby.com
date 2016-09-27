@@ -10,8 +10,8 @@
   <meta name="description" content="  This issue was a collaboration with my wife, Jia Wu. Jia is an associatescientist at the Yale Child Study Center, where she spends a good portion ofher tim...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/intro-to-basic-statistical-methods">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/intro-to-basic-statistical-methods">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -249,7 +249,7 @@ to get what I needed from R. In fact, the complete implementation of my
 <code class="highlighter-rouge">Olympics::Analysis</code> singleton object ended up being just a couple paragraphs
 of code, as shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Olympics</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Olympics</span>
   <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="no">Analysis</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span><span class="p">)</span>
     <span class="kp">attr_accessor</span> <span class="ss">:r</span>
 
@@ -305,7 +305,7 @@ of miscellaneous data munging, using the CSV standard library to read data in as
 a table, and access it by column. For example, I’m able to get all of the
 country names by executing the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">table</span> <span class="o">=</span> <span class="no">CSV</span><span class="p">.</span><span class="nf">table</span><span class="p">(</span><span class="s2">"data/1996_combined.csv"</span><span class="p">,</span> <span class="ss">:headers</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">table</span> <span class="o">=</span> <span class="no">CSV</span><span class="p">.</span><span class="nf">table</span><span class="p">(</span><span class="s2">"data/1996_combined.csv"</span><span class="p">,</span> <span class="ss">:headers</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">table</span><span class="p">[</span><span class="ss">:noc</span><span class="p">]</span>
 <span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"Afghanistan"</span><span class="p">,</span> <span class="s2">"Albania"</span><span class="p">,</span> <span class="p">.</span><span class="nf">.</span><span class="p">.</span><span class="nf">,</span> <span class="s2">"Zambia"</span><span class="p">,</span> <span class="s2">"Zimbabwe"</span><span class="p">]</span>
 </code></pre>
@@ -315,7 +315,7 @@ country names by executing the following code:</p>
 object even automatically converts numeric columns into their appropriate 
 Ruby objects by default:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">table</span><span class="p">[</span><span class="ss">:all_medals</span><span class="p">].</span><span class="nf">reduce</span><span class="p">(:</span><span class="o">+</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">table</span><span class="p">[</span><span class="ss">:all_medals</span><span class="p">].</span><span class="nf">reduce</span><span class="p">(:</span><span class="o">+</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="mi">837</span>
 </code></pre>
 </div>
@@ -326,7 +326,7 @@ article. However, it is worth pointing out that in order to make the data
 I got back from <code class="highlighter-rouge">Olympic::Analysis.correlation</code> display friendly, I needed to 
 do some extra transformations on it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Olympics</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Olympics</span>
   <span class="k">class</span> <span class="nc">Report</span>
     <span class="c1"># ...</span>
 

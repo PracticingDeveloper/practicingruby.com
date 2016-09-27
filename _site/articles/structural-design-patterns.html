@@ -10,8 +10,8 @@
   <meta name="description" content="In this two part series, I’ve been looking at the classical design patterns laid out by the Gang of Four and exploring their relevance to modern day Ruby pro...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/structural-design-patterns">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/structural-design-patterns">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -87,7 +87,7 @@
 configuring which backend is used. The following example shows how Marky might
 be used:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># using RDiscount as a backend</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># using RDiscount as a backend</span>
 <span class="no">Marky</span><span class="p">.</span><span class="nf">adapter</span> <span class="o">=</span> <span class="ss">:rdiscount</span>
 
 <span class="no">Marky</span><span class="p">.</span><span class="nf">to_html</span><span class="p">(</span><span class="s2">"hello world"</span><span class="p">)</span> <span class="c1">#=&gt; "&lt;p&gt;hello world&lt;/p&gt;</span>
@@ -101,7 +101,7 @@ be used:</p>
 
 <p>To make this work, it is necessary to map the name of an adapter to a class which wraps the underlying engine and implements a <code class="highlighter-rouge">to_html()</code> method. The code that actually wires up the adapter is shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Marky</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Marky</span>
   <span class="kp">extend</span> <span class="nb">self</span>
 
   <span class="k">def</span> <span class="nf">adapter</span>
@@ -129,7 +129,7 @@ be used:</p>
 
 <p>While this uses a tiny bit of dynamic Ruby magic to look up the right module name, when we see the actual adapters, it all comes together.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># adapters/bluecloth.rb</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># adapters/bluecloth.rb</span>
 
 <span class="nb">require</span> <span class="s2">"bluecloth"</span>
 
@@ -146,7 +146,7 @@ be used:</p>
 </code></pre>
 </div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># adapters/rdiscount.rb</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># adapters/rdiscount.rb</span>
 
 <span class="nb">require</span> <span class="s2">"rdiscount"</span>
 
@@ -177,7 +177,7 @@ one engine out for another when necessary.</p>
 
 <p>I had a hard time thinking through where this pattern has its place in Ruby, mainly because there is a built in separation of interface and implementation in Ruby via duck typing semantics. The best example I could come up with was to port the painfully complex C++ example that SourceMaking uses in their article to something that is a bit more natural looking in Ruby. Read it over, and think about what it might be gaining us as you go.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1">##Concrete Implementations</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1">##Concrete Implementations</span>
 
 <span class="k">class</span> <span class="nc">BasicTimeData</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">hour</span><span class="p">,</span> <span class="n">minutes</span><span class="p">)</span>
@@ -251,7 +251,7 @@ that method. However, if someone wanted to play with the internals, they could
 call <code class="highlighter-rouge">curve!()</code> instead and get themselves an object that implements a
 <code class="highlighter-rouge">to_pdf()</code> method, as in the following example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">chunk</span> <span class="o">=</span> <span class="n">canvas</span><span class="p">.</span><span class="nf">curve!</span><span class="p">(</span><span class="ss">:point1</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">chunk</span> <span class="o">=</span> <span class="n">canvas</span><span class="p">.</span><span class="nf">curve!</span><span class="p">(</span><span class="ss">:point1</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span>
                       <span class="ss">:point2</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span><span class="mi">50</span><span class="p">],</span> 
                       <span class="ss">:bound1</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span><span class="mi">90</span><span class="p">],</span>
                       <span class="ss">:bound2</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span><span class="mi">90</span><span class="p">])</span>
@@ -267,7 +267,7 @@ call <code class="highlighter-rouge">curve!()</code> instead and get themselves 
 
 <p>We can catch a glimpse of how this <code class="highlighter-rouge">to_pdf()</code> method is actually implemented via several composed primitive objects by taking a look at the source for the <code class="highlighter-rouge">curve!()</code> method.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">curve!</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">curve!</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
   <span class="n">chunk</span><span class="p">(</span><span class="ss">:curve</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
     <span class="p">[</span> <span class="n">move_to!</span><span class="p">(</span><span class="ss">:point</span> <span class="o">=&gt;</span> <span class="n">c</span><span class="p">[</span><span class="ss">:point1</span><span class="p">]),</span>
       <span class="n">curve_to!</span><span class="p">(</span><span class="ss">:point</span> <span class="o">=&gt;</span> <span class="n">c</span><span class="p">[</span><span class="ss">:point2</span><span class="p">],</span>
@@ -281,7 +281,7 @@ call <code class="highlighter-rouge">curve!()</code> instead and get themselves 
 
 <p>In the above, <code class="highlighter-rouge">chunk()</code> is a helper method which builds a <code class="highlighter-rouge">Prawn::Core::Chunk</code> object, which serves as the composite object in this system. We’ll look at how chunks are implemented in a bit, but note that the block given to the <code class="highlighter-rouge">chunk()</code> method defines what the individual chunk is composed of. In this case, a curve consists of two subchunks, one responsible for generating a move instruction, and one for rendering a curve from the current drawing location to another point. The definitions for both of those methods are shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">move_to!</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">move_to!</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
   <span class="n">chunk</span><span class="p">(</span><span class="ss">:move_to</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
     <span class="n">raw_chunk</span><span class="p">(</span><span class="s2">"%.3f %.3f m"</span> <span class="o">%</span> <span class="n">c</span><span class="p">[</span><span class="ss">:point</span><span class="p">])</span>
   <span class="k">end</span>
@@ -297,7 +297,7 @@ call <code class="highlighter-rouge">curve!()</code> instead and get themselves 
 
 <p>Similar to <code class="highlighter-rouge">chunk!()</code>, these methods can called directly, producing an object with a <code class="highlighter-rouge">to_pdf()</code> method, as shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">chunk</span> <span class="o">=</span> <span class="n">canvas</span><span class="p">.</span><span class="nf">move_to!</span><span class="p">(</span><span class="ss">:point</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">])</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">chunk</span> <span class="o">=</span> <span class="n">canvas</span><span class="p">.</span><span class="nf">move_to!</span><span class="p">(</span><span class="ss">:point</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">])</span>
 <span class="nb">puts</span> <span class="n">chunk</span><span class="p">.</span><span class="nf">to_pdf</span>
 
 <span class="n">chunk2</span> <span class="o">=</span> <span class="n">canvas</span><span class="p">.</span><span class="nf">curve_to!</span><span class="p">(</span><span class="ss">:point</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span><span class="mi">50</span><span class="p">],</span>
@@ -312,7 +312,7 @@ call <code class="highlighter-rouge">curve!()</code> instead and get themselves 
 
 <p>Through these two methods, we encounter the leaf nodes in our composition, <code class="highlighter-rouge">Prawn::Core::RawChunk</code> objects. These objects are where the actual text that is in our <code class="highlighter-rouge">to_pdf()</code> is stored. With that in mind, we can now look at the actual objects that this graphics system is built on.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Prawn</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Prawn</span>
   <span class="k">module</span> <span class="nn">Core</span>
     <span class="k">class</span> <span class="nc">RawChunk</span>
       <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
@@ -362,7 +362,7 @@ call <code class="highlighter-rouge">curve!()</code> instead and get themselves 
 
 <p>A <a href="http://en.wikipedia.org/wiki/Proxy_pattern">Proxy</a> is any object that acts as a drop-in replacement object that does a bit of work and then delegates to some other underlying object. This is another pattern that’s easy to recognize for Rails developers, because it is used extensively in ActiveRecord associations support. The following example shows a typical interaction between a base model and one of its associations.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">quiz</span> <span class="o">=</span> <span class="no">Quiz</span><span class="p">.</span><span class="nf">first</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">quiz</span> <span class="o">=</span> <span class="no">Quiz</span><span class="p">.</span><span class="nf">first</span>
 <span class="n">quiz</span><span class="p">.</span><span class="nf">questions</span><span class="p">.</span><span class="nf">class</span> <span class="c1">#=&gt; Array</span>
 
 <span class="n">quiz</span><span class="p">.</span><span class="nf">questions</span><span class="p">.</span><span class="nf">count</span> <span class="c1">#=&gt; 10</span>
@@ -378,7 +378,7 @@ call <code class="highlighter-rouge">curve!()</code> instead and get themselves 
 
 <p>While the questions association claims to be an array, it also provides some of the common helpers found in <code class="highlighter-rouge">ActiveRecord::Base</code>. If we stick to the core idea and ignore some of the Rails specific details, creating such an association proxy is fairly easy to do using Ruby’s delegate standard library. The code below more or less does the trick.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"delegate"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"delegate"</span>
 
 <span class="k">class</span> <span class="nc">Quiz</span>
   <span class="k">def</span> <span class="nf">questions</span>
@@ -437,7 +437,7 @@ call <code class="highlighter-rouge">curve!()</code> instead and get themselves 
 
 <p>Interestingly enough, while Ruby provides a standard library for building Proxy objects, most people tend to implement them in a different way, through the use of an explicit <code class="highlighter-rouge">method_missing()</code> hook on a blank slate object such as Ruby 1.9’s BasicObject. For example, we could have written our HasManyAssociation code in the manner shown below and things would still work as expected.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">HasManyAssociation</span> <span class="o">&lt;</span> <span class="no">BasicObject</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">HasManyAssociation</span> <span class="o">&lt;</span> <span class="no">BasicObject</span>
   <span class="kp">attr_accessor</span> <span class="ss">:associated_class</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
@@ -469,7 +469,7 @@ call <code class="highlighter-rouge">curve!()</code> instead and get themselves 
 
 <p>The <a href="http://en.wikipedia.org/wiki/Facade_pattern">Facade pattern</a> simplifies how users interact with a codebase by implementing an interface that hides many implementation details for the most common behaviors needed by consumers. Looking at it from the outside, a perfect example of this is the open-uri standard library. When using open-uri, it is possible to do a simple HTTP get request with just a single line of code, as shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"open-uri"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"open-uri"</span>
 
 <span class="nb">puts</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"http://www.google.com"</span><span class="p">).</span><span class="nf">read</span>
 </code></pre>
@@ -477,7 +477,7 @@ call <code class="highlighter-rouge">curve!()</code> instead and get themselves 
 
 <p>The purpose of open-uri is to make reading a resource via an HTTP GET request look and feel like opening an ordinary file. This is a very common use case, so open-uri makes it easy to work with. To see what this facade is hiding, we can write the equivalent code using the libraries it wraps, <code class="highlighter-rouge">Net::HTTP</code> and <code class="highlighter-rouge">URI</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'net/http'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'net/http'</span>
 <span class="nb">require</span> <span class="s1">'uri'</span>
 
 <span class="n">url</span> <span class="o">=</span> <span class="no">URI</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="s1">'http://www.google.com'</span><span class="p">)</span>
@@ -502,7 +502,7 @@ call <code class="highlighter-rouge">curve!()</code> instead and get themselves 
 
 <p>However, if we stub out the actual font metrics generation, it’s easy to see that this problem can be solved by wrapping a simple Ruby hash that has an initializer block.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FontMetrics</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FontMetrics</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
     <span class="vi">@string</span> <span class="o">=</span> <span class="n">string</span>

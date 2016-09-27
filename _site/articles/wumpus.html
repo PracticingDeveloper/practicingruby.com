@@ -10,8 +10,8 @@
   <meta name="description" content="Hunt the Wumpus is a hide-and-seek game that takes place in an undergroundcave network full of interconnected rooms. To win the game, the playerneeds to loca...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/wumpus">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/wumpus">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -249,7 +249,7 @@ to query and manipulate the hazards that can be found in a room –
 including bats, pits, and the wumpus itself. In particular, we will
 build an object with the following attributes and behaviors:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A room"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A room"</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"has a number"</span>
   <span class="n">it</span> <span class="s2">"may contain hazards"</span>
 
@@ -271,7 +271,7 @@ in the necessary details.</p>
 <p>1) Every room has an identifying number that helps the player keep 
 track of where they are:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A room"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A room"</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:room</span><span class="p">)</span> <span class="p">{</span> <span class="no">Wumpus</span><span class="o">::</span><span class="no">Room</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="p">}</span>
 
   <span class="n">it</span> <span class="s2">"has a number"</span> <span class="k">do</span>
@@ -286,7 +286,7 @@ track of where they are:</p>
 <p>2) Rooms may contain hazards, which can be added or removed as the 
 game progresses:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"may contain hazards"</span> <span class="k">do</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"may contain hazards"</span> <span class="k">do</span> 
   <span class="c1"># rooms start out empty</span>
   <span class="n">assert</span> <span class="n">room</span><span class="p">.</span><span class="nf">empty?</span>
 
@@ -312,7 +312,7 @@ game progresses:</p>
 
 <p>3) Each room can be connected to other rooms in the cave:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"with neighbors"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"with neighbors"</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:exit_numbers</span><span class="p">)</span> <span class="p">{</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="p">}</span>
 
   <span class="n">before</span> <span class="k">do</span>
@@ -327,7 +327,7 @@ game progresses:</p>
 <p>4) One-way paths are not allowed, i.e. all connections between rooms are
 bidirectional:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"has two-way connections to neighbors"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"has two-way connections to neighbors"</span> <span class="k">do</span>
   <span class="n">exit_numbers</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span> 
     <span class="c1"># a neighbor can be looked up by room number</span>
     <span class="n">room</span><span class="p">.</span><span class="nf">neighbor</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="nf">number</span><span class="p">.</span><span class="nf">must_equal</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
@@ -342,7 +342,7 @@ bidirectional:</p>
 <p>5) Each room knows all of its exits, which consist of
 all neighboring room numbers:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"knows the numbers of all neighboring rooms"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"knows the numbers of all neighboring rooms"</span> <span class="k">do</span>
   <span class="n">room</span><span class="p">.</span><span class="nf">exits</span><span class="p">.</span><span class="nf">must_equal</span><span class="p">(</span><span class="n">exit_numbers</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
@@ -351,7 +351,7 @@ all neighboring room numbers:</p>
 <p>6) Neighboring rooms can be selected at random, which is
 useful for certain game events:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can choose a neighbor randomly"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can choose a neighbor randomly"</span> <span class="k">do</span>
   <span class="n">exit_numbers</span><span class="p">.</span><span class="nf">must_include</span><span class="p">(</span><span class="n">room</span><span class="p">.</span><span class="nf">random_neighbor</span><span class="p">.</span><span class="nf">number</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
@@ -360,7 +360,7 @@ useful for certain game events:</p>
 <p>7) A room is considered safe only if there are no hazards within it
 or any of its neighbors:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"is not safe if it has hazards"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"is not safe if it has hazards"</span> <span class="k">do</span>
   <span class="n">room</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">)</span>
 
   <span class="n">refute</span> <span class="n">room</span><span class="p">.</span><span class="nf">safe?</span>
@@ -399,7 +399,7 @@ a collection object by connecting rooms together in an ad-hoc fashion,
 traversing the structure and manipulating it would be cumbersome. For that
 reason, we will build a <code class="highlighter-rouge">Wumpus::Cave</code> object with the following properties:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A cave"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A cave"</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"has 20 rooms that each connect to exactly three other rooms"</span> 
   <span class="n">it</span> <span class="s2">"can select rooms at random"</span>
   <span class="n">it</span> <span class="s2">"can move hazards from one room to another"</span>
@@ -417,7 +417,7 @@ how they’re meant to work.</p>
 <p>1) The cave has 20 rooms, and each room is connected to exactly 
 three other rooms:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A cave"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A cave"</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:cave</span><span class="p">)</span>  <span class="p">{</span> <span class="no">Wumpus</span><span class="o">::</span><span class="no">Cave</span><span class="p">.</span><span class="nf">dodecahedron</span> <span class="p">}</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:rooms</span><span class="p">)</span> <span class="p">{</span> <span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="nf">.</span><span class="mi">20</span><span class="p">).</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="n">cave</span><span class="p">.</span><span class="nf">room</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>
 
@@ -446,7 +446,7 @@ file in your own code, it should make passing these tests easy.</p>
 
 <p>2) Rooms in the cave can be selected randomly:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can select rooms at random"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can select rooms at random"</span> <span class="k">do</span>
   <span class="n">sampling</span> <span class="o">=</span> <span class="no">Set</span><span class="p">.</span><span class="nf">new</span>
 
   <span class="c1"># see test/helper.rb for how this assertion works</span>
@@ -468,7 +468,7 @@ eventually hit every room in the cave.</p>
 
 <p>3) Hazards can be moved from one room to another:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can move hazards from one room to another"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can move hazards from one room to another"</span> <span class="k">do</span>
   <span class="n">room</span>      <span class="o">=</span> <span class="n">cave</span><span class="p">.</span><span class="nf">random_room</span>
   <span class="n">neighbor</span>  <span class="o">=</span> <span class="n">room</span><span class="p">.</span><span class="nf">neighbors</span><span class="p">.</span><span class="nf">first</span>
 
@@ -492,7 +492,7 @@ adajecent to each other.</p>
 
 <p>4) Hazards can be randomly distributed throughout the cave:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can add hazards at random to a specific number of rooms"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can add hazards at random to a specific number of rooms"</span> <span class="k">do</span>
   <span class="n">cave</span><span class="p">.</span><span class="nf">add_hazard</span><span class="p">(</span><span class="ss">:bats</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
   <span class="n">rooms</span><span class="p">.</span><span class="nf">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">has?</span><span class="p">(</span><span class="ss">:bats</span><span class="p">)</span> <span class="p">}.</span><span class="nf">count</span><span class="p">.</span><span class="nf">must_equal</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -511,7 +511,7 @@ in mind while implementing this method.</p>
 
 <p>5) Rooms can be looked up based on the hazards they contain:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can find a room with a particular hazard"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can find a room with a particular hazard"</span> <span class="k">do</span>
   <span class="n">cave</span><span class="p">.</span><span class="nf">add_hazard</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
   <span class="n">assert</span> <span class="n">cave</span><span class="p">.</span><span class="nf">room_with</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">).</span><span class="nf">has?</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">)</span>
@@ -526,7 +526,7 @@ of the game.</p>
 
 <p>6) A safe entrance can be located:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can find a safe room to serve as an entrance"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can find a safe room to serve as an entrance"</span> <span class="k">do</span>
   <span class="n">cave</span><span class="p">.</span><span class="nf">add_hazard</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
   <span class="n">cave</span><span class="p">.</span><span class="nf">add_hazard</span><span class="p">(</span><span class="ss">:pit</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
   <span class="n">cave</span><span class="p">.</span><span class="nf">add_hazard</span><span class="p">(</span><span class="ss">:bats</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
@@ -591,7 +591,7 @@ possible outcomes for any player action:</p>
 <p>If you take this single example and generalize it, you’ll find that every turn
 of Hunt the Wumpus involves only three distinct kinds of events:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"the player"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"the player"</span> <span class="k">do</span>
   <span class="n">it</span> <span class="s2">"can sense hazards in neighboring rooms"</span> 
   <span class="n">it</span> <span class="s2">"can encounter hazards when entering a room"</span>
   <span class="n">it</span> <span class="s2">"can perform actions on neighboring rooms"</span> 
@@ -611,7 +611,7 @@ but for now just try to follow along as best as you can.</p>
 because we need to reconstruct something similar to the layout shown in the
 previous diagram in order to meaningfully test its behavior:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"the player"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"the player"</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:player</span><span class="p">)</span> <span class="p">{</span> <span class="no">Wumpus</span><span class="o">::</span><span class="no">Player</span><span class="p">.</span><span class="nf">new</span> <span class="p">}</span>
 
   <span class="n">let</span><span class="p">(</span><span class="ss">:empty_room</span><span class="p">)</span> <span class="p">{</span> <span class="no">Wumpus</span><span class="o">::</span><span class="no">Room</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">}</span>
@@ -634,7 +634,7 @@ interested in tracking during setup, using some dummy callbacks that are
 meant to serve as stand-ins for real game logic. This is not an
 elegant way of building a test harness, but it gets the job done:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">let</span><span class="p">(</span><span class="ss">:sensed</span><span class="p">)</span>      <span class="p">{</span> <span class="no">Set</span><span class="p">.</span><span class="nf">new</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">let</span><span class="p">(</span><span class="ss">:sensed</span><span class="p">)</span>      <span class="p">{</span> <span class="no">Set</span><span class="p">.</span><span class="nf">new</span> <span class="p">}</span>
 <span class="n">let</span><span class="p">(</span><span class="ss">:encountered</span><span class="p">)</span> <span class="p">{</span> <span class="no">Set</span><span class="p">.</span><span class="nf">new</span> <span class="p">}</span>
 
 <span class="n">before</span> <span class="k">do</span>
@@ -667,7 +667,7 @@ elegant way of building a test harness, but it gets the job done:</p>
 <p>Once all of that is taken care of, the callbacks can be tested in isolated
 scenarios:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can sense hazards in neighboring rooms"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"can sense hazards in neighboring rooms"</span> <span class="k">do</span>
   <span class="n">player</span><span class="p">.</span><span class="nf">enter</span><span class="p">(</span><span class="n">empty_room</span><span class="p">)</span>
   <span class="n">player</span><span class="p">.</span><span class="nf">explore_room</span>
 
@@ -725,14 +725,14 @@ would be better spent focusing on the game logic.</p>
 implemented in terms of the three game objects we just built. To get started, we
 need a cave!</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cave</span> <span class="o">=</span> <span class="no">Wumpus</span><span class="o">::</span><span class="no">Cave</span><span class="p">.</span><span class="nf">dodecahedron</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">cave</span> <span class="o">=</span> <span class="no">Wumpus</span><span class="o">::</span><span class="no">Cave</span><span class="p">.</span><span class="nf">dodecahedron</span>
 </code></pre>
 </div>
 
 <p>This cave will contain three pits, three giant bats, and the most evil and
 stinky Wumpus you could ever imagine:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">cave</span><span class="p">.</span><span class="nf">add_hazard</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">cave</span><span class="p">.</span><span class="nf">add_hazard</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">cave</span><span class="p">.</span><span class="nf">add_hazard</span><span class="p">(</span><span class="ss">:pit</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="n">cave</span><span class="p">.</span><span class="nf">add_hazard</span><span class="p">(</span><span class="ss">:bats</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 </code></pre>
@@ -741,7 +741,7 @@ stinky Wumpus you could ever imagine:</p>
 <p>We also need a player to navigate the cave, and a narrator to regale us with
 tales about the player’s adventures:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">player</span>    <span class="o">=</span> <span class="no">Wumpus</span><span class="o">::</span><span class="no">Player</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">player</span>    <span class="o">=</span> <span class="no">Wumpus</span><span class="o">::</span><span class="no">Player</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">narrator</span>  <span class="o">=</span> <span class="no">Wumpus</span><span class="o">::</span><span class="no">Narrator</span><span class="p">.</span><span class="nf">new</span>
 </code></pre>
 </div>
@@ -749,7 +749,7 @@ tales about the player’s adventures:</p>
 <p>Whenever a player senses a hazard nearby, the narrator will give us a hint
 of what kind of trouble lurks just around the bend:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">sense</span><span class="p">(</span><span class="ss">:bats</span><span class="p">)</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">sense</span><span class="p">(</span><span class="ss">:bats</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">narrator</span><span class="p">.</span><span class="nf">say</span><span class="p">(</span><span class="s2">"You hear a rustling sound nearby"</span><span class="p">)</span> 
 <span class="k">end</span>
 
@@ -769,7 +769,7 @@ of this later, but the basic idea is that it will cause the
 Wumpus to either run away to an adjacent room, or to gobble
 the player up:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">encounter</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">)</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">encounter</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">player</span><span class="p">.</span><span class="nf">act</span><span class="p">(</span><span class="ss">:startle_wumpus</span><span class="p">,</span> <span class="n">player</span><span class="p">.</span><span class="nf">room</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
@@ -787,7 +787,7 @@ can make navigation very complicated, because stumbling
 back into that room will cause the player to be moved
 to yet another random location:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">encounter</span><span class="p">(</span><span class="ss">:bats</span><span class="p">)</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">encounter</span><span class="p">(</span><span class="ss">:bats</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">narrator</span><span class="p">.</span><span class="nf">say</span> <span class="s2">"Giant bats whisk you away to a new cavern!"</span>
 
   <span class="n">old_room</span> <span class="o">=</span> <span class="n">player</span><span class="p">.</span><span class="nf">room</span>
@@ -804,7 +804,7 @@ to yet another random location:</p>
 story ends immediately, even though the player’s journey
 will probably go on forever:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">encounter</span><span class="p">(</span><span class="ss">:pit</span><span class="p">)</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">encounter</span><span class="p">(</span><span class="ss">:pit</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">narrator</span><span class="p">.</span><span class="nf">finish_story</span><span class="p">(</span><span class="s2">"You fell into a bottomless pit. Enjoy the ride!"</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
@@ -814,7 +814,7 @@ will probably go on forever:</p>
 The movement action is straightforward: it simply updates the player’s
 current location and then fires callbacks for any hazards encountered:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">action</span><span class="p">(</span><span class="ss">:move</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">destination</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">action</span><span class="p">(</span><span class="ss">:move</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">destination</span><span class="o">|</span>
   <span class="n">player</span><span class="p">.</span><span class="nf">enter</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre>
@@ -831,7 +831,7 @@ is slayed and the story ends happily ever after. If instead the player shoots
 into the wrong room, then no matter where the Wumpus is in the cave, it will 
 be startled by the sound.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">action</span><span class="p">(</span><span class="ss">:shoot</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">destination</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">action</span><span class="p">(</span><span class="ss">:shoot</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">destination</span><span class="o">|</span>
   <span class="k">if</span> <span class="n">destination</span><span class="p">.</span><span class="nf">has?</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">)</span>
     <span class="n">narrator</span><span class="p">.</span><span class="nf">finish_story</span><span class="p">(</span><span class="s2">"YOU KILLED THE WUMPUS! GOOD JOB, BUDDY!!!"</span><span class="p">)</span> 
   <span class="k">else</span>
@@ -850,7 +850,7 @@ move anywhere in the cave, even if it is not in a nearby room.</p>
 <p>If the Wumpus is in the same room as the player at the end of this process,
 it will gobble the player up and the game will end in sadness and tears:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">action</span><span class="p">(</span><span class="ss">:startle_wumpus</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">old_wumpus_room</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">player</span><span class="p">.</span><span class="nf">action</span><span class="p">(</span><span class="ss">:startle_wumpus</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">old_wumpus_room</span><span class="o">|</span>
   <span class="k">if</span> <span class="p">[</span><span class="ss">:move</span><span class="p">,</span> <span class="ss">:stay</span><span class="p">].</span><span class="nf">sample</span> <span class="o">==</span> <span class="ss">:move</span>
     <span class="n">new_wumpus_room</span> <span class="o">=</span> <span class="n">old_wumpus_room</span><span class="p">.</span><span class="nf">random_neighbor</span>
     <span class="n">cave</span><span class="p">.</span><span class="nf">move</span><span class="p">(</span><span class="ss">:wumpus</span><span class="p">,</span> <span class="ss">from: </span><span class="n">old_wumpus_room</span><span class="p">,</span> <span class="ss">to: </span><span class="n">new_wumpus_room</span><span class="p">)</span>

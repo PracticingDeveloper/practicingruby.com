@@ -10,8 +10,8 @@
   <meta name="description" content="This article was written by Avdi Grimm. Avdi is a Ruby Rogue, aconsulting pair programmer, and the head chef at RubyTapas. He writesabout software developmen...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/adventure-in-prototypes">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/adventure-in-prototypes">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -100,7 +100,7 @@ an <code class="highlighter-rouge">adventurer</code> object. This object will se
 game’s world, translating our commands into interactions between
 objects:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">adventurer</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">adventurer</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
 </code></pre>
 </div>
 
@@ -108,7 +108,7 @@ objects:</p>
 its surroundings. The <code class="highlighter-rouge">look</code> command will cause the adventurer to output
 a description of its current location:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="n">adventurer</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="n">adventurer</span>
   <span class="kp">attr_accessor</span> <span class="ss">:location</span>
 
   <span class="k">def</span> <span class="nf">look</span>
@@ -121,7 +121,7 @@ a description of its current location:</p>
 <p>Then we add a starting location, called <code class="highlighter-rouge">end_of_road</code>, and put the
 adventurer in that location:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">end_of_road</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">end_of_road</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
 <span class="k">def</span> <span class="nc">end_of_road</span><span class="o">.</span><span class="nf">description</span>
   <span class="o">&lt;&lt;</span><span class="no">END</span><span class="sh">
 You are standing at the end of a road before a small brick building.
@@ -136,12 +136,13 @@ down a gully.
 
 <p>Now we can tell our adventurer to take a look around:</p>
 
-<pre><code class="language-console">&gt; adventurer.look
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>&gt; adventurer.look
 
 You are standing at the end of a road before a small brick building.
 Around you is a forest.  A small stream flows out of the building and
 down a gully.
 </code></pre>
+</div>
 
 <h2 id="adding-some-conveniences">Adding some conveniences</h2>
 
@@ -158,7 +159,7 @@ have to build our tools with the class-oriented materials at hand. This
 is intended to be behind-the-scenes support code. In other words, pay no
 attention to the man behind the green curtain!</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ObjectBuilder</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ObjectBuilder</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">object</span><span class="p">)</span>
     <span class="vi">@object</span> <span class="o">=</span> <span class="n">object</span>
   <span class="k">end</span>
@@ -209,7 +210,7 @@ make more sense when we start to make use of it.</p>
 <p>We add another bit of syntax sugar: a global method named <code class="highlighter-rouge">Object</code> (not
 to be confused with the class of the same name):</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">Object</span><span class="p">(</span><span class="o">&amp;</span><span class="n">definition</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">Object</span><span class="p">(</span><span class="o">&amp;</span><span class="n">definition</span><span class="p">)</span>
   <span class="n">obj</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
   <span class="n">obj</span><span class="p">.</span><span class="nf">singleton_class</span><span class="p">.</span><span class="nf">instance_exec</span><span class="p">(</span><span class="no">ObjectBuilder</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">definition</span><span class="p">)</span>
   <span class="n">obj</span>
@@ -223,7 +224,7 @@ block in the context of the object’s singleton class, passing an
 
 <p>Now we recreate our adventurer using this new helper:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">adventurer</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">adventurer</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
   <span class="n">o</span><span class="p">.</span><span class="nf">location</span> <span class="o">=</span> <span class="n">end_of_road</span>
 
   <span class="kp">attr_writer</span> <span class="ss">:location</span>
@@ -240,20 +241,20 @@ gives us a convenient, powerful notation for creating new ad-hoc
 objects. We can create attribute reader methods and assign the value of
 the attribute all at once:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">o</span><span class="p">.</span><span class="nf">location</span> <span class="o">=</span> <span class="n">end_of_road</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">o</span><span class="p">.</span><span class="nf">location</span> <span class="o">=</span> <span class="n">end_of_road</span>
 </code></pre>
 </div>
 
 <p>We can use standard Ruby class-level code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="kp">attr_writer</span> <span class="ss">:location</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="kp">attr_writer</span> <span class="ss">:location</span>
 </code></pre>
 </div>
 
 <p>And finally we can define new methods by assigning a lambda to an 
 attribute:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">o</span><span class="p">.</span><span class="nf">look</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">location</span><span class="p">.</span><span class="nf">description</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">o</span><span class="p">.</span><span class="nf">look</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">location</span><span class="p">.</span><span class="nf">description</span> <span class="p">}</span>
 </code></pre>
 </div>
 
@@ -263,12 +264,13 @@ attribute:</p>
 <p>Before we move on, let’s take a moment to make sure our shiny new adventurer still works the
 same as before:</p>
 
-<pre><code class="language-console">&gt; adventurer.look
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>&gt; adventurer.look
 
 You are standing at the end of a road before a small brick building.
 Around you is a forest.  A small stream flows out of the building and
 down a gully.
 </code></pre>
+</div>
 
 <h2 id="moving-around">Moving around</h2>
 
@@ -276,7 +278,7 @@ down a gully.
 We want to give it the ability to move from location to location. First,
 we make a small modification to our <code class="highlighter-rouge">Object()</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">Object</span><span class="p">(</span><span class="n">object</span><span class="o">=</span><span class="kp">nil</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">definition</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">Object</span><span class="p">(</span><span class="n">object</span><span class="o">=</span><span class="kp">nil</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">definition</span><span class="p">)</span>
   <span class="n">obj</span> <span class="o">=</span> <span class="n">object</span> <span class="o">||</span> <span class="no">Object</span><span class="p">.</span><span class="nf">new</span>
   <span class="n">obj</span><span class="p">.</span><span class="nf">singleton_class</span><span class="p">.</span><span class="nf">instance_exec</span><span class="p">(</span><span class="no">ObjectBuilder</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">definition</span><span class="p">)</span>
   <span class="n">obj</span>
@@ -291,7 +293,7 @@ existing object which is passed in as an argument.</p>
 method will take a direction (like <code class="highlighter-rouge">:east</code>), and attempt to move to the
 new location using the <code class="highlighter-rouge">exits</code> association on its current location:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">adventurer</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">adventurer</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
   <span class="n">o</span><span class="p">.</span><span class="nf">go</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">direction</span><span class="p">){</span>
     <span class="k">if</span><span class="p">(</span><span class="n">destination</span> <span class="o">=</span> <span class="n">location</span><span class="p">.</span><span class="nf">exits</span><span class="p">[</span><span class="n">direction</span><span class="p">])</span>
       <span class="nb">self</span><span class="p">.</span><span class="nf">location</span> <span class="o">=</span> <span class="n">destination</span>
@@ -306,7 +308,7 @@ new location using the <code class="highlighter-rouge">exits</code> association 
 
 <p>We add a destination room to the system:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">wellhouse</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">wellhouse</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
   <span class="n">o</span><span class="p">.</span><span class="nf">description</span> <span class="o">=</span> <span class="o">&lt;&lt;</span><span class="no">END</span><span class="sh">
 You are inside a small building, a wellhouse for a large spring.
 </span><span class="no">END</span>
@@ -317,33 +319,36 @@ You are inside a small building, a wellhouse for a large spring.
 <p>Then we add an <code class="highlighter-rouge">exits</code> Hash to <code class="highlighter-rouge">end_of_road</code>, with an entry saying that
 the <code class="highlighter-rouge">wellhouse</code> is to the <code class="highlighter-rouge">:north</code> of it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">end_of_road</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">exits</span> <span class="o">=</span> <span class="p">{</span><span class="ss">north: </span><span class="n">wellhouse</span><span class="p">}</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">end_of_road</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">exits</span> <span class="o">=</span> <span class="p">{</span><span class="ss">north: </span><span class="n">wellhouse</span><span class="p">}</span> <span class="p">}</span>
 </code></pre>
 </div>
 
 <p>With that done, we are now ready to set off on our journey!</p>
 
-<pre><code class="language-console">&gt; adventurer.go(:north)
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>&gt; adventurer.go(:north)
 
 You are inside a small building, a wellhouse for a large spring.
 </code></pre>
+</div>
 
 <h2 id="cloning-prototypes">Cloning prototypes</h2>
 
 <p>We try to go north again, expecting to see the admonition “You can’t go
 that way” as we bump into the wall:</p>
 
-<pre><code class="language-console">&gt; adventurer.go(:north)
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>&gt; adventurer.go(:north)
 </code></pre>
+</div>
 
 <p>Instead, we get an exception:</p>
 
-<pre><code class="language-console">-:82:in `block (2 levels) in &lt;main&gt;': undefined method `exits' for 
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>-:82:in `block (2 levels) in &lt;main&gt;': undefined method `exits' for 
 #&lt;Object:0x0000000434d768&gt; (NoMethodError)
         from -:56:in `instance_exec'
         from -:56:in `block (2 levels) in define_code_method'
         from -:100:in `&lt;main&gt;'
 </code></pre>
+</div>
 
 <p>This is because we never got around to adding an <code class="highlighter-rouge">exits</code> Hash to
 <code class="highlighter-rouge">wellhouse</code>. We could go ahead and do that now. But as we think about
@@ -353,7 +358,7 @@ instead of us having to add it manually every time.</p>
 
 <p>Toward that end, we create a <em>prototypical room</em>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">room</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">exits</span> <span class="o">=</span> <span class="p">{}</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">room</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">exits</span> <span class="o">=</span> <span class="p">{}</span> <span class="p">}</span>
 </code></pre>
 </div>
 
@@ -362,7 +367,7 @@ the <code class="highlighter-rouge">room</code> prototype. We do this by simply 
 use <code class="highlighter-rouge">#clone</code> rather than <code class="highlighter-rouge">#dup</code> because <code class="highlighter-rouge">#clone</code> copies singleton class
 methods:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">new_wellhouse</span> <span class="o">=</span> <span class="n">room</span><span class="p">.</span><span class="nf">clone</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">new_wellhouse</span> <span class="o">=</span> <span class="n">room</span><span class="p">.</span><span class="nf">clone</span>
 
 <span class="n">new_wellhouse</span><span class="p">.</span><span class="nf">exits</span><span class="p">[</span><span class="ss">:south</span><span class="p">]</span> <span class="o">=</span> <span class="n">end_of_road</span>
 </code></pre>
@@ -372,7 +377,7 @@ methods:</p>
 Ruby’s <code class="highlighter-rouge">#clone</code> (as well as <code class="highlighter-rouge">#dup</code>) are <em>shallow copies</em>, <code class="highlighter-rouge">room</code> and
 <code class="highlighter-rouge">new_wellhouse</code> now share the same <code class="highlighter-rouge">exits</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'pp'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'pp'</span>
 
 <span class="nb">puts</span> <span class="s2">"new_wellhouse exits:"</span>
 <span class="n">pp</span> <span class="n">new_wellhouse</span><span class="p">.</span><span class="nf">exits</span>
@@ -381,7 +386,7 @@ Ruby’s <code class="highlighter-rouge">#clone</code> (as well as <code class="
 </code></pre>
 </div>
 
-<pre><code class="language-console">new_wellhouse exits:
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>new_wellhouse exits:
 {:south=&gt;
   #&lt;Object:0x0000000482c8d8
    @exits=
@@ -398,6 +403,7 @@ room exits:
        @description=
         "You are inside a small building, a wellhouse for a large spring.\n"&gt;}&gt;}
 </code></pre>
+</div>
 
 <p>To fix this, we could possibly customize the way Ruby does cloning by overriding
 the <a href="http://jonathanleighton.com/articles/2011/initialize_clone-initialize_dup-and-initialize_copy-in-ruby/">Object#initialize_clone</a>
@@ -406,7 +412,7 @@ Because extending core objects is a bit safer than modifying them, we opt to
 define our own <code class="highlighter-rouge">Object#copy</code> method which does a one-level-deep copying of
 instance variables:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Object</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Object</span>
   <span class="k">def</span> <span class="nf">copy</span>
     <span class="n">prototype</span> <span class="o">=</span> <span class="nb">clone</span>
 
@@ -425,7 +431,7 @@ instance variables:</p>
 <p>Then we recreate <code class="highlighter-rouge">room</code> and <code class="highlighter-rouge">new_wellhouse</code>, and confirm that they no
 longer share exits:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">room</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">exits</span> <span class="o">=</span> <span class="p">{}</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">room</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">exits</span> <span class="o">=</span> <span class="p">{}</span> <span class="p">}</span>
 
 <span class="c1"># Use the newly defined Object#copy here instead of Object#clone</span>
 <span class="n">new_wellhouse</span> <span class="o">=</span> <span class="n">room</span><span class="p">.</span><span class="nf">copy</span>
@@ -439,7 +445,7 @@ longer share exits:</p>
 </code></pre>
 </div>
 
-<pre><code class="language-console">new_wellhouse exits:
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>new_wellhouse exits:
 {:south=&gt;
   #&lt;Object:0x00000002ea85d8
    @exits=
@@ -450,6 +456,7 @@ longer share exits:</p>
 room exits:
 {}
 </code></pre>
+</div>
 
 <p>Cloning a prototypical object in order to create new
 objects is the most basic form of prototype-based programming. In fact,
@@ -486,7 +493,7 @@ the style of method definition used in <code class="highlighter-rouge">ObjectBui
 implementation <code class="highlighter-rouge">Procs</code> of new methods were stored in instance variables
 named for the methods:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Object</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Object</span>
   <span class="k">def</span> <span class="nf">implementation_of</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">respond_to?</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span>
       <span class="n">implementation</span> <span class="o">=</span> <span class="nb">instance_variable_get</span><span class="p">(</span><span class="s2">"@</span><span class="si">#{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -506,7 +513,7 @@ named for the methods:</p>
 
 <p>We then define a new kind of <code class="highlighter-rouge">Module</code>, called <code class="highlighter-rouge">Prototype</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Prototype</span> <span class="o">&lt;</span> <span class="no">Module</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Prototype</span> <span class="o">&lt;</span> <span class="no">Module</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
     <span class="vi">@target</span> <span class="o">=</span> <span class="n">target</span>
     <span class="k">super</span><span class="p">()</span> <span class="k">do</span>
@@ -545,7 +552,7 @@ delegates a <code class="highlighter-rouge">#foo</code> message to object <code 
 <code class="highlighter-rouge">forwardable</code> library, <code class="highlighter-rouge">self</code> in that method will be object <code class="highlighter-rouge">b</code>. This is
 easily demonstrated:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'forwardable'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'forwardable'</span>
 
 <span class="k">class</span> <span class="nc">A</span>
   <span class="kp">extend</span> <span class="no">Forwardable</span>
@@ -583,13 +590,14 @@ all of their methods, Ruby considers all of our objects as belonging to
 different classes for the purposes of method binding. We can see this if
 we try to rebind a method from <code class="highlighter-rouge">room</code> onto <code class="highlighter-rouge">wellhouse</code> and then call it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">room</span><span class="p">.</span><span class="nf">method</span><span class="p">(</span><span class="ss">:exits</span><span class="p">).</span><span class="nf">unbind</span><span class="p">.</span><span class="nf">bind</span><span class="p">(</span><span class="n">wellhouse</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">room</span><span class="p">.</span><span class="nf">method</span><span class="p">(</span><span class="ss">:exits</span><span class="p">).</span><span class="nf">unbind</span><span class="p">.</span><span class="nf">bind</span><span class="p">(</span><span class="n">wellhouse</span><span class="p">)</span>
 </code></pre>
 </div>
 
-<pre><code class="language-console">-:115:in `bind': singleton method called for a different object (TypeError)
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>-:115:in `bind': singleton method called for a different object (TypeError)
         from -:115:in `&lt;main&gt;'
 </code></pre>
+</div>
 
 <p>By storing the implementation of methods as raw <code class="highlighter-rouge">Procs</code>, without any
 association to a specific class, we are able to take the implementations
@@ -598,7 +606,7 @@ and <code class="highlighter-rouge">instance_exec</code> them in other contexts.
 <p>The last change we make to support dynamic prototype inheritance is to
 add a new <code class="highlighter-rouge">#prototype</code> method to our <code class="highlighter-rouge">ObjectBuilder</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ObjectBuilder</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ObjectBuilder</span>
   <span class="k">def</span> <span class="nf">prototype</span><span class="p">(</span><span class="n">proto</span><span class="p">)</span>
     <span class="c1"># Leave method implementations on the proto object</span>
     <span class="n">ivars</span> <span class="o">=</span> <span class="n">proto</span><span class="p">.</span><span class="nf">instance_variables</span><span class="p">.</span><span class="nf">reject</span><span class="p">{</span> <span class="o">|</span><span class="n">ivar_name</span><span class="o">|</span>
@@ -632,7 +640,7 @@ prototype of <code class="highlighter-rouge">wellhouse</code>. We are then able 
 point back to <code class="highlighter-rouge">end_of_road</code>, using the <code class="highlighter-rouge">exits</code> association that
 <code class="highlighter-rouge">wellhouse</code> now inherits from <code class="highlighter-rouge">room</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">wellhouse</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">prototype</span> <span class="n">room</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">wellhouse</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">prototype</span> <span class="n">room</span> <span class="p">}</span>
 
 <span class="n">wellhouse</span><span class="p">.</span><span class="nf">exits</span><span class="p">[</span><span class="ss">:south</span><span class="p">]</span> <span class="o">=</span> <span class="n">end_of_road</span>
 
@@ -642,7 +650,7 @@ point back to <code class="highlighter-rouge">end_of_road</code>, using the <cod
 
 <p>Then we can move around again to make sure things are working as expected:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">puts</span> <span class="s2">"* trying to go north from wellhouse"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">puts</span> <span class="s2">"* trying to go north from wellhouse"</span>
 <span class="n">adventurer</span><span class="p">.</span><span class="nf">go</span><span class="p">(</span><span class="ss">:north</span><span class="p">)</span>
 
 <span class="nb">puts</span> <span class="s2">"* going back south"</span>
@@ -650,13 +658,14 @@ point back to <code class="highlighter-rouge">end_of_road</code>, using the <cod
 </code></pre>
 </div>
 
-<pre><code class="language-console">* trying to go north from wellhouse
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>* trying to go north from wellhouse
 You can't go that way
 * going back south
 You are standing at the end of a road before a small brick building.
 Around you is a forest.  A small stream flows out of the building and
 down a gully.
 </code></pre>
+</div>
 
 <h2 id="carrying-items-around">Carrying items around</h2>
 
@@ -666,7 +675,7 @@ and drop items to our game. We start by creating a prototypical
 “container” object, which has an array of items and the ability to
 transfer an item from itself to another container:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">container</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">container</span> <span class="o">=</span> <span class="no">Object</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
   <span class="n">o</span><span class="p">.</span><span class="nf">items</span> <span class="o">=</span> <span class="p">[]</span>
   <span class="n">o</span><span class="p">.</span><span class="nf">transfer_item</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">recipient</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">recipient</span><span class="p">.</span><span class="nf">items</span> <span class="o">&lt;&lt;</span> <span class="n">items</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
@@ -679,7 +688,7 @@ transfer an item from itself to another container:</p>
 taking items, dropping items, and listing the adventurer’s current
 inventory:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">adventurer</span><span class="p">)</span> <span class="p">{</span><span class="o">|</span><span class="n">o</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">adventurer</span><span class="p">)</span> <span class="p">{</span><span class="o">|</span><span class="n">o</span><span class="o">|</span>
   <span class="n">o</span><span class="p">.</span><span class="nf">prototype</span> <span class="n">container</span>
 
   <span class="n">o</span><span class="p">.</span><span class="nf">look</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">{</span>
@@ -724,7 +733,7 @@ accept any substring of the intended object’s name.</p>
 <p>Next we make <code class="highlighter-rouge">wellhouse</code> a container, and add a list of starting items
 to it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">wellhouse</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">wellhouse</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span>
   <span class="n">o</span><span class="p">.</span><span class="nf">prototype</span> <span class="n">container</span>
   <span class="n">o</span><span class="p">.</span><span class="nf">items</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">"a shiny brass lamp"</span><span class="p">,</span>
@@ -747,14 +756,14 @@ single-inheritance prototype system!)</p>
 
 <p>Finally, we make <code class="highlighter-rouge">end_of_road</code> a container:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">end_of_road</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">prototype</span><span class="p">(</span><span class="n">container</span><span class="p">)</span> <span class="p">}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Object</span><span class="p">(</span><span class="n">end_of_road</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">o</span><span class="o">|</span> <span class="n">o</span><span class="p">.</span><span class="nf">prototype</span><span class="p">(</span><span class="n">container</span><span class="p">)</span> <span class="p">}</span>
 </code></pre>
 </div>
 
 <p>We then proceed to tell our adventurer to pick up a bottle of water from
 the wellhouse, and put it down at the end of the road:</p>
 
-<pre><code class="language-console">&gt; adventurer.go(:north)
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>&gt; adventurer.go(:north)
 You are inside a small building, a wellhouse for a large spring.
 &gt; adventurer.take("water")
 You take a bottle of water.
@@ -776,6 +785,7 @@ Around you is a forest.  A small stream flows out of the building and
 down a gully.
 There is a bottle of water here.
 </code></pre>
+</div>
 
 <p>And with that, we now have a small but functional system which allows us to move
 around the game world and interact with it.</p>

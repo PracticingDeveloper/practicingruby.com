@@ -10,8 +10,8 @@
   <meta name="description" content="In this issue and the next one, I look at several design patterns laid out bythe Gang of Four and explore their relevance to modern day Ruby programming. Myg...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/creational-design-patterns">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/creational-design-patterns">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -104,7 +104,7 @@ library that makes it easier to implement.</p>
 library, which on the surface should look quite like an ordinary Ruby class
 definition.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"singleton"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"singleton"</span>
 
 <span class="k">class</span> <span class="nc">SimpleLogger</span>
   <span class="kp">include</span> <span class="no">Singleton</span>
@@ -139,7 +139,7 @@ definition.</p>
 
 <p>Nothing here looks out of the ordinary, but you can begin to see the impact of the Singleton mixin as soon as you try to create a SimpleLogger instance.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">logger</span> <span class="o">=</span> <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">logger</span> <span class="o">=</span> <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">new</span>
 <span class="no">NoMethodError</span><span class="p">:</span> <span class="kp">private</span> <span class="nb">method</span> <span class="sb">`new' called for SimpleLogger:Class
   from (irb):2
 </span></code></pre>
@@ -147,7 +147,7 @@ definition.</p>
 
 <p>Since the purpose of the singleton pattern is to allow for the creation of only a single instance, it makes sense that you might not be able to expect construction to work as normal. The example below demonstrates what you need to do instead.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">logger</span> <span class="o">=</span> <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">instance</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">logger</span> <span class="o">=</span> <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">instance</span>
 
 <span class="n">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
 <span class="n">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">"Something you might want to know"</span><span class="p">)</span>
@@ -161,7 +161,7 @@ definition.</p>
 over using ordinary class definitions and global variables, such as in the code
 below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="vg">$LOGGER</span> <span class="o">=</span> <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="vg">$LOGGER</span> <span class="o">=</span> <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">new</span>
 <span class="vg">$LOGGER</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
 <span class="vg">$LOGGER</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">"Something you might want to know"</span><span class="p">)</span>
 </code></pre>
@@ -173,7 +173,7 @@ below:</p>
 
 <p>The standard library implementation of the Singleton pattern is reasonable, and fairly clever. However, I feel it probably leans a bit too closely to a direct translation, and instead typically use a different technique in my own code. Below you can see how I might write SimpleLogger if left to my own devices.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimpleLogger</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">SimpleLogger</span>
   <span class="kp">extend</span> <span class="nb">self</span>
 
   <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -203,7 +203,7 @@ below:</p>
 
 <p>This code preserves the lazy evaluation component while removing the concept of an instance entirely. The module itself becomes a singleton object, allowing you to call methods directly on it which affect the state stored on the module.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="s2">"Some serious problem"</span><span class="p">)</span>
 <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">"Something you might want to know"</span><span class="p">)</span>
 <span class="no">SimpleLogger</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="s2">"log.txt"</span><span class="p">)</span>
 </code></pre>
@@ -223,20 +223,20 @@ below:</p>
 
 <p>While the actual source code is more complex than what I’ll show here, the basic idea of applying a multiton here is quite simple. We can start off by assuming that our <code class="highlighter-rouge">Font</code> class has an ordinary constructor which takes a font file and then processes it into a meaningful dataset. Initializing a font directly then looks something like this.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">font</span> <span class="o">=</span> <span class="no">Font</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"/path/to/times.ttf"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">font</span> <span class="o">=</span> <span class="no">Font</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"/path/to/times.ttf"</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>On top of this basic interface, we layer a mapping mechanism that when used, looks something like the code below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">Font</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="s2">"Times New Roman"</span> <span class="o">=&gt;</span> <span class="s2">"/path/to/times.ttf"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">Font</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="s2">"Times New Roman"</span> <span class="o">=&gt;</span> <span class="s2">"/path/to/times.ttf"</span><span class="p">)</span>
 <span class="no">Font</span><span class="p">[</span><span class="s2">"Times New Roman"</span><span class="p">]</span> <span class="c1">#=&gt; A font instance</span>
 </code></pre>
 </div>
 
 <p>To bring all of the above together, we can take a look at a skeletal <code class="highlighter-rouge">Font</code> class which implements the Multiton pattern.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Font</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Font</span>
   <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
     <span class="k">def</span> <span class="nf">file_names</span>
       <span class="vi">@file_names</span> <span class="o">||=</span> <span class="p">{}</span>
@@ -274,7 +274,7 @@ below:</p>
 
 <p>In a Mendicant University course, one of our students (Carol Nichols) ran into a design issue that we were able to improve by introducing factory methods. She was building an <code class="highlighter-rouge">AdjacencyMatrix</code> datastructure for storing graph data, and her original API looked like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">AdjacencyMatrix</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">AdjacencyMatrix</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kp">false</span><span class="p">)</span>
     <span class="c1">#...</span>
   <span class="k">end</span>
@@ -287,14 +287,14 @@ below:</p>
 
 <p>Using boolean switches as arguments aren’t especially expressive, and so the suggestion was quickly made to move towards a hash-based argument allowing for the following usage.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">undirected_matrix</span> <span class="o">=</span> <span class="no">AdjacencyMatrix</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">undirected_matrix</span> <span class="o">=</span> <span class="no">AdjacencyMatrix</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> 
 <span class="n">directed_matrix</span>   <span class="o">=</span> <span class="no">AdjacencyMatrix</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="ss">:directed</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">)</span>
 </code></pre>
 </div>
 
 <p>Generally speaking, this isn’t a bad strategy, but the more we thought about it, the more we realized that there isn’t really a need for a dynamic option here. Consumers would always know whether a graph they were trying to represent was directed or undirected at the time they constructed their object, and the default call without the <code class="highlighter-rouge">:directed</code> argument still wasn’t very expressive about this detail. After some discussion, we settled on the following design, which introduces the Factory method pattern.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">AdjacencyMatrix</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">AdjacencyMatrix</span>
   <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
     <span class="k">def</span> <span class="nf">undirected</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
       <span class="kp">new</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -332,7 +332,7 @@ applications.</p>
 reference a particular class can be used to instantiate records 
 via ActiveRecord:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">factory</span> <span class="ss">:user</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">factory</span> <span class="ss">:user</span> <span class="k">do</span>
   <span class="n">first_name</span> <span class="s1">'John'</span>
   <span class="n">last_name</span>  <span class="s1">'Doe'</span>
   <span class="n">admin</span> <span class="kp">false</span>
@@ -352,7 +352,7 @@ it more flexible.</p>
 
 <p>Due to the flexible nature of Ruby’s type system, we don’t need an actual language construct for abstract classes. With that in mind, when we note that an <a href="http://en.wikipedia.org/wiki/Abstract_factory">Abstract Factory</a> is simply an abstract interface for concrete Factory objects to conform to, this pattern pretty much falls away. This is perhaps easier to show than to explain, so I will go ahead and build out a Ruby version of the example shown in the wikipedia article I’ve linked to above.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">OSXGuiToolkit</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">OSXGuiToolkit</span>
   <span class="kp">extend</span> <span class="nb">self</span>
 
   <span class="k">def</span> <span class="nf">button</span>
@@ -406,7 +406,7 @@ it more flexible.</p>
 
 <p>A while back, I was experimenting with coming up with some generalized domain language for producing output in a number of different formats. While I had more complex goals in mind, the basic usage ended up looking something like what you see below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ListFormatter</span> <span class="o">&lt;</span> <span class="no">Fatty</span><span class="o">::</span><span class="no">Formatter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ListFormatter</span> <span class="o">&lt;</span> <span class="no">Fatty</span><span class="o">::</span><span class="no">Formatter</span>
   <span class="nb">format</span> <span class="ss">:text</span> <span class="k">do</span>
     <span class="k">def</span> <span class="nf">render</span>
       <span class="n">params</span><span class="p">[</span><span class="ss">:data</span><span class="p">].</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="s2">"* </span><span class="si">#{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span> <span class="p">}.</span><span class="nf">join</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
@@ -425,7 +425,7 @@ it more flexible.</p>
 
 <p>With some formats defined, the ListFormatter class can be used in the following manner.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="n">data</span> <span class="o">=</span> <span class="sx">%w[foo bar baz]</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="n">data</span> <span class="o">=</span> <span class="sx">%w[foo bar baz]</span>
   <span class="p">[</span><span class="ss">:html</span><span class="p">,</span> <span class="ss">:text</span><span class="p">].</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="nb">format</span><span class="o">|</span>
     <span class="nb">puts</span> <span class="no">ListFormatter</span><span class="p">.</span><span class="nf">render</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="ss">:data</span> <span class="o">=&gt;</span> <span class="n">data</span><span class="p">)</span>
   <span class="k">end</span>
@@ -443,7 +443,7 @@ it more flexible.</p>
 
 <p>While this all may look a bit magical on the surface, the implementation is just a few lines of relatively dull dynamic Ruby code.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Fatty</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Fatty</span>
   <span class="k">class</span> <span class="nc">Formatter</span>
     
     <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>    

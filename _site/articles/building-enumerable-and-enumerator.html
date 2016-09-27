@@ -10,8 +10,8 @@
   <meta name="description" content="When I first came to Ruby, one of the things that impressed me the most was the killer features provided by the Enumerable module. I eventually also came to ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/building-enumerable-and-enumerator">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/building-enumerable-and-enumerator">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -75,7 +75,7 @@
 
 <p>If you have some time to do so, try to get at least some of the tests to go green before reading my implementation code and explanations, as you’ll learn a lot more that way. But if you’re not planning on doing that, at least read through the tests carefully and think about how you might go about implementing the features they describe.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SortedList</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SortedList</span>
   <span class="kp">include</span> <span class="no">FakeEnumerable</span>
 
   <span class="k">def</span> <span class="nf">initialize</span>
@@ -173,7 +173,7 @@
 
 <p>Before I began work on implementing <code class="highlighter-rouge">FakeEnumerable</code>, I needed to get its tests to a failure state rather than an error state. The following code does exactly that:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FakeEnumerable</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FakeEnumerable</span>
   <span class="k">def</span> <span class="nf">map</span> 
   <span class="k">end</span>
 
@@ -191,7 +191,7 @@
 
 <p>I then began working on implementing the methods one by one, starting with <code class="highlighter-rouge">map</code>. The key thing to realize while working with <code class="highlighter-rouge">Enumerable</code> is that every feature will build on top of the <code class="highlighter-rouge">each</code> method in some way, using it in combination with <code class="highlighter-rouge">yield</code> to produce its results. The <code class="highlighter-rouge">map</code> feature is possibly the most straightforward nontrivial combination of these operations, as you can see in this implementation:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">map</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">map</span> 
   <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
 
   <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">out</span> <span class="o">&lt;&lt;</span> <span class="k">yield</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">}</span>
@@ -203,7 +203,7 @@
 
 <p>Here we see that <code class="highlighter-rouge">map</code> is simply a function that builds up a new array by taking each element and replacing it with the return value of the block you provide to it. We can clean this up to make it a one liner using <code class="highlighter-rouge">Object#tap</code>, but I’m not sure if I like that approach because it breaks the simplicity of the implementation a bit. That said, I’ve included it here for your consideration and will use it throughout the rest of this article, just for the sake of brevity.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">map</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">map</span>
   <span class="p">[].</span><span class="nf">tap</span> <span class="p">{</span> <span class="o">|</span><span class="n">out</span><span class="o">|</span> <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">out</span> <span class="o">&lt;&lt;</span> <span class="k">yield</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
@@ -211,7 +211,7 @@
 
 <p>Implementing <code class="highlighter-rouge">select</code> is quite easy as well. It builds on the same concepts used to implement <code class="highlighter-rouge">map</code> but adds a conditional check to see whether the block returns a <code class="highlighter-rouge">true</code> value. For each new yielded element, if the value returned by the block is logically true, the element gets added to the newly built array; otherwise, it does not.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">select</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">select</span>
   <span class="p">[].</span><span class="nf">tap</span> <span class="p">{</span> <span class="o">|</span><span class="n">out</span><span class="o">|</span> <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">out</span> <span class="o">&lt;&lt;</span> <span class="n">e</span> <span class="k">if</span> <span class="k">yield</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
@@ -219,7 +219,7 @@
 
 <p>Implementing <code class="highlighter-rouge">sort_by</code> is a little more tricky. I cheated and looked at the API documentation, which (perhaps surprisingly) describes how the method is implemented and even gives a reference implementation in Ruby. Apparently, <code class="highlighter-rouge">sort_by</code> uses a <a href="http://en.wikipedia.org/wiki/Schwartzian_transform">Schwartzian transform</a> to convert the collection we are iterating over into tuples containing the sort key and the original element. It then uses <code class="highlighter-rouge">Array#sort</code> to put these in order, and it finally uses <code class="highlighter-rouge">map</code> on the resulting array to convert the array of tuples back into an array of the elements from the original collection. That’s definitely more confusing to explain than it is to implement in code, so just look at the following code for clarification:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">sort_by</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">sort_by</span>
   <span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">a</span><span class="o">|</span> <span class="p">[</span><span class="k">yield</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">a</span><span class="p">]</span> <span class="p">}.</span><span class="nf">sort</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">a</span><span class="o">|</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">}</span>
 <span class="k">end</span>
 </code></pre>
@@ -229,7 +229,7 @@
 
 <p>Implementing <code class="highlighter-rouge">reduce</code> is a bit more involved because it has three different ways of interacting with it. It’s also interesting because it’s one of the few <code class="highlighter-rouge">Enumerable</code> methods that isn’t necessarily designed to return an <code class="highlighter-rouge">Array</code> object. I’ll let you ponder the following implementation a bit before providing more commentary, because reading through it should be a good exercise.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="n">operation_or_value</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="n">operation_or_value</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
   <span class="k">case</span> <span class="n">operation_or_value</span>
   <span class="k">when</span> <span class="no">Symbol</span>
     <span class="c1"># convert things like reduce(:+) into reduce { |s,e| s + e }</span>
@@ -265,7 +265,7 @@
 
 <p>Similar to before, I needed to write some code to get my tests to a failure state. First, I set up the skeleton of the <code class="highlighter-rouge">FakeEnumerator</code> class.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FakeEnumerator</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FakeEnumerator</span>
   <span class="k">def</span> <span class="nf">next</span>
   <span class="k">end</span>
 
@@ -280,7 +280,7 @@
 
 <p>Then I realized that I needed to back and at least modify the <code class="highlighter-rouge">FakeEnumerable#map</code> method, as my tests rely on it returning a <code class="highlighter-rouge">FakeEnumerator</code> object when a block is not provided, in a similar manner to the way <code class="highlighter-rouge">Enumerable#map</code> would return an <code class="highlighter-rouge">Enumerator</code> in that scenario.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FakeEnumerable</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FakeEnumerable</span>
   <span class="k">def</span> <span class="nf">map</span> 
     <span class="k">if</span> <span class="nb">block_given?</span>
       <span class="p">[].</span><span class="nf">tap</span> <span class="p">{</span> <span class="o">|</span><span class="n">out</span><span class="o">|</span> <span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">out</span> <span class="o">&lt;&lt;</span> <span class="k">yield</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>
@@ -298,7 +298,7 @@
 
 <p>Our tests call for us to implement <code class="highlighter-rouge">next</code>, <code class="highlighter-rouge">rewind</code>, and <code class="highlighter-rouge">each_index</code>, but before we can do that meaningfully, we need to make <code class="highlighter-rouge">FakeEnumerator</code> into a <code class="highlighter-rouge">FakeEnumerable</code>-enabled proxy object. There are no tests for this because I didn’t want to reveal too many hints to those who wanted to try this exercise at home, but this code will do the trick:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FakeEnumerator</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FakeEnumerator</span>
   <span class="kp">include</span> <span class="no">FakeEnumerable</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">iter</span><span class="p">)</span> 
@@ -319,7 +319,7 @@
 
 <p>What we need to be able to do is iterate once, then pause and return a value. Then, when <code class="highlighter-rouge">next</code> is called again, we need to be able to advance one more iteration and repeat the process. We could do something like run the whole iteration and cache the results into an array, then do some sort of indexing operation, but that’s both inefficient and impractical for certain applications. This problem made me realize that Ruby’s <code class="highlighter-rouge">Fiber</code> construct might be a good fit because it specifically allows you to jump in and out of a chunk of code on demand. So I decided to try that out and see how far I could get. After some fumbling around, I got the following code to pass the test:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># loading the fiber stdlib gives us some extra features, including Fiber#alive?</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># loading the fiber stdlib gives us some extra features, including Fiber#alive?</span>
 <span class="nb">require</span> <span class="s2">"fiber"</span> 
 
 <span class="k">class</span> <span class="nc">FakeEnumerator</span>
@@ -348,7 +348,7 @@
 
 <p>The use of <code class="highlighter-rouge">Fiber</code> objects to implement <code class="highlighter-rouge">next</code> makes it possible to work with infinite iterators, such as <code class="highlighter-rouge">Enumerable#cycle</code>. Though we won’t get into implementation details, the following code should give some hints as to why this is a useful feature:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">row_colors</span> <span class="o">=</span> <span class="p">[</span><span class="ss">:red</span><span class="p">,</span> <span class="ss">:green</span><span class="p">].</span><span class="nf">cycle</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">row_colors</span> <span class="o">=</span> <span class="p">[</span><span class="ss">:red</span><span class="p">,</span> <span class="ss">:green</span><span class="p">].</span><span class="nf">cycle</span>
 <span class="o">=&gt;</span> <span class="c1">#&lt;Enumerator: [:red, :green]:cycle&gt;</span>
 <span class="o">&gt;&gt;</span> <span class="n">row_colors</span><span class="p">.</span><span class="nf">next</span>
 <span class="o">=&gt;</span> <span class="ss">:red</span>
@@ -365,7 +365,7 @@
 
 <p>I found a way to implement <code class="highlighter-rouge">rewind</code> that is trivial, but something about it makes me wonder if I’ve orphaned a <code class="highlighter-rouge">Fiber</code> object somewhere and whether that has weird garbage collection mplications. But nonetheless, because our implementation of <code class="highlighter-rouge">next</code> depends on the caching of a <code class="highlighter-rouge">Fiber</code> object to keep track of where it is in its iteration, the easiest way to rewind back to the beginning state is to simply wipe out that object. The following code gets my <code class="highlighter-rouge">rewind</code> tests passing:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rewind</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rewind</span>
   <span class="vi">@fiber</span> <span class="o">=</span> <span class="kp">nil</span>
 <span class="k">end</span>
 </code></pre>
@@ -373,7 +373,7 @@
 
 <p>Now only one feature stands between us and the completion of our exercise: <code class="highlighter-rouge">with_index</code>. The real <code class="highlighter-rouge">with_index</code> method in Ruby is much smarter than what you’re about to see, but for its most simple functionality, the following code will do the trick:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">with_index</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">with_index</span>
   <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
   <span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> 
     <span class="n">out</span> <span class="o">=</span> <span class="k">yield</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>

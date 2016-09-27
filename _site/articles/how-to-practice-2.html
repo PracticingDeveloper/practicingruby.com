@@ -10,8 +10,8 @@
   <meta name="description" content="  NOTE: I generally remove temporal references in Practicing Ruby articles to keep them disconnected from a particular point in time, butin this case I inten...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/how-to-practice-2">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/how-to-practice-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -179,7 +179,7 @@ some modifications to make it not match the reference.</p>
 
 <p>[06:51] Phase 1 complete!</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">ruby</span> <span class="n">check_solution</span><span class="p">.</span><span class="nf">rb</span> <span class="n">samples</span><span class="o">/</span><span class="n">reference</span><span class="p">.</span><span class="nf">txt</span> <span class="n">samples</span><span class="o">/</span><span class="n">good</span><span class="p">.</span><span class="nf">txt</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">ruby</span> <span class="n">check_solution</span><span class="p">.</span><span class="nf">rb</span> <span class="n">samples</span><span class="o">/</span><span class="n">reference</span><span class="p">.</span><span class="nf">txt</span> <span class="n">samples</span><span class="o">/</span><span class="n">good</span><span class="p">.</span><span class="nf">txt</span> 
 <span class="no">GOOD</span>
 
 <span class="err">$</span> <span class="n">ruby</span> <span class="n">check_solution</span><span class="p">.</span><span class="nf">rb</span> <span class="n">samples</span><span class="o">/</span><span class="n">reference</span><span class="p">.</span><span class="nf">txt</span> <span class="n">samples</span><span class="o">/</span><span class="n">bad</span><span class="p">.</span><span class="nf">txt</span>
@@ -189,7 +189,7 @@ some modifications to make it not match the reference.</p>
 
 <p>Source code is dead simple, just a few lines.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"digest/sha1"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"digest/sha1"</span>
 
 <span class="n">expected</span> <span class="o">=</span> <span class="no">Digest</span><span class="o">::</span><span class="no">SHA1</span><span class="p">.</span><span class="nf">hexdigest</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="no">ARGV</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 <span class="n">actual</span>   <span class="o">=</span> <span class="no">Digest</span><span class="o">::</span><span class="no">SHA1</span><span class="p">.</span><span class="nf">hexdigest</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="no">ARGV</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
@@ -217,7 +217,7 @@ bugs. Drat!</p>
 <p>[07:08] Oh, apparently I just don’t know how to use curl, working now! (albiet
 with a little echo hack to add a newline)</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">curl</span> <span class="o">-</span><span class="no">F</span> <span class="s2">"data=@samples/bad.txt"</span> <span class="mi">127</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span><span class="mi">4567</span><span class="o">/</span><span class="n">reference</span><span class="p">.</span><span class="nf">txt</span><span class="p">;</span> <span class="n">echo</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="err">$</span> <span class="n">curl</span> <span class="o">-</span><span class="no">F</span> <span class="s2">"data=@samples/bad.txt"</span> <span class="mi">127</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span><span class="mi">4567</span><span class="o">/</span><span class="n">reference</span><span class="p">.</span><span class="nf">txt</span><span class="p">;</span> <span class="n">echo</span>
 <span class="no">BAD</span>
 <span class="err">$</span> <span class="n">curl</span> <span class="o">-</span><span class="no">F</span> <span class="s2">"data=@samples/good.txt"</span> <span class="mi">127</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">1</span><span class="p">:</span><span class="mi">4567</span><span class="o">/</span><span class="n">reference</span><span class="p">.</span><span class="nf">txt</span><span class="p">;</span> <span class="n">echo</span>
 <span class="no">GOOD</span>
@@ -226,7 +226,7 @@ with a little echo hack to add a newline)</p>
 
 <p>Source is still quite simple, so I can inline it here.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"rubygems"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"rubygems"</span>
 <span class="nb">require</span> <span class="s2">"sinatra"</span>
 <span class="nb">require</span> <span class="s2">"digest/sha1"</span>
 
@@ -301,7 +301,7 @@ you <em>have</em> googled sl by now, right? :)</p>
 console to imagine their interactions. Will need to save a proper implementation
 for later.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">Puzzle</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"Reference"</span><span class="p">,</span> <span class="ss">:fingerprint</span> <span class="o">=&gt;</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">Puzzle</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s2">"Reference"</span><span class="p">,</span> <span class="ss">:fingerprint</span> <span class="o">=&gt;</span>
 <span class="o">&gt;&gt;</span> <span class="no">Digest</span><span class="o">::</span><span class="no">SHA1</span><span class="p">.</span><span class="nf">hexdigest</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="s2">"</span><span class="si">#{</span><span class="no">RAILS_ROOT</span><span class="si">}</span><span class="s2">/samples/reference.txt"</span><span class="p">)))</span>
 
 <span class="o">=&gt;</span> <span class="c1">#&lt;Puzzle id: 1, name: "Reference", fingerprint:</span>

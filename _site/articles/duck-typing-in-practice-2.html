@@ -10,8 +10,8 @@
   <meta name="description" content="Today, I’ve got a handful of neat examples to share, each which demonstrates an interesting use of duck typing. We’ll start by looking a feature built into R...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/duck-typing-in-practice-2">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/duck-typing-in-practice-2">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -71,7 +71,7 @@ floats are used in a given expression. While I assume that you are already
 familiar with Ruby’s behavior, the following example demonstrates what 
 I’ve just described.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="o">/</span><span class="mi">2</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="o">/</span><span class="mi">2</span>
 <span class="o">=&gt;</span> <span class="mi">1</span>
 <span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="o">.</span><span class="mi">0</span>
 <span class="o">=&gt;</span> <span class="mi">1</span><span class="o">.</span><span class="mi">5</span>
@@ -80,7 +80,7 @@ I’ve just described.</p>
 
 <p>This is an obvious candidate for implementation level special casing, but since all the primitive numeric types in Ruby are actually objects, Ruby prefers something a bit more flexible and consistent. What actually happens when an arithmetic operation is performed on a Ruby number is that a method called <code class="highlighter-rouge">coerce()</code> is called to do any necessary type modifications so that the computations work as expected. The irb session shown below demonstrates calling <code class="highlighter-rouge">coerce()</code> directly on both a <code class="highlighter-rouge">Fixnum</code> and a <code class="highlighter-rouge">Float</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="p">.</span><span class="nf">coerce</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="p">.</span><span class="nf">coerce</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 <span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="p">.</span><span class="nf">coerce</span><span class="p">(</span><span class="mi">2</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">2</span><span class="o">.</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">.</span><span class="mi">0</span><span class="p">]</span>
@@ -95,7 +95,7 @@ I’ve just described.</p>
 
 <p>To demonstrate this, I have created a partial implementation of a <code class="highlighter-rouge">BinaryInteger</code> object. A <code class="highlighter-rouge">BinaryInteger</code> is meant to act similar to Ruby’s <code class="highlighter-rouge">Fixnum</code> objects but display itself to the user in binary notation. Here’s an example of how such an object might be used:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">int</span> <span class="o">=</span> <span class="no">BinaryInteger</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">int</span> <span class="o">=</span> <span class="no">BinaryInteger</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
 <span class="o">=&gt;</span> <span class="mb">0b101000</span>
 <span class="o">&gt;&gt;</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">int</span>
 <span class="o">=&gt;</span> <span class="mb">0b101010</span>
@@ -109,7 +109,7 @@ I’ve just described.</p>
 
 <p>The following class definition does not quite produce a complete <code class="highlighter-rouge">Numeric</code> work-alike but it is sufficient for making the previous example work as shown. It also serves to demonstrate that <code class="highlighter-rouge">coerce()</code> is indeed the magic that ties all of Ruby’s arithmetic operations together.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BinaryInteger</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">BinaryInteger</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="vi">@value</span> <span class="o">=</span> <span class="n">value</span>
   <span class="k">end</span>
@@ -156,7 +156,7 @@ I’ve just described.</p>
 
 <p>The first example of duck typing in actual Ruby projects that I want to share is actually quite similar to the contrived <code class="highlighter-rouge">read_data()</code> example I shared on Tuesday. Today, rather than showing you the usage code first, I want you to take a look at the implementation and try to spot the usage of duck typing and guess at what it gains us before reading on.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{})</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{})</span>
   <span class="no">Prawn</span><span class="p">.</span><span class="nf">verify_options</span> <span class="p">[</span><span class="ss">:at</span><span class="p">,</span> <span class="ss">:position</span><span class="p">,</span> <span class="ss">:vposition</span><span class="p">,</span> <span class="ss">:height</span><span class="p">,</span>
                         <span class="ss">:width</span><span class="p">,</span> <span class="ss">:scale</span><span class="p">,</span> <span class="ss">:fit</span><span class="p">],</span> <span class="n">options</span>
 
@@ -177,7 +177,7 @@ I’ve just described.</p>
 
 <p>If you guessed this code is used to make it so that the <code class="highlighter-rouge">image()</code> method can be called with either a file name or a file handle, you had the right idea. It does all of the things we discussed yesterday, allowing the use of this code with <code class="highlighter-rouge">StringIO</code>, <code class="highlighter-rouge">Tempfile</code>, any mock object that implements a <code class="highlighter-rouge">read()</code> method, etc. But the really interesting use case is the one that we actually wrote this feature for, shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"open-uri"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"open-uri"</span>
 
 <span class="no">Prawn</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="s2">"remote_images.pdf"</span><span class="p">)</span> <span class="k">do</span>
   <span class="n">image</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"http://prawn.majesticseacreature.com/images/prawn.png"</span><span class="p">)</span>
@@ -197,7 +197,7 @@ guess without knowing a bit about Prawn, it represents the elegant compromise th
 
 <p>One area Aaron Patterson found was a hotspot for many Rails apps are <code class="highlighter-rouge">ActiveRecord</code> scopes, which allow the users to create custom filters. For example, consider the following example which filters by email address.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Comment</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Comment</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
   <span class="n">scope</span> <span class="ss">:with_email</span><span class="p">,</span> <span class="nb">lambda</span> <span class="p">{</span> <span class="o">|</span><span class="n">email</span><span class="o">|</span>
     <span class="n">where</span><span class="p">(</span><span class="ss">:email</span> <span class="o">=&gt;</span> <span class="n">email</span><span class="p">)</span>
   <span class="p">}</span>
@@ -223,7 +223,7 @@ a <code class="highlighter-rouge">call()</code> method.</p>
 <p>Shown below is the one line patch that changes the behavior of <code class="highlighter-rouge">scope()</code> to
 allow the use of any object that implements a meaningful <code class="highlighter-rouge">call()</code> method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># BEFORE</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># BEFORE</span>
 <span class="n">options</span> <span class="o">=</span> <span class="n">filter</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Proc</span><span class="p">)</span> <span class="p">?</span> <span class="n">filter</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="p">:</span> <span class="n">filter</span>
 
 <span class="c1"># AFTER</span>
@@ -233,7 +233,7 @@ allow the use of any object that implements a meaningful <code class="highlighte
 
 <p>With this nearly microscopic change, we can write a faster <code class="highlighter-rouge">with_email()</code> scope that also leaves room for complex logic such as validations in its own neatly defined namespace. The following definition is functionally equivalent to our original code that passes a <code class="highlighter-rouge">Proc</code> to <code class="highlighter-rouge">scope()</code>, but has a lot more potential for future growth.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmailFilter</span> 
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EmailFilter</span> 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">model_class</span><span class="p">)</span>
     <span class="vi">@model_class</span> <span class="o">=</span> <span class="n">model_class</span>
   <span class="k">end</span>

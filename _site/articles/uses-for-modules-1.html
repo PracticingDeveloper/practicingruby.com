@@ -10,8 +10,8 @@
   <meta name="description" content="  Note: This article series on modules is also available as a PDF download. ThePDF version has been revised and is more up-to-date than what you see here.Mod...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/uses-for-modules-1">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/uses-for-modules-1">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -74,7 +74,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>Imagine that you are writing an XML generation library, and in it, you have a class to generate your XML documents. Perhaps uncreatively, you choose the name <code class="highlighter-rouge">Document</code> for your class, creating something similar to what is shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Document</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Document</span>
   <span class="k">def</span> <span class="nf">generate</span>
     <span class="c1"># ...</span>
   <span class="k">end</span>
@@ -84,7 +84,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>On its own, this seems to make a lot of sense; a user could do something simple like the following to make use of your library.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"your_xml_lib"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"your_xml_lib"</span>
 <span class="n">document</span> <span class="o">=</span> <span class="no">Document</span><span class="p">.</span><span class="nf">new</span>
 <span class="c1"># do something with document</span>
 <span class="nb">puts</span> <span class="n">document</span><span class="p">.</span><span class="nf">generate</span>
@@ -93,7 +93,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>But imagine that you were using another library that generates PDF documents, which happens to use similar uncreative naming for its class that does the PDF document generation. Then, the following code would look equally valid.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"their_pdf_lib"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"their_pdf_lib"</span>
 <span class="n">document</span> <span class="o">=</span> <span class="no">Document</span><span class="p">.</span><span class="nf">new</span>
 <span class="c1"># do something with document</span>
 <span class="nb">puts</span> <span class="n">document</span><span class="p">.</span><span class="nf">generate</span>
@@ -104,7 +104,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>But there is no reason for this to happen, as long as both libraries take care to namespace things. Shown below is an example of two <code class="highlighter-rouge">Document</code> classes that could co-exist peacefully.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># somewhere in your_xml_lib</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># somewhere in your_xml_lib</span>
 
 <span class="k">module</span> <span class="nn">XML</span>
   <span class="k">class</span> <span class="nc">Document</span>
@@ -124,7 +124,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>Using both classes in the same application is as easy, as long as you explicitly include the namespace when referring to each library’s <code class="highlighter-rouge">Document</code> class.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"your_xml_lib"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"your_xml_lib"</span>
 <span class="nb">require</span> <span class="s2">"their_pdf_lib"</span>
 
 <span class="c1"># this pair of calls refer to two completely different classes</span>
@@ -137,7 +137,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>Firstly, namespacing actually applies to the way constants are looked up in Ruby in general, not classes in particular. This means that it applies to modules nested within modules as well as ordinary constants as well.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">A</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">A</span>
   <span class="k">module</span> <span class="nn">B</span>
   <span class="k">end</span>
 <span class="k">end</span>
@@ -154,7 +154,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>Secondly, this same behavior of using modules as namespaces applies just as well to classes, as in the code below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Blog</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Blog</span>
   <span class="k">class</span> <span class="nc">Comment</span>
     <span class="c1">#...</span>
   <span class="k">end</span>
@@ -164,7 +164,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>Be sure to note that in this example, nesting a class within a class does not in any way make it a subclass or establish any relationship between <code class="highlighter-rouge">Blog</code> and <code class="highlighter-rouge">Blog::Comment</code> except that <code class="highlighter-rouge">Blog::Comment</code> is within the <code class="highlighter-rouge">Blog</code> namespace. In the example below, you can see that a class nested within another class looks the same as a class nested within a module.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">blog</span> <span class="o">=</span> <span class="no">Blog</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">blog</span> <span class="o">=</span> <span class="no">Blog</span><span class="p">.</span><span class="nf">new</span>
 <span class="n">comment</span> <span class="o">=</span> <span class="no">Blog</span><span class="o">::</span><span class="no">Comment</span><span class="p">.</span><span class="nf">new</span>
 <span class="c1"># ...</span>
 </code></pre>
@@ -176,7 +176,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>For example, examine the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FancyReporter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FancyReporter</span>
   <span class="k">class</span> <span class="nc">Document</span>
     <span class="k">def</span> <span class="nf">initialize</span>
        <span class="vi">@output</span> <span class="o">=</span> <span class="no">String</span><span class="p">.</span><span class="nf">new</span>
@@ -190,7 +190,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>If you load this code into irb and play with a bit on its own, you can inspect an instance of Document to see that its output attribute is a core ruby <code class="highlighter-rouge">String</code> object, as shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">FancyReporter</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">output</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="no">FancyReporter</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">output</span>
 <span class="o">=&gt;</span> <span class="s2">""</span>
 <span class="o">&gt;&gt;</span> <span class="no">FancyReporter</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">output</span><span class="p">.</span><span class="nf">class</span>
 <span class="o">=&gt;</span> <span class="no">String</span>
@@ -199,7 +199,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>While this seems fairly obvious, it is easy for a bit of unrelated code written elsewhere to change everything. Consider the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FancyReporter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FancyReporter</span>
   <span class="k">module</span> <span class="nn">String</span>
     <span class="k">class</span> <span class="nc">Formatter</span>
     <span class="k">end</span>
@@ -210,7 +210,7 @@ PDF version has been revised and is more up-to-date than what you see here.</p>
 
 <p>While the designer of <code class="highlighter-rouge">FancyReporter</code> was most likely trying to be well organized by offering <code class="highlighter-rouge">FancyReporter::String::Formatter</code>, this small change causes headaches because it changes the meaning of <code class="highlighter-rouge">String.new</code> in <code class="highlighter-rouge">Document</code>’s initialize method. In fact, you cannot even create an instance of <code class="highlighter-rouge">Document</code> before the following error is raised:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="sc">?&gt;</span> <span class="no">FancyReporter</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">new</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="sc">?&gt;</span> <span class="no">FancyReporter</span><span class="o">::</span><span class="no">Document</span><span class="p">.</span><span class="nf">new</span>
 <span class="no">NoMethodError</span><span class="p">:</span> <span class="n">undefined</span> <span class="nb">method</span> <span class="sb">`new' for FancyReporter::String:Module
 	from (irb):35:in `</span><span class="kp">initialize</span><span class="s1">'
 	from (irb):53:in `new'</span>
@@ -227,7 +227,7 @@ independent of context, and that is to use explicit constant lookups from the
 global namespace. You can see an example of explicit lookups in the following
 code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FancyReporter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">FancyReporter</span>
   <span class="k">class</span> <span class="nc">Document</span>
     <span class="k">def</span> <span class="nf">initialize</span>
        <span class="vi">@output</span> <span class="o">=</span> <span class="o">::</span><span class="no">String</span><span class="p">.</span><span class="nf">new</span>
@@ -249,13 +249,13 @@ code:</p>
 
 <p>In some older documentation, and some relatively recent code written by folks who learned from old documentation, you may see class methods being called in the manner shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="no">YAML</span><span class="o">::</span><span class="nb">load</span><span class="p">(</span><span class="no">File</span><span class="o">::</span><span class="n">read</span><span class="p">(</span><span class="s2">"foo.yaml"</span><span class="p">))</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="no">YAML</span><span class="o">::</span><span class="nb">load</span><span class="p">(</span><span class="no">File</span><span class="o">::</span><span class="n">read</span><span class="p">(</span><span class="s2">"foo.yaml"</span><span class="p">))</span>
 </code></pre>
 </div>
 
 <p>While the above code runs fine, it’s only a historical accident that it does. In fact, <code class="highlighter-rouge">::</code> was never meant for method invocation, class methods or otherwise. You can easily demonstrate that <code class="highlighter-rouge">::</code> can be used to execute instance methods as well, which eliminates any notion that <code class="highlighter-rouge">::</code> has some special ‘class methods only’ distinction to it.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="s2">"foo"</span><span class="o">::</span><span class="n">reverse</span> <span class="c1">#=&gt; "oof"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="s2">"foo"</span><span class="o">::</span><span class="n">reverse</span> <span class="c1">#=&gt; "oof"</span>
 </code></pre>
 </div>
 
@@ -267,7 +267,7 @@ code:</p>
 
 <p>In your code, you should feel free to replace any method calls that use this style with ordinary <code class="highlighter-rouge">Foo.bar</code> calls. This actually reflects more of the true nature of Ruby, in that it doesn’t emphasize the difference between class level calls and instance level calls, since that distinction isn’t especially important. In documentation, things are a little trickier, but it is now generally accepted that <code class="highlighter-rouge">Foo.bar</code> refers to a class method and <code class="highlighter-rouge">Foo#bar</code> refers to an instance method. In cases where that distinction alone might be confusing, you could always be explicit, as in the example below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span><span class="p">.</span><span class="nf">bar</span> <span class="c1"># obj is an instance of Foo</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">obj</span><span class="p">.</span><span class="nf">bar</span> <span class="c1"># obj is an instance of Foo</span>
 </code></pre>
 </div>
 

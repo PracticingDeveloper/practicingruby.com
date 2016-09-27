@@ -10,8 +10,8 @@
   <meta name="description" content="  This issue was a collaboration with Alberto Fernández Capel, a Ruby developerfrom Spain. Although it has been through many revisions sincewe started, Alber...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/gentle-intro-to-actor-based-concurrency">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/gentle-intro-to-actor-based-concurrency">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -118,7 +118,7 @@ convert this problem domain into a few basic Ruby objects.</p>
 <p>All three of the solutions we’ll discuss in this article rely on a <code class="highlighter-rouge">Chopstick</code>
 class and a <code class="highlighter-rouge">Table</code> class. The definitions of both classes are shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Chopstick</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Chopstick</span>
   <span class="k">def</span> <span class="nf">initialize</span>
     <span class="vi">@mutex</span> <span class="o">=</span> <span class="no">Mutex</span><span class="p">.</span><span class="nf">new</span>
   <span class="k">end</span>
@@ -177,7 +177,7 @@ We’ll start with what <em>doesn’t</em> work.</p>
 solution to this problem, but has a fatal flaw that prevents it from being
 thread safe. Can you spot it?</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Philosopher</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Philosopher</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
     <span class="vi">@name</span> <span class="o">=</span> <span class="nb">name</span>
   <span class="k">end</span>
@@ -228,7 +228,7 @@ philosopher would simply wait forever for their right-hand chopstick to
 become available – resulting in a deadlock. You can reproduce the problem
 by running the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">names</span> <span class="o">=</span> <span class="sx">%w{Heraclitus Aristotle Epictetus Schopenhauer Popper}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">names</span> <span class="o">=</span> <span class="sx">%w{Heraclitus Aristotle Epictetus Schopenhauer Popper}</span>
 
 <span class="n">philosophers</span> <span class="o">=</span> <span class="n">names</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span> <span class="no">Philosopher</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span> <span class="p">}</span>
 <span class="n">table</span>        <span class="o">=</span> <span class="no">Table</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">philosophers</span><span class="p">.</span><span class="nf">size</span><span class="p">)</span>
@@ -245,7 +245,7 @@ by running the following code:</p>
 <p>Ruby is smart enough to inform you of what went wrong, so you should end up
 seeing a backtrace that looks something like this:</p>
 
-<pre><code class="language-console">Aristotle is thinking
+<div class="language-console highlighter-rouge"><pre class="highlight"><code>Aristotle is thinking
 Popper is eating.
 Popper is thinking
 Epictetus is eating.
@@ -259,6 +259,7 @@ dining_philosophers_uncoordinated.rb:79:in `join': deadlock detected (fatal)
   from dining_philosophers_uncoordinated.rb:79:in `each'
   from dining_philosophers_uncoordinated.rb:79:in `&lt;main&gt;
 </code></pre>
+</div>
 
 <p>In many situations, the most simple solution tends to be the best one, but this
 is obviously not one of those cases. Since we’ve learned the hard way that the
@@ -285,7 +286,7 @@ eat, even if there may be more than four chopsticks already in use.</p>
 <p>To avoid this situation we need to protect the critical region with a mutex, as
 shown below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Waiter</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Waiter</span>
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">capacity</span><span class="p">)</span>
     <span class="vi">@capacity</span> <span class="o">=</span> <span class="n">capacity</span>
     <span class="vi">@mutex</span>    <span class="o">=</span> <span class="no">Mutex</span><span class="p">.</span><span class="nf">new</span>
@@ -306,7 +307,7 @@ shown below:</p>
 <p>Introducing the <code class="highlighter-rouge">Waiter</code> object requires us to make some minor changes to our
 <code class="highlighter-rouge">Philosopher</code> object, but they are fairly straightforward:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Philosopher</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Philosopher</span>
 
   <span class="c1"># ... all omitted code same as before</span>
 
@@ -336,7 +337,7 @@ shown below:</p>
 <p>The runner code also needs minor tweaks, but is mostly similar to what
 you saw earlier:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">names</span> <span class="o">=</span> <span class="sx">%w{Heraclitus Aristotle Epictetus Schopenhauer Popper}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">names</span> <span class="o">=</span> <span class="sx">%w{Heraclitus Aristotle Epictetus Schopenhauer Popper}</span>
 
 <span class="n">philosophers</span> <span class="o">=</span> <span class="n">names</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span> <span class="no">Philosopher</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span> <span class="p">}</span>
 
@@ -374,7 +375,7 @@ context, but the changed portions are marked with comments.</p>
 of this code, so don’t worry about understanding every last detail. Instead,
 just try to get a basic idea of what’s going on here:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Philosopher</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Philosopher</span>
   <span class="kp">include</span> <span class="no">Celluloid</span>
 
   <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
@@ -469,7 +470,7 @@ just try to get a basic idea of what’s going on here:</p>
 
 <p>The runner code is similar to before, with only some very minor changes:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">names</span> <span class="o">=</span> <span class="sx">%w{Heraclitus Aristotle Epictetus Schopenhauer Popper}</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">names</span> <span class="o">=</span> <span class="sx">%w{Heraclitus Aristotle Epictetus Schopenhauer Popper}</span>
 
 <span class="n">philosophers</span> <span class="o">=</span> <span class="n">names</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span> <span class="no">Philosopher</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span> <span class="p">}</span>
 
@@ -523,7 +524,7 @@ model is within our reach. In fact, the following 80 lines of code are
 enough to serve as a replacement for our use of Celluloid in the 
 previous example:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'thread'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'thread'</span>
 
 <span class="k">module</span> <span class="nn">Actor</span>  <span class="c1"># To use this, you'd include Actor instead of Celluloid</span>
   <span class="k">module</span> <span class="nn">ClassMethods</span>

@@ -10,8 +10,8 @@
   <meta name="description" content="The most simple and unambiguous benefit that automated testing provides is that it can be used to minimize the impact of regressions. If each bug fix is acco...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/regession-testing">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/regession-testing">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -71,7 +71,7 @@
 
 <p>We now have support for Github-style mentions in our comments here on practicingruby.com, but the initial version of this feature was much more fragile than the one that is now in place. When Jordan first demonstrated the feature to me, I immediately tried to break it by manually testing how it dealt with case sensitivity, punctuation, and mentions of users who were not subscribed to Practicing Ruby. I succeeded at demonstrating bad behavior for two out of three of these cases, so Jordan quickly coded up a fix and an accompanying test for that fix. The test he wrote is shown here:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"returns an array of valid users mentioned"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"returns an array of valid users mentioned"</span> <span class="k">do</span>
   <span class="n">person</span> <span class="o">=</span> <span class="no">Factory</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">:github_nickname</span> <span class="o">=&gt;</span> <span class="s2">"PerSon"</span><span class="p">)</span>
   <span class="n">frank</span> <span class="o">=</span> <span class="no">Factory</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">:github_nickname</span> <span class="o">=&gt;</span> <span class="s2">"frank-pepelio"</span><span class="p">)</span>
 
@@ -91,7 +91,7 @@
 
 <p>If you guessed that it was because I have some deep-rooted hatred for Frank Pepelio, unfortunately that’s not correct. But if instead you guessed that it was because I thought this test was covering too many different behaviors at once, you were spot on. I came up with the following tests as a suitable replacement.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"returns an array of valid users mentioned"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"returns an array of valid users mentioned"</span> <span class="k">do</span>
   <span class="n">person</span> <span class="o">=</span> <span class="no">Factory</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">:github_nickname</span> <span class="o">=&gt;</span> <span class="s2">"PerSon"</span><span class="p">)</span>
   <span class="n">frank</span> <span class="o">=</span> <span class="no">Factory</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">:github_nickname</span> <span class="o">=&gt;</span> <span class="s2">"frank-pepelio"</span><span class="p">)</span>
 
@@ -157,7 +157,7 @@
 
 <p>With that in mind, I set out to write integration tests that cover the process of linking your GitHub account to your MailChimp subscription from end to end. I started with the easy case of when your GitHub email address matches the one you subscribed to this newsletter with. The code below is my first rough draft of a test that walks through that process.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"github autolinking"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"github autolinking"</span> <span class="k">do</span>
   <span class="no">Factory</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">:email</span> <span class="o">=&gt;</span> <span class="s2">"gregory.t.brown@gmail.com"</span><span class="p">)</span>
 
   <span class="no">OmniAuth</span><span class="p">.</span><span class="nf">config</span><span class="p">.</span><span class="nf">add_mock</span><span class="p">(</span><span class="ss">:github</span><span class="p">,</span> <span class="p">{</span>
@@ -193,7 +193,7 @@
 
 <p>No longer feeling confident in my ability to weed out these errors from memory, I did a quick projectwide search with ack on the word “deliver” to confirm that this was indeed the last instance of this particular bug. After I was sure that was the case, I was able to move onto the workflow that caused me to detect this bug in the first place: our manual MailChimp-to-GitHub linking process. It is more or less the same set of steps, but involves filling out a form field before the confirmation email gets sent.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"github manual linking"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"github manual linking"</span> <span class="k">do</span>
   <span class="no">Factory</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">:email</span> <span class="o">=&gt;</span> <span class="s2">"gregory.t.brown@gmail.com"</span><span class="p">)</span>
 
   <span class="no">OmniAuth</span><span class="p">.</span><span class="nf">config</span><span class="p">.</span><span class="nf">add_mock</span><span class="p">(</span><span class="ss">:github</span><span class="p">,</span> <span class="p">{</span>
@@ -233,7 +233,7 @@
 
 <p>Now that the immediate concern of having some tests to accompany my bug fixes was resolved, I turned my eye to the messy code I had just written and found it in dire need of refactoring. Because I typically only ever worked far down the Rails stack in my consulting work, proper integration testing is a skill I never picked up. But just my sense of Ruby coding in general made me realize that I could do some simple extractions to at least hide some of the nasty stuff this code was doing. The following tests show what I ended up with.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"github autolinking"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">test</span> <span class="s2">"github autolinking"</span> <span class="k">do</span>
   <span class="n">email</span> <span class="o">=</span> <span class="s2">"gregory.t.brown@gmail.com"</span>
   <span class="n">uid</span>   <span class="o">=</span> <span class="s2">"12345"</span>
 

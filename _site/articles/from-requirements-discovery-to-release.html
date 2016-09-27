@@ -10,8 +10,8 @@
   <meta name="description" content="Every time we start a greenfield software project, we are faced with the overwhelming responsibility of creating something from nothing. Because the path fro...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/from-requirements-discovery-to-release">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/from-requirements-discovery-to-release">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -125,7 +125,7 @@ a big part of the physical game has to do with building little stacks of army ti
 
 <p>In order to implement this visualization, I needed to make some decisions about how the battlefield data was going to be represented, but I wanted to defer as much of that work as possible. After <a href="https://gist.github.com/1310883">asking for some feedback about this problem</a>, I opted to write the visualization code against a simple array of arrays of Ruby primitives that could be trivially be transformed to and from JSON. Within a few minutes, I had a script that was generating similar output to my original sketch:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"json"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"json"</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="no">JSON</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="no">ARGV</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 
@@ -168,7 +168,7 @@ a big part of the physical game has to do with building little stacks of army ti
 
 <p>Although you don’t necessarily need to worry about writing super-clean code for a first release of a project, it is important to at least lay down the basic groundwork, which makes it possible to replace bad code with good code later. By introducing a <code class="highlighter-rouge">TextDisplay</code> object, I was able to reduce the <em>stackwars-viewer</em> script to the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1">#!/usr/bin/env ruby</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1">#!/usr/bin/env ruby</span>
 
 <span class="nb">require</span> <span class="s2">"json"</span>
 <span class="nb">require_relative</span> <span class="s2">"../lib/stack_wars"</span>
@@ -181,7 +181,7 @@ a big part of the physical game has to do with building little stacks of army ti
 
 <p>After the initial extraction of the code from my script, I thought about how much time I wanted to invest in refactoring <code class="highlighter-rouge">TextDisplay</code>. I ended up deciding that because this game will eventually have a GUI that completely replaces its command-line interface, I shouldn’t put too much effort into code that would soon be deleted. However, I couldn’t resist making it at least a tiny bit more readable for the time being:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">StackWars</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">StackWars</span>
   <span class="k">class</span> <span class="nc">TextDisplay</span>
     <span class="nc">COLOR_SYM</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">"black"</span> <span class="o">=&gt;</span> <span class="s2">"B"</span><span class="p">,</span> <span class="s2">"white"</span> <span class="o">=&gt;</span> <span class="s2">"W"</span> <span class="p">}</span>
     <span class="no">HEADER</span>    <span class="o">=</span> <span class="s2">"</span><span class="si">#{</span><span class="s1">' '</span><span class="o">*</span><span class="mi">7</span><span class="si">}#{</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="nf">.</span><span class="mi">8</span><span class="p">).</span><span class="nf">to_a</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s1">' '</span><span class="o">*</span><span class="mi">6</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
@@ -216,7 +216,7 @@ a big part of the physical game has to do with building little stacks of army ti
 
 <p>After writing this code, I wondered whether I should tackle the building of a proper <code class="highlighter-rouge">Battlefield</code> class that would take the raw data for each cell and wrap it in a <code class="highlighter-rouge">Territory</code> object. I was hesitant to make both of these changes at once, so I ended up compromising by creating a <code class="highlighter-rouge">Battlefield</code> class that simply wrapped the nested array of primitives for now:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">StackWars</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">StackWars</span>
   <span class="k">class</span> <span class="nc">Battlefield</span>
     <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_json</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
       <span class="kp">new</span><span class="p">(</span><span class="no">JSON</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="n">json_file</span><span class="p">)))</span>
@@ -243,7 +243,7 @@ a big part of the physical game has to do with building little stacks of army ti
 
 <p>With this new object in place, I was able to further simplify the <em>stackwars-viewer</em> script, leading to the trivial code shown here:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s2">"../lib/stack_wars"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s2">"../lib/stack_wars"</span>
 
 <span class="nb">puts</span> <span class="no">StackWars</span><span class="o">::</span><span class="no">Battlefield</span><span class="p">.</span><span class="nf">from_json</span><span class="p">(</span><span class="no">ARGV</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </code></pre>
@@ -261,7 +261,7 @@ a big part of the physical game has to do with building little stacks of army ti
 
 <p>With this in mind, I knew it was time to take a closer look at some of the game actions in Stack Wars. Because the FORTIFY action must be implemented before any of the other game actions become meaningful, I decided to start there. The following code was my initial stab at figuring out what I needed to build in order to get this feature working:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">fortify</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">fortify</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
   <span class="n">position</span><span class="p">.</span><span class="nf">add_army</span><span class="p">(</span><span class="n">active_player</span><span class="p">.</span><span class="nf">color</span><span class="p">)</span>
   <span class="n">active_player</span><span class="p">.</span><span class="nf">reserves</span> <span class="o">-=</span> <span class="mi">1</span>
 <span class="k">end</span>
@@ -270,7 +270,7 @@ a big part of the physical game has to do with building little stacks of army ti
 
 <p>Until this point in the project, I had been avoiding writing formal tests because I had a mixture of trivial code and throwaway code. But now that I was about to work on some Serious Business, I decided to try test-driving things. After a fair amount of struggling, I decided to add <em>mocha</em> into the mix and begin test-driving a <code class="highlighter-rouge">Game</code> class through the use of mock objects:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s2">"../test_helper"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s2">"../test_helper"</span>
 
 <span class="n">describe</span> <span class="s2">"StackWars::Game"</span> <span class="k">do</span>
 
@@ -301,7 +301,7 @@ a big part of the physical game has to do with building little stacks of army ti
 
 <p>Taking this approach made it possible for me to test whether the <code class="highlighter-rouge">Game</code> class was able to delegate <code class="highlighter-rouge">fortify</code> calls to territories, even though I had not yet implemented the <code class="highlighter-rouge">Territory</code> class. It gave me a pretty nice way to look at the problem from the outside in and resulted in a clean-looking <code class="highlighter-rouge">Game</code> class:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">StackWars</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">StackWars</span>
   <span class="k">class</span> <span class="nc">Game</span>
     <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">battlefield</span><span class="p">)</span>
       <span class="vi">@players</span>         <span class="o">=</span> <span class="p">[</span><span class="no">Player</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"black"</span><span class="p">),</span> <span class="no">Player</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"white"</span><span class="p">)].</span><span class="nf">cycle</span>
@@ -335,7 +335,7 @@ a big part of the physical game has to do with building little stacks of army ti
 
 <p>After making it so that the <code class="highlighter-rouge">Battlefield</code> object contained a nested array of <code class="highlighter-rouge">Territory</code> objects, I went back and wrote some unit tests for <code class="highlighter-rouge">Territory</code>. The tests ended up being fairly long and tedious, but the implementation code for <code class="highlighter-rouge">Territory#fortify</code> ended up being quite simple and worked as expected:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">StackWars</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">StackWars</span>
   <span class="k">class</span> <span class="nc">Territory</span>
     <span class="c1"># other methods omitted</span>
 
@@ -435,7 +435,7 @@ Fortifying white baseline position at (2,0)
 
 <p>After implementing the FORTIFY action, I thought I would be able to repeat the process for MOVE, ATTACK, and INVADE. Anticipating this approach, I roughed out a replacement for <code class="highlighter-rouge">Game#fortify()</code> called <code class="highlighter-rouge">Game#play()</code>, which took into account all game actions and selected the right one based on the circumstances:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">play</span><span class="p">(</span><span class="n">pos1</span><span class="p">,</span> <span class="n">pos2</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">play</span><span class="p">(</span><span class="n">pos1</span><span class="p">,</span> <span class="n">pos2</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
   <span class="k">if</span> <span class="n">pos2</span><span class="p">.</span><span class="nf">nil?</span>
     <span class="n">territory</span> <span class="o">=</span> <span class="n">territory_at</span><span class="p">(</span><span class="n">pos1</span><span class="p">)</span>
     
@@ -474,7 +474,7 @@ Fortifying white baseline position at (2,0)
 
 <p>Once I got things to a reasonable level of stability, I realized that I could then build a fairly good integration test by replaying moves from a real, complete game. After a few more tweaks, my wife and I managed to make it through a game without a crash. I then set up a demo script that would replay these moves one by one until it reached the end of the game. Once I got that stage working, I extracted it into an integration test that reads the moves from a JSON file, calls <code class="highlighter-rouge">Game#play</code> for each one, and then does some validations to make sure the game ended as expected:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A full game of stack wars"</span> <span class="k">do</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"A full game of stack wars"</span> <span class="k">do</span>
   <span class="n">let</span><span class="p">(</span><span class="ss">:moves</span><span class="p">)</span> <span class="k">do</span>
     <span class="n">moves_file</span> <span class="o">=</span> <span class="s2">"</span><span class="si">#{</span><span class="no">File</span><span class="p">.</span><span class="nf">dirname</span><span class="p">(</span><span class="kp">__FILE__</span><span class="p">)</span><span class="si">}</span><span class="s2">/../fixtures/moves.json"</span>
     <span class="no">JSON</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="n">moves_file</span><span class="p">))</span>

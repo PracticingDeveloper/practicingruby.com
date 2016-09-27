@@ -10,8 +10,8 @@
   <meta name="description" content="When Mike Burns outlined his vision of Unobtrusive Ruby, I initially thought it was going to be a hit with the community. However, a lack of specific example...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/articles/unobtrusive-ruby-in-practice">
-  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://practicingruby.com/articles/unobtrusive-ruby-in-practice">
+  <link rel="alternate" type="application/rss+xml" title="Practicing Ruby" href="http://practicingruby.com/feed.xml">
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -71,7 +71,7 @@
 
 <p>Because Ruby lets us pass classes around like any other object, we have a way to do dependency injection that isn’t as common in other languages. For example, we can write something like the following code:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Roster</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Roster</span>
  <span class="k">def</span> <span class="nf">initialize</span>          
     <span class="vi">@participants</span> <span class="o">=</span> <span class="p">[]</span>  
   <span class="k">end</span>  
@@ -111,7 +111,7 @@ about a very similar example made me realize just how much we tend to pass
 classes around unnecessarily when we could be directly passing the objects our
 class depends on. With that in mind, Derick helped me refactor the previous example to the more flexible design shown below.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Roster</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Roster</span>
  <span class="k">def</span> <span class="nf">initialize</span>          
     <span class="vi">@participants</span> <span class="o">=</span> <span class="p">[]</span>  
   <span class="k">end</span>  
@@ -140,7 +140,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>While this is a subtle change, it has a major impact on the way <code class="highlighter-rouge">Roster</code> and its printer object relate to one another. The <code class="highlighter-rouge">Roster#print</code> method originally had a dependency on both the constructor of its printer object as well as its <code class="highlighter-rouge">print()</code> instance method. Our new code reduces that coupling by depending only on the existence of a <code class="highlighter-rouge">print()</code> method in the general case. The examples below demonstrate the added flexibility that this new approach offers us.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># does not provide a .new() method</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># does not provide a .new() method</span>
 <span class="k">module</span> <span class="nn">FunctionalPrinter</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">print</span><span class="p">(</span><span class="n">participant_names</span><span class="p">)</span>
     <span class="nb">puts</span> <span class="s2">"Participants:</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span>  
@@ -188,7 +188,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>Some libaries we use strongly encourages us to create subclasses of the objects they provide, while others downright force us to do so. <code class="highlighter-rouge">ActiveRecord</code> is an example of a library that is almost useless without inheritance, but is very complicated and would be hard to use as an example. The code below is a much simpler example of a tool which expects you to use subclasses of its provided <code class="highlighter-rouge">Plugin</code> class to get the job done.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Inspector</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Inspector</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="no">Plugin</span><span class="p">.</span><span class="nf">registered_plugins</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="p">}</span>
   <span class="k">end</span>
@@ -234,7 +234,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>The code below shows a much more flexible alternative, which completely removes the dependency on class inheritance.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Inspector</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Inspector</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">registered_plugins</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="p">}</span>
   <span class="k">end</span>
@@ -265,7 +265,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>Now any object that has a valid <code class="highlighter-rouge">analyze</code> method will work as a plugin, as long as you explicitly register it with <code class="highlighter-rouge">Inspector</code>. This results in much cleaner looking code for this trivial implementation, but the general strategy can also can be used in situations where inheritance is still a part of the picture. The code below shows plugins which inherit from a parent class coexisting with plugins built from scratch.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Inspector</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Inspector</span>
   <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">registered_plugins</span><span class="p">.</span><span class="nf">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="n">e</span><span class="p">.</span><span class="nf">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="p">}</span>
   <span class="k">end</span>
@@ -322,7 +322,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>As an example of some practical code which uses dependency injection, we can look at the Highline command line library. In ordinary usage, Highline outputs everything to <code class="highlighter-rouge">STDIN</code> and <code class="highlighter-rouge">STDOUT</code>. You can install HighLine via RubyGems and run the example below to get a feel for how it works.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"highline"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"highline"</span>
 
 <span class="n">console</span> <span class="o">=</span> <span class="no">HighLine</span><span class="p">.</span><span class="nf">new</span>
 <span class="nb">name</span>    <span class="o">=</span> <span class="n">console</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="s2">"What is your name?"</span><span class="p">)</span> 
@@ -332,7 +332,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>In ordinary cases, this is exactly what we want: ordinary input and output from your console. However, to test HighLine, we made it possible to inject input and output objects to use in place of <code class="highlighter-rouge">STDIN</code> and <code class="highlighter-rouge">STDOUT</code>. The example below shows the use of <code class="highlighter-rouge">StringIO</code> objects, which is what we use in our unit tests.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"stringio"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"stringio"</span>
 <span class="nb">require</span> <span class="s2">"highline"</span>
 
 <span class="n">input</span>   <span class="o">=</span> <span class="no">StringIO</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s2">"Gregory</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
@@ -369,7 +369,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>However, <code class="highlighter-rouge">Enumerator</code> takes things a step farther by requiring no interface at all. You can name the methods of the target collection anything you want, you simply need to tell <code class="highlighter-rouge">Enumerator</code> which method it should delegate its <code class="highlighter-rouge">each</code> method to when you initialize an <code class="highlighter-rouge">Enumerator</code>. See the example below to see how flexible this approach is.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">RandomInfiniteList</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">RandomInfiniteList</span>
   <span class="k">def</span> <span class="nf">generate</span>
     <span class="kp">loop</span> <span class="k">do</span>
       <span class="k">yield</span> <span class="nb">rand</span>
@@ -389,7 +389,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>The example below shows what an <code class="highlighter-rouge">Inspector</code> class which implements a “expects no interface” API style might look like. To keep things interesting, I’ve left implementing this class up to you. If you get stuck, feel free to leave a comment asking for hints on how to build this out.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c1"># delegates to the WordLengthPlugin module</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># delegates to the WordLengthPlugin module</span>
 <span class="no">Inspector</span><span class="p">.</span><span class="nf">report</span><span class="p">(</span><span class="s2">"Word Length"</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">data</span><span class="o">|</span>
   <span class="no">WordLengthPlugin</span><span class="p">.</span><span class="nf">analyze</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="k">end</span>
@@ -410,7 +410,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>Suppose that you want to open a binary file and read its contents into a <code class="highlighter-rouge">String</code>. You could write the following code and it will get the job done.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">file</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="s2">"foo.jpg"</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">file</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="s2">"foo.jpg"</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span>
 <span class="n">image_data</span> <span class="o">=</span> <span class="n">file</span><span class="p">.</span><span class="nf">read</span>
 <span class="n">file</span><span class="p">.</span><span class="nf">close</span>
 </code></pre>
@@ -418,7 +418,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>But this approach is only the correct way to do things if you want to explicitly work with the <code class="highlighter-rouge">File</code> object and control exactly when it gets opened and closed. If all you want to do is read the contents of a binary file, this is three actions for what should be one “data in, data out” operation. Fortunately, Ruby recognizes this as a common use case and provides a nicer API that you can use instead.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">image_data</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">binread</span><span class="p">(</span><span class="s2">"foo.jpg"</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">image_data</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">binread</span><span class="p">(</span><span class="s2">"foo.jpg"</span><span class="p">)</span>
 </code></pre>
 </div>
 
@@ -426,7 +426,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>The code below shows the generic form of doing a GET request via the <code class="highlighter-rouge">Net::HTTP</code> standard library. It is not the most terse way to use <code class="highlighter-rouge">Net::HTTP</code>, but one of the most common.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'net/http'</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'net/http'</span>
 
 <span class="n">url</span> <span class="o">=</span> <span class="no">URI</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="s1">'http://www.google.com'</span><span class="p">)</span>
 <span class="n">res</span> <span class="o">=</span> <span class="no">Net</span><span class="o">::</span><span class="no">HTTP</span><span class="p">.</span><span class="nf">start</span><span class="p">(</span><span class="n">url</span><span class="p">.</span><span class="nf">host</span><span class="p">,</span> <span class="n">url</span><span class="p">.</span><span class="nf">port</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">http</span><span class="o">|</span>
@@ -439,7 +439,7 @@ class depends on. With that in mind, Derick helped me refactor the previous exam
 
 <p>There is a whole lot going on here, including explicit <code class="highlighter-rouge">URI</code> parsing and explicit calls to <code class="highlighter-rouge">get()</code>. But as we saw with <code class="highlighter-rouge">File.open</code> vs. <code class="highlighter-rouge">File.binread</code>, Ruby provides a convenient alternative for this very common operation. The open-uri standard library makes it possible to write the following code instead.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"open-uri"</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"open-uri"</span>
 
 <span class="nb">puts</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"http://google.com"</span><span class="p">).</span><span class="nf">read</span>
 </code></pre>
