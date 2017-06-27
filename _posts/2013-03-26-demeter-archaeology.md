@@ -433,4 +433,4 @@ to the original statements on the law has been engaging and worthwhile.
 * [An excellent account of the Law of Demeter and its practical uses, by David Bock](
 http://www.ccs.neu.edu/research/demeter/demeter-method/LawOfDemeter/paper-boy/demeter.pdf)
 
-* [Practicing Ruby Issue 5.2: Rocket Science and the Law of Demeter](https://practicingruby.com/articles/shared/gulrqynwlywm)
+* [Practicing Ruby Issue 5.2: Temporal coupling and the Law of Demeter](http://practicingruby.com/articles/temporal-coupling-and-the-law-of-demeter)

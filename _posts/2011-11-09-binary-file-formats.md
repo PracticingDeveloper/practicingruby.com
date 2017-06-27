@@ -515,4 +515,4 @@ well on your way to tackling pretty much any binary file format.
 
 [^1]: To determine the storage space needed for the pixel array in BMP images, I used the computations described in the [Wikipedia article on bitmap images](http://en.wikipedia.org/wiki/BMP_file_format#Pixel_storage).
 
-> NOTE: If you'd like to learn more about this topic, consider doing the Practicing Ruby self-guided course on [Streams, Files, and Sockets](https://practicingruby.com/articles/study-guide-1?u=dc2ab0f9bb). You've already completed one of its reading exercises by working through this article!
+> NOTE: If you'd like to learn more about this topic, consider doing the Practicing Ruby self-guided course on [Streams, Files, and Sockets](http://practicingruby.com/articles/study-guide-1). You've already completed one of its reading exercises by working through this article!

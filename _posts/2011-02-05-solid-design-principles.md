@@ -529,15 +529,15 @@ a form of LSP violation.
 To protect against those violations, the best bet is to embrace duck typing as
 much as possible. Since this article is already super long and we've already
 covered duck typing extensively in issues
-[#14](http://practicingruby.com/articles/43) and
-[#15](http://practicingruby.com/articles/44) of Practicing Ruby, It would be
+[#14](http://practicingruby.com/articles/duck-typing-in-practice-1) and
+[#15](http://practicingruby.com/articles/duck-typing-in-practice-2) of Practicing Ruby, It would be
 sufficient to simply re-read those articles if you need a refresher and then
 promptly move on to the next principle. But in case you want to dig deeper, here
 are a couple more articles related to this topic that you should definitely read
 if you haven't seen them before. All three are about how to get around
 explicitly naming classes in case statements, which is a form of LSP violation.
 
-* [Ruby case statements and kind_of?(Sandi Metz)](http://sandimetz.com/2009/06/ruby-case-statements-and-kindof.html)
+* [Ruby case statements and kind_of? (Sandi Metz)](https://www.sandimetz.com/blog/2009/06/12/ruby-case-statements-and-kind-of)
 
 * [The Double Dispatch Dance (Aaron Patterson)](http://blog.rubybestpractices.com/posts/aaronp/001_double_dispatch_dance.html)
 
@@ -623,7 +623,7 @@ class HTMLRosterPrinter
   def to_s
     "<h3>Participants</h3><ul>"+
     @participant_names.map { |e| "<li>#{e}</li>" } +
-    "</ul>
+    "</ul>"
   end
 end
 

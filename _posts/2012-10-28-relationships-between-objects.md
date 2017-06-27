@@ -488,8 +488,8 @@ you have an interesting story to share, please leave a comment!
 
 [GOOS]: http://www.growing-object-oriented-software.com/
 [rack]: http://rack.github.com/
-[pr-4.11]: https://practicingruby.com/articles/64
-[pr-5.2]: https://practicingruby.com/articles/71
+[pr-4.11]: http://practicingruby.com/articles/responsibility-centric-vs-data-centric-design
+[pr-5.2]: http://practicingruby.com/articles/temporal-coupling-and-the-law-of-demeter
 [ports-and-adapters]: http://alistair.cockburn.us/Hexagonal+architecture
 [newman-mailer]: http://elm-city-craftworks.github.com/newman/lib/newman/mailer.html
 [newman-testmailer]: http://elm-city-craftworks.github.com/newman/lib/newman/test_mailer.html

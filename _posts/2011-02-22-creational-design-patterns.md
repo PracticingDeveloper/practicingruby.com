@@ -36,7 +36,7 @@ if they're not semantically identical.
 ### Singleton
 
 <i>UPDATE 2011-12-20: Be sure to check out what [Practicing Ruby
-2.8](http://practicingruby.com/articles/shared/jleygxejeopq) has to say about
+2.8](http://practicingruby.com/articles/ruby-and-the-singleton-pattern-dont-get-along) has to say about
 implementing Singleton pattern in Ruby. My feelings on this have changed over
 time</i>
 

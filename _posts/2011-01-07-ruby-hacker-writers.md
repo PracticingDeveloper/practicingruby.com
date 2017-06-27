@@ -9,7 +9,7 @@ summary: Find out which Ruby hackers consistently write great content worth read
 issue_number: '1.17'
 ---
 
-In the [last issue](http://practicingruby.com/articles/45) we covered five folks who are working on really interesting projects. In this issue, I'd like to pay some attention to five other Ruby hackers who have caught my attention through their excellent technical writing. As a technical author myself, I am particularly moved by folks who educate and inform our community through more than just code, but through written words as well.
+In the [last issue](http://practicingruby.com/articles/ruby-hackers) we covered five folks who are working on really interesting projects. In this issue, I'd like to pay some attention to five other Ruby hackers who have caught my attention through their excellent technical writing. As a technical author myself, I am particularly moved by folks who educate and inform our community through more than just code, but through written words as well.
 
 Similar to Issue #16's list, this lineup is in no particular order, is far too short to do the community justice, and is purely subjective in nature. None of these folks knew I was going to write about them and my recommendations are completely unsolicited.
 

@@ -209,7 +209,7 @@ after the rule where we want the trigger to fire.
 To use this parser, we also need a tokenizer that can break the input
 data into tokens, along with some other boilerplate code. If you are curious
 about how that works, you can check out [this standalone
-example](https://gist.githubusercontent.com/sandal/9532497/raw/8e3bb03fc24c8f6604f96516bf242e7e13d0f4eb/parser_example.y).
+example](https://gist.githubusercontent.com/practicingruby/9532497/raw/bc970db9a7f174d5f502c83ca6e67ce31681ebe3/parser_example.y).
 
 Now that we've covered the basics, we can use knowledge we have so far to build 
 an event based JSON parser and tokenizer.
@@ -702,4 +702,4 @@ It's pretty messy, but I think could be cleaned up by using a state machine.
 
 That's all. Thanks for reading! <3 <3 <3
 
-> NOTE: If you'd like to learn more about this topic, consider doing the Practicing Ruby self-guided course on [Streams, Files, and Sockets](https://practicingruby.com/articles/study-guide-1?u=dc2ab0f9bb). You've already completed one of its reading exercises by working through this article!
+> NOTE: If you'd like to learn more about this topic, consider doing the Practicing Ruby self-guided course on [Streams, Files, and Sockets](http://practicingruby.com/articles/study-guide-1). You've already completed one of its reading exercises by working through this article!

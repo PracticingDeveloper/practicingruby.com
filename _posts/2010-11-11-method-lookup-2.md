@@ -10,7 +10,7 @@ summary: Use your knowledge of Ruby's lookup path to determine where to add meth
 issue_number: '1.2'
 ---
 
-In [Issue #1](http://practicingruby.com/articles/29) we discussed Ruby's lookup
+In [Issue #1](http://practicingruby.com/articles/method-lookup-1) we discussed Ruby's lookup
 path and proved by example that class inheritance is only a small part of the 
 picture. To recap, Ruby methods are looked up in the following order:
 

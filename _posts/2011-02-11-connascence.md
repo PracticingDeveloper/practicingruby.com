@@ -11,7 +11,7 @@ issue_number: '1.24'
 ---
 
 My article on the [SOLID design
-principles](http://practicingruby.com/articles/52) was inspired by a great talk
+principles](http://practicingruby.com/articles/solid-design-principles) was inspired by a great talk
 I saw by Sandi Metz at GoRuCo 2009. Coincidentally, this  article is inspired by
 another great talk I saw in 2009, called [The Building Blocks of
 Modularity](http://confreaks.net/videos/77-mwrc2009-the-building-blocks-of-modularity).
@@ -425,7 +425,7 @@ of time, we'll skip the details for now.
 ### Reflections
 
 While we dug deep into some heavy theory in [last week's SOLID
-article](http://practicingruby.com/articles/52), I tried to keep the connascence
+article](http://practicingruby.com/articles/solid-design-principles), I tried to keep the connascence
 examples simple, practical, and common. But that is not to say that connascence
 isn't every bit as deep a concept as SOLID, and your investigations should not
 stop at the examples I've shown here.

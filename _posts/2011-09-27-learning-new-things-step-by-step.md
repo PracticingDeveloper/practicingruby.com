@@ -254,7 +254,7 @@ This video shows the faster-moving rectangle. Jumping a distance of two pixels a
 
 <iframe width="640" height="480" src="//www.youtube.com/embed/B4_KZonH3qw?rel=0" frameborder="0" allowfullscreen></iframe>
 
-This was the first time that I started feeling the desire to refactor things: updating four values when I could have updated one seemed a bit tedious. However, I try to keep a semistrict policy of not refactoring unless I am in deep pain for the first few hours of working with a new tool. The reason I do this is to allow my mind to work in a purely creative mode, avoiding invoking the inner "judge" that I talked about in [Practicing Ruby 2.2](http://practicingruby.com/articles/2). Take this note as fair warning, though: there will be more repetitive code to come before this exercise is completed!
+This was the first time that I started feeling the desire to refactor things: updating four values when I could have updated one seemed a bit tedious. However, I try to keep a semistrict policy of not refactoring unless I am in deep pain for the first few hours of working with a new tool. The reason I do this is to allow my mind to work in a purely creative mode, avoiding invoking the inner "judge" that I talked about in [Practicing Ruby 2.2](http://practicingruby.com/articles/attacking-sticky-problems). Take this note as fair warning, though: there will be more repetitive code to come before this exercise is completed!
 
 At this point, I had a red square moving at a speed that looks comparable to how things tend to move in old-school arcade games. Because the novelty value of moving a little square around in a void wears off pretty quickly, the next step was to introduce some other game objects into the mix.
 
