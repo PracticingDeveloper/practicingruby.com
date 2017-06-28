@@ -11,7 +11,7 @@ issue_number: 4.12.3
 ---
 
 > **NOTE:** This is one of [four lessons
-> learned](http://practicingruby.com/articles/65) from my 90 day [self-study on
+> learned](http://practicingruby.com/articles/tdd-lessons-learned) from my 90 day [self-study on
 > test-driven development](http://practicingruby.com/articles/28). 
 > If this topic interests you, be sure to check out the other lessons!
 
@@ -60,7 +60,7 @@ will be maximized and their drawbacks minimized. The interesting thing is that
 while several of these heuristics are meant to improve the testability of code,
 nearly as many have a direct influence on software design in general. Taken
 together, the following four points strongly favor [responsibility-centric
-design](http://practicingruby.com/articles/64):
+design](http://practicingruby.com/articles/responsibility-centric-vs-data-centric-design):
 
 * Don't use getters.
 * Only mock your immediate neighbors.

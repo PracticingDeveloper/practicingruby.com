@@ -9,7 +9,7 @@ summary: Explore some lessons learned the hard way in developing the Newman mail
 issue_number: '3.6'
 ---
 
-In [Issue 3.5](http://practicingruby.com/articles/22), I  challenged Practicing Ruby subscribers to read through and play with the uncommented source code of [Newman 0.1.1](https://github.com/mendicant-original/newman/tree/v0.1.1), the first release of my micro-framework for building email-centric applications. My hope was that by looking through the implementation of a framework in its very early stages of development, readers would be able to familiarize themselves with the kinds of challenges involved in building this sort of project.
+In [Issue 3.5](http://practicingruby.com/articles/framework-design-and-implementation-1), I  challenged Practicing Ruby subscribers to read through and play with the uncommented source code of [Newman 0.1.1](https://github.com/mendicant-original/newman/tree/v0.1.1), the first release of my micro-framework for building email-centric applications. My hope was that by looking through the implementation of a framework in its very early stages of development, readers would be able to familiarize themselves with the kinds of challenges involved in building this sort of project.
 
 If you didn't participate in that challenge, I recommend spending an hour or two working through it now before reading the rest of this article. My feeling was (and is) that because framework development is about taking care of a thousand tiny details, it's important to see where this kind of project begins before you can really appreciate where it ends up. Assuming you've gone ahead and done that, we can move on to this week's exercise.
 

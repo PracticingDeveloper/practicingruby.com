@@ -10,7 +10,7 @@ summary: Discover how Barbara Liskov's concept of "behavioral subtypes" apply to
 issue_number: '3.8'
 ---
 
-In [Issue 3.7](http://practicingruby.com/articles/24), I started to explore the criteria laid out by Sakkinen's
+In [Issue 3.7](http://practicingruby.com/articles/disciplined-inheritance-1), I started to explore the criteria laid out by Sakkinen's
 [Disciplined Inheritance](http://scholar.google.com/scholar?cluster=5893037045851782349&hl=en&as_sdt=0,7&sciodt=0,7), 
 a language-agnostic paper published more than two decades ago that is surprisingly 
 relevant to the modern Ruby programmer. In this issue, we continue where Issue 3.7 
@@ -395,7 +395,7 @@ A huge hint is that the first problem is based on an issue discussed in [Liskov'
 
 ### Behavioral subtyping versus duck typing
 
-Between this article and the topics discussed in [Issue 3.7](http://practicingruby.com/articles/24), this two-part series offers a fairly comprehensive view of disciplined inheritance practices for the Ruby programmer. However, as I hinted toward the beginning of this article, there is the somewhat looser concept of duck typing that deserves a mention if we really want to see the whole picture.
+Between this article and the topics discussed in [Issue 3.7](http://practicingruby.com/articles/disciplined-inheritance-1), this two-part series offers a fairly comprehensive view of disciplined inheritance practices for the Ruby programmer. However, as I hinted toward the beginning of this article, there is the somewhat looser concept of duck typing that deserves a mention if we really want to see the whole picture.
 
 What duck typing and behavioral subtypes have in common is that both concepts rely on what an object can do rather than what exactly it is. They differ in that behavioral subtypes seem to be more about the behavior of an entire object and duck typing is about how a given object behaves within a certain context. Duck typing can be a good deal more flexible than behavioral subtyping in that sense, because typically it involves an object implementing a meaningful response to a single message rather than an entire suite of behaviors. You can find a ton of examples of duck typing in use in Ruby, but perhaps the easiest to spot is the ubiquitous use of the `to_s` method.
 

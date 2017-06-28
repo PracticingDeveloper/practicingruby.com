@@ -502,7 +502,7 @@ with, I'd love to hear what you think might be worth adding to the mix.
 [exception-notification]: https://github.com/smartinez87/exception_notification
 [gh-flow]: http://scottchacon.com/2011/08/31/github-flow.html
 [capybara]: https://github.com/jnicklas/capybara
-[pr-4.12.1]: http://practicingruby.com/articles/66
+[pr-4.12.1]: http://practicingruby.com/articles/end-to-end-testing-is-essential
 [simulated-user]: https://github.com/elm-city-craftworks/practicing-ruby-web/blob/f00f89b0a547829aea4ced523a3d23a136f1a6a7/test/support/simulated_user.rb
 [autonomation]: http://en.wikipedia.org/wiki/Autonomation
 [htmlescape]: https://github.com/elm-city-craftworks/practicing-ruby-web/commit/223ca92a0b769713ce3c2137de76a8f34f06647e

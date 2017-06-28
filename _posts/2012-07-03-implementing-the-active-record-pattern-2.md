@@ -12,7 +12,7 @@ issue_number: '4.10'
 
 > This two part article explores the challenges involved in
 > building a minimal implementation of the Active Record pattern. 
-> [Part 1 (Issue 4.8)](http://practicingruby.com/articles/60) provides
+> [Part 1 (Issue 4.8)](http://practicingruby.com/articles/implementing-the-active-record-pattern-1) provides
 > some basic background information about the problem and
 > walks through some of the low level structures that are
 > needed to build an ORM. Part 2 (this issue) builds on top of
@@ -26,7 +26,7 @@ involves shoehorning a bunch of persistence-related functionality into model
 objects. In the case of Rails, models inherit from `ActiveRecord::Base` which
 has dozens of modules mixed into it. This inheritance-based approach is the
 common way of doing complex behavior sharing in Ruby, but comes at a [high
-maintainence cost](http://practicingruby.com/articles/62). This is one of the
+maintainence cost](http://practicingruby.com/articles/hidden-costs-of-inheritance). This is one of the
 main design challenges that
 [BrokenRecord](https://github.com/elm-city-craftworks/broken_record) attempts to solve.
 
@@ -424,7 +424,7 @@ end
 ```
 
 This method calls `BrokenRecord::Table#all`, which as you saw in 
-[Issue 4.8](http://practicingruby.com/articles/60) returns an
+[Issue 4.8](http://practicingruby.com/articles/implementing-the-active-record-pattern-1) returns an
 array of hashes representing the results returned from the 
 database when a trivial `select * from articles` query is issued. 
 For this particular data set, the following results get 
@@ -571,7 +571,7 @@ end
 By now you should be able to quickly identify `BrokenRecord::FieldSet` as the object that
 receives any calls that `Record` does not answer itself. The good
 news is that you already know how `FieldSet` works, because it was discussed in
-detail in [Issue 4.8](http://practicingruby.com/articles/60). But if you need a
+detail in [Issue 4.8](http://practicingruby.com/articles/implementing-the-active-record-pattern-1). But if you need a
 refresher, check out the following code:
 
 ```ruby
@@ -638,7 +638,7 @@ Active Record object is in its most basic form.
 ### EXERCISE: Implementing minimal association support 
 
 The process of working through the low level foundations built up in [Issue
-4.8](http://practicingruby.com/articles/60) combined with this article's 
+4.8](http://practicingruby.com/articles/implementing-the-active-record-pattern-1) combined with this article's 
 extensive walkthrough of how BrokenRecord implements some basic CRUD 
 functionality probably gave you enough learning moments to make you want to 
 quit while you're ahead. That said, if you are looking to dig a little deeper, I'd recommend

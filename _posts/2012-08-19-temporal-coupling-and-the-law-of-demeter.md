@@ -153,7 +153,7 @@ These are deep claims, but the remainder of the discussion between Smyth
 and Lieberherr did not elaborate much further on them. However, it is 
 fascinating to imagine the kind of programming style that Smyth
 is advocating here: it boils down to a highly robust form of
-[responsibility-driven development](http://practicingruby.com/articles/64) with 
+[responsibility-driven development](http://practicingruby.com/articles/responsibility-centric-vs-data-centric-design) with 
 concurrent (and potentially distributed) objects that communicate almost 
 exclusively via callback mechanisms. If Smyth were not an established
 scientist working on some of the world's most challenging problems,
