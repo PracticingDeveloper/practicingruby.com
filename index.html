@@ -3,14 +3,47 @@ layout: default
 ---
 
 <div class="home">
-  <ul class="post-list">
-    {% for post in site.posts %}
-      <li>
-        <div class="post-link">
-          <a href="{{ post.url | prepend: site.github.url }}">{{ post.title }}</a>
-        </div>
-        <div class="post-summary">{{ post.summary }}<br/><span class="post-meta">Issue {{ post.issue_number }} — {{ post.date | date: "%B %-d, %Y" }}</span></div>
-      </li>
-    {% endfor %}
-  </ul>
+  <div class="header" style="text-align: center;">
+    <h1 style="text-align: center; font-size: 50px; font-weight: bold;">Practicing Ruby</h1>
+    <h2 style="text-align: center;">Delightful lessons for the dedicated programmer</h2>
+    <img src="ruby-divider.png" style="margin-bottom: 15px;"/>
+    <big>Welcome to Practicing Ruby, an open archive of lessons that take a deep-dive into software development. Look beyond the code to solve problems, explore  ideas, and learn something new.</big>
+  </div>
+
+  <br />
+  <hr style="background-color: #ddd; color: #ddd; border: none; height: 1px;" />
+  <br />
+
+  <div class="categories">
+    <div id="most-popular">
+      {% assign posts = site.posts | where:"categories","editors-picks" %}
+      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+        Most popular
+        {% if posts.size > 5 %}
+          <a href="/most-popular" style="float: right; font-size: 16px;">View All</a>
+        {% endif %}
+      </h3>
+      <ul style="list-style: none; margin-left: 0px;">
+        {% for post in posts limit:5 %}
+          {% include category-item.html post=post %}
+        {% endfor %}
+      </ul>
+    </div>
+
+    <br />
+    <div id="editors-picks">
+      {% assign posts = site.posts | where:"categories","editors-picks" %}
+      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+        Editor's picks
+        {% if posts.size > 5 %}
+          <a href="/editors-picks" style="float: right; font-size: 16px;">View All</a>
+        {% endif %}
+      </h3>
+      <ul style="list-style: none; margin-left: 0px;">
+        {% for post in posts limit:5 %}
+          {% include category-item.html post=post %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 </div>
