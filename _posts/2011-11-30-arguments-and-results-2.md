@@ -221,7 +221,7 @@ class LazyObject < BasicObject
 end
 ```
 
-Another option would be to use [lazy.rb](http://moonbase.rydia.net/software/lazy.rb/), which provides similar functionality via `Lazy::Promise` objects that get instantiated via the `Lazy.promise` method:
+Another option would be to use [lazy.rb](https://github.com/mental/lazy), which provides similar functionality via `Lazy::Promise` objects that get instantiated via the `Lazy.promise` method:
 
 ```ruby
 require "lazy"

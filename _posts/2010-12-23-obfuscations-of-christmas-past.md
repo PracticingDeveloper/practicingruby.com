@@ -5,18 +5,18 @@ date: '2010-12-23'
 categories: articles
 author: Gregory Brown
 permalink: articles/obfuscations-of-christmas-past
-summary: Tear apart an obfuscated Ruby program from Christian Neukirchen to learn
+summary: Tear apart an obfuscated Ruby program from Leah Neukirchen to learn
   some neat tricks.
 issue_number: '1.13'
 ---
 
 Rather than always focusing on SERIOUS BUSINESS, I'd like share something a little more light hearted today. Whether you celebrate Christmas or not, I think you'll find this little holiday themed hack a great deal of fun to play with.
 
-### Christian Neukirchen's Christmas Hack
+### Leah Neukirchen's Christmas Hack
 
 When I first started programming in Ruby, the ruby-talk mailing list was the best place to interact with the community and keep up with other active Ruby hackers. But because there were a lot more hobbyists in 2004 than there were people doing Ruby as a full time job, the posts focused on sharing fun hacks just as often as they did on discussing practical issues.
 
-One of my favorites was [Christian Neukirchen](http://twitter.com/#!/chneukirchen)'s obfuscated Christmas message to the Ruby community in 2004. I've copied the source code below, and I encourage you to run it and see that it is indeed a valid Ruby program!
+One of my favorites was [Leah Neukirchen](http://twitter.com/#!/chneukirchen)'s obfuscated Christmas message to the Ruby community in 2004. I've copied the source code below, and I encourage you to run it and see that it is indeed a valid Ruby program!
 
 ```ruby
 s="IyBUaGFua3MgZm9yIGxvb2tpbmcgYXQgbXkgY29kZ
@@ -82,7 +82,7 @@ hello world
 => nil
 ```
 
-Another way of decoding `Base64` encoded strings is via the `String#unpack` method, using the template `"m*"`. You can see this in Christian's code, which is what tipped Michael off in the first place. With that in mind, we can build a tiny obfuscated "Hello World" program.
+Another way of decoding `Base64` encoded strings is via the `String#unpack` method, using the template `"m*"`. You can see this in Leah's code, which is what tipped Michael off in the first place. With that in mind, we can build a tiny obfuscated "Hello World" program.
 
 ```ruby
 s = 
@@ -99,9 +99,9 @@ In the end, Michael was right when he said this was pretty easy to do. As long
 as you understand some basic string manipulation and how to decode a `base64` 
 encoded string, you could use this technique to render your code as pretty much any arbitrary ASCII art.
 
-Of course, one would expect that the guy who eventually would go on to create something as clever and useful as the [Rack web server interface](https://github.com/rack/rack) would have an extra trick or two up his sleeve. Not to disappoint, Christian confirmed Michael's explanation was valid, but in the process revealed that he felt it'd be too fragile and tedious to manually format the code himself into the desired ascii art.
+Of course, one would expect that the person who eventually would go on to create something as clever and useful as the [Rack web server interface](https://github.com/rack/rack) would have an extra trick or two up their sleeve. Not to disappoint, Leah confirmed Michael's explanation was valid, but in the process revealed that they felt it'd be too fragile and tedious to manually format the code themselves into the desired ascii art.
 
-For those curious about how he got around this problem, you can check out his [full solution](http://groups.google.com/group/comp.lang.ruby/msg/aa5b4f8eaa85e6b8?dmode=source)
+For those curious about how they got around this problem, you can check out their [full solution](http://groups.google.com/group/comp.lang.ruby/msg/aa5b4f8eaa85e6b8?dmode=source)
  which implements a code generator that fills in a template with the `base64` encoded source.
 
 While the code should be pretty easy to follow with a little effort, feel free to post questions here if you need help figuring things out. It's a really neat bit of code and is worth exploring, so I don't mind giving some hints where needed.

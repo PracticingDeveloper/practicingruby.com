@@ -12,7 +12,7 @@ issue_number: 4.12.1
 
 > **NOTE:** This is one of [four lessons
 > learned](http://practicingruby.com/articles/tdd-lessons-learned) from my 90 day [self-study on
-> test-driven development](http://practicingruby.com/articles/28). 
+> test-driven development](http://practicingruby.com/articles/tdd-costs-and-benefits). 
 > If this topic interests you, be sure to check out the other lessons!
 
 Perhaps the most significant thing I have noticed about my own TDD habits 

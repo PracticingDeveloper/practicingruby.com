@@ -307,7 +307,7 @@ between objects is to persist the objects not in a way that requires explicit
 mapping, but by using an object database.
 
 In the past, there were a few approaches to solving this problem in Ruby—
-notable contestants being [Madeleine](http://madeleine.rubyforge.org),
+notable contestants being [Madeleine](https://github.com/andrzejkrzywda/madeleine),
 [ODB](http://zeropluszero.com/software/odb/), and
 [HybridDB](https://github.com/pauliephonic/hybriddb); unfortunately, all of
 these seem to be no longer maintained (although some birds at the wroc\_love.rb
@@ -425,5 +425,5 @@ If this topic sounds intriguing, you might be
 interested in another of my talks, which was given at wroc\_love.rb this year (with a
 highly revised version scheduled for the Scottish Ruby Conference in Edinburgh):
 _Decoupling Persistence (Like There’s Some Tomorrow)_
-([slides](http://decoupling-wrocloverb-2012.heroku.com),
+([slides](http://talks.chastell.net/src-2012),
 [video](https://www.youtube.com/watch?v=w7Eol9N3jGI)).

@@ -15,7 +15,7 @@ Greg's, so he was thrilled to contribute. From late 2011 to mid 2012, James
 wrote his own series of programming articles called [Rubies in the Rough][rubies].
 Yes, James just stole Greg's good idea.*
 
-[rubies]: http://subinterest.com/rubies-in-the-rough
+[rubies]: http://graysoftinc.com/rubies-in-the-rough
 
 In this article, we will look at a fun problem that was in a couple of the [Peepcode][peepcode] _Play by Play_ videos. I've played around with this kata a bit and given it to a programming student of mine, so I know it pretty well by now. Its solution touches on a couple of neat programming topics, so dig in and see what you can learn.
 

@@ -32,7 +32,7 @@ a fresh look at my use of TDD and how it effects my work. For a period
 of 90 days, I challenged myself to practice formal TDD as often as 
 possible, and to learn as much about 
 it as I could during that time. While the [original plans for my self
-study](http://practicingruby.com/articles/28) were much more
+study](http://practicingruby.com/articles/tdd-costs-and-benefits) were much more
 rigorous than what I ended up doing, I did maintain a fairly
 disciplined TDD workflow throughout the three month period, and that
 taught me a few lessons worth sharing.
