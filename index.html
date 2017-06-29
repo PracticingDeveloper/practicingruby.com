@@ -12,7 +12,7 @@ layout: default
 
   <div class="categories">
     <div id="most-popular">
-      {% assign posts = site.posts | where:"categories","editors-picks" %}
+      {% assign posts = site.posts | where:"categories","most-popular" %}
       <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
         Most popular lessons
         {% if posts.size > 5 %}
@@ -222,7 +222,7 @@ layout: default
     </div>
 
     <div id="cs-concepts">
-      {% assign posts = site.posts | where:"categories","maintenance" %}
+      {% assign posts = site.posts | where:"categories","cs-concepts" %}
       <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
         Exploring CS concepts with Ruby
         {% if posts.size > 5 %}
