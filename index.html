@@ -3,9 +3,9 @@ layout: default
 ---
 
 <div class="home">
-  <div class="header" style="text-align: center; padding-top: 40px; padding-bottom: 80px;">
-    <h1 style="text-align: center; font-size: 50px; font-weight: bold;">Practicing Ruby</h1>
-    <h2 style="text-align: center;">Delightful lessons for the dedicated programmer</h2>
+  <div class="header">
+    <h1>Practicing Ruby</h1>
+    <h2>Delightful lessons for the dedicated programmer</h2>
     <img src="ruby-divider.png" style="margin-bottom: 15px; padding-bottom: 20px; padding-top: 20px"/>
     <big>Welcome to Practicing Ruby, a free and open source archive of lessons that take a deep-dive into software development. Our articles will help you solve problems, explore ideas, and learn useful techniques to apply in your daily work.</big>
   </div>
@@ -13,13 +13,13 @@ layout: default
   <div class="categories">
     <div id="most-popular">
       {% assign posts = site.posts | where:"categories","most-popular" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Most popular lessons
         {% if posts.size > 5 %}
-          <a href="/categories/most-popular" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/most-popular" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -28,13 +28,13 @@ layout: default
 
     <div id="editors-picks">
       {% assign posts = site.posts | where:"categories","editors-picks" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Editor's picks
         {% if posts.size > 5 %}
-          <a href="/categories/editors-picks" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/editors-picks" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -43,13 +43,13 @@ layout: default
 
     <div id="working-with-data">
       {% assign posts = site.posts | where:"categories","working-with-data" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Working with data
         {% if posts.size > 5 %}
-          <a href="/categories/working-with-data" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/working-with-data" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -58,13 +58,13 @@ layout: default
 
     <div id="building">
       {% assign posts = site.posts | where:"categories","building" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Building on your knowledge
         {% if posts.size > 5 %}
-          <a href="/categories/building" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/building" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -73,13 +73,13 @@ layout: default
 
     <div id="testing">
       {% assign posts = site.posts | where:"categories","testing" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         All things testing
         {% if posts.size > 5 %}
-          <a href="/categories/testing" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/testing" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -88,13 +88,13 @@ layout: default
 
     <div id="spotlights">
       {% assign posts = site.posts | where:"categories","spotlights" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Spotlights
         {% if posts.size > 5 %}
-          <a href="/categories/spotlights" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/spotlights" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -103,13 +103,13 @@ layout: default
 
     <div id="software-design">
       {% assign posts = site.posts | where:"categories","software-design" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Software design
         {% if posts.size > 5 %}
-          <a href="/categories/software-design" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/software-design" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -118,13 +118,13 @@ layout: default
 
     <div id="domain-modeling">
       {% assign posts = site.posts | where:"categories","domain-modeling" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Domain modeling
         {% if posts.size > 5 %}
-          <a href="/categories/domain-modeling" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/domain-modeling" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -133,13 +133,13 @@ layout: default
 
     <div id="ruby-quirks">
       {% assign posts = site.posts | where:"categories","ruby-quirks" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Ruby quirks
         {% if posts.size > 5 %}
-          <a href="/categories/ruby-quirks" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/ruby-quirks" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -148,13 +148,13 @@ layout: default
 
     <div id="games">
       {% assign posts = site.posts | where:"categories","games" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Games
         {% if posts.size > 5 %}
-          <a href="/categories/games" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/games" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -163,13 +163,13 @@ layout: default
 
     <div id="open-source">
       {% assign posts = site.posts | where:"categories","open-source" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Open source
         {% if posts.size > 5 %}
-          <a href="/categories/open-source" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/open-source" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -178,13 +178,13 @@ layout: default
 
     <div id="problem-solving">
       {% assign posts = site.posts | where:"categories","problem-solving" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Problem solving
         {% if posts.size > 5 %}
-          <a href="/categories/problem-solving" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/problem-solving" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -193,13 +193,13 @@ layout: default
 
     <div id="communication">
       {% assign posts = site.posts | where:"categories","communication" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Communication
         {% if posts.size > 5 %}
-          <a href="/categories/communication" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/communication" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -208,13 +208,13 @@ layout: default
 
     <div id="maintenance">
       {% assign posts = site.posts | where:"categories","maintenance" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Maintaining code and quality
         {% if posts.size > 5 %}
-          <a href="/categories/maintenance" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/maintenance" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -223,13 +223,13 @@ layout: default
 
     <div id="cs-concepts">
       {% assign posts = site.posts | where:"categories","cs-concepts" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Exploring CS concepts with Ruby
         {% if posts.size > 5 %}
-          <a href="/categories/cs-concepts" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/cs-concepts" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}
@@ -238,13 +238,13 @@ layout: default
 
     <div id="everything-else">
       {% assign posts = site.posts | where:"categories","everything-else" %}
-      <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+      <h3>
         Everything else
         {% if posts.size > 5 %}
-          <a href="/categories/everything-else" style="float: right; font-size: 16px;">View All</a>
+          <a href="/categories/everything-else" class="view-all">View All</a>
         {% endif %}
       </h3>
-      <ul style="list-style: none; margin-left: 0px;">
+      <ul>
         {% for post in posts limit:5 %}
           {% include category-item.html post=post %}
         {% endfor %}

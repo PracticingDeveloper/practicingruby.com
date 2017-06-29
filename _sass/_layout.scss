@@ -249,6 +249,36 @@
     }
 }
 
+/* OTHER SITE STYLES */
+
+.header {
+  text-align: center;
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+.header h1 {
+  font-size: 50px;
+  font-weight: bold;
+}
+
 .categories div {
   margin-bottom: 30px;
+}
+
+.categories div h3 {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.categories div ul {
+  list-style: none;
+  margin-left: 0px;
+}
+
+a.view-all {
+  float: right;
+  font-size: 16px;
+  color: #111;
+  padding-top: 2px;
 }
