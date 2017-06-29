@@ -12,10 +12,20 @@ layout: default
     {{ content }}
   </div>
 
-  <div style="text-align: center">
-    <h3><a href="/">Want to keep reading? Check out the archives for more.</a></h3>
-
-    <small>Practicing Ruby is proudly independent, open source, and advertising free.<br/>If you insist on being asked for something in return, check out <a href="/about">how to support my work</a>.</small>
+  <div class="related-posts">
+    <h3>Want to keep reading? Here are some recommendations...</h3>
+    <ul>
+      {% for title in page.related %}
+        {% assign post = site.posts | where:"title",title %}
+        <li>
+          <a href="{{ post.url | prepend: site.github.url }}">
+            {{ post.title }}
+          </a>
+        </li>
+      {% endfor %}
+      <li>
+        <a href="/">Return to the homepage to see all articles and categories</a>
+      </li>
+    </ul>
   </div>
-
 </article>
