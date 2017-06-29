@@ -1,11 +1,11 @@
 ---
 layout: page
-title: Communicating with other programmers
+title: Problem solving
 ---
 
 <div class="home">
   <ul class="post-list">
-    {% assign posts = site.posts | where:"categories","communicating" %}
+    {% assign posts = site.posts | where:"categories","problem-solving" %}
     {% for post in posts %}
       <li>
         <div class="post-link">

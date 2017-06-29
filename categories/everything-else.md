@@ -1,11 +1,11 @@
 ---
 layout: page
-title: Coding in your free time
+title: Everything else
 ---
 
 <div class="home">
   <ul class="post-list">
-    {% assign posts = site.posts | where:"categories","free-time" %}
+    {% assign posts = site.posts | where:"categories","everything-else" %}
     {% for post in posts %}
       <li>
         <div class="post-link">
