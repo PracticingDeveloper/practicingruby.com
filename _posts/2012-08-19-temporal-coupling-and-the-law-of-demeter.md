@@ -20,7 +20,7 @@ literally out of this world.
 
 ### An introduction to Smyth's Law of Demeter
 
-[David Smyth](http://mars.jpl.nasa.gov/zipcodemars/bio-contribution.cfm?bid=1018&cid=393&pid=377&country_id=0), 
+[David Smyth](https://mars.nasa.gov/people/info.cfm?id=1018), 
 a scientist who worked on various Mars missions for NASA's Jet 
 Propulsion Laboratory, came up with this seemingly innocuous definition
 of the Law of Demeter:

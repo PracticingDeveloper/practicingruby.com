@@ -28,8 +28,7 @@ of Demeter at its source, is considering the ways in which they differ.
 
 Both papers posit that there are different versions of the Law of Demeter. But
 the taxonomies they construct for the law differ considerably from each other.
-A lot of further thought and work, evidently, went into the law between 1988 and
-1989. 
+A lot of further thought and work, evidently, went into the law between 1988 and 1989. 
 
 I'm going to put the two taxonomies, and the differences between them, under a
 microscope -- at least, a medium-powered microscope. I won't recapitulate
@@ -75,40 +74,40 @@ a case where there's a kind of circular structure to the instance variable types
 of a set of classes. The following example is adapted from the article, and while Ruby doesn't enforce instance variable classes, the code illustrates the basic difficulty the authors identify: 
 
 ```ruby
-  class A
-    def initialize
-      @b, @c, @d, @e = B.new, C.new, D.new, E.new
-    end
-
-    def bad_style
-      b.d.e
-    end
-
-    attr_reader :b, :c, :d, :e
+class A
+  def initialize
+    @b, @c, @d, @e = B.new, C.new, D.new, E.new
   end
 
-  class B
-    def initialize
-      @c, @d = C.new, D.new
-    end
-
-    attr_reader :c, :d
+  def bad_style
+    b.d.e
   end
 
-  class C; end
+  attr_reader :b, :c, :d, :e
+end
 
-  class D
-    def initialize
-      @e = E.new
-    end
-
-    attr_reader :e
+class B
+  def initialize
+    @c, @d = C.new, D.new
   end
 
-  class E; end
+  attr_reader :c, :d
+end
 
-  a = A.new
-  a.bad_style
+class C; end
+
+class D
+  def initialize
+    @e = E.new
+  end
+
+  attr_reader :e
+end
+
+class E; end
+
+a = A.new
+a.bad_style
 ```
 
 The `bad_style` instance method in class `A`, called at the end of the example, triggers a series of calls. The first, a call to the reader method `b`, returns `a`'s instance variable `@b`, which is an instance of class `B`. Then the message `d` is sent to that `B` instance; the result is an instance of `D`, namely the instance held in the instance variable `@d` of the `B` instance. Sending `d` to a `B` instance is legal, Demeter-wise, because one of `a`'s instance variables is of class `B`. Then the `D` instance gets the message `e`; this is also OK for the same reason. 
@@ -147,10 +146,12 @@ version. Of the languages for which they offer such formulations, the closest to
 Ruby is Smalltalk-80. In that language, the authors state that message-sending
 should be restricted to:
 
-* an argument object of [the method] M including objects in pseudo variables
-  "self" and "super" or
-* an instance variable object of the class to which M is attached. 
+```
+  * an argument object of [the method] M including objects in pseudo variables "self" and "super" or
+  * an instance variable object of the class to which M is attached. 
+
   (332)
+```
 
 As before, newly-created objects and objects in global variables count as
 argument objects.

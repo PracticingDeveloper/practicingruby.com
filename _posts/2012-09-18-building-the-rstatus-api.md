@@ -18,7 +18,7 @@ also involved in the Pittsburgh Ruby community, and is a co-organizer of the
 [Steel City Ruby Conf](http://steelcityrubyconf.org/).*
 
 [Rstat.us](https://rstat.us) is a microblogging site that is similar to Twitter, but 
-based on the [OStatus](http://ostatus.org/about) open standard. It's designed to be federated so
+based on the [OStatus](https://en.wikipedia.org/wiki/OStatus) open standard. It's designed to be federated so
 that anyone can run an instance of rstat.us on their own domain while still being
 able to follow people on other domains. Although rstat.us is an active project 
 which has a lot to offer its users, the lack of an API has limited its
@@ -140,7 +140,7 @@ it feels familiar, and that may explain why the technique is so popular.
 this RPC-like style. There is a lot of documentation about all the URLs
 available, what parameters they take, and what the returned data or resulting
 state will be. For example, here is how you would get the text of the 3 most
-recent tweets made by user @climagic with Twitter's JSON API ([relevant
+recent tweets made by user [@climagic](https://twitter.com/@climagic) with Twitter's JSON API ([relevant
 documentation](https://dev.twitter.com/docs/api/1/get/statuses/home_timeline)):
 
 ```ruby
@@ -166,7 +166,7 @@ Rendering JSON from the server is usually fairly simple as well, and
 the simplicity of providing and consuming JSON in many different languages
 is another one of the big reasons why JSON APIs are gaining in popularity. Twitter
 actually decided to [drop support for XML, RSS, and
-Atom](https://dev.twitter.com/docs/api/1.1/overview#JSON_support_only) in
+Atom](https://web.archive.org/web/20120920095243/https://dev.twitter.com/docs/api/1.1/overview#JSON_support_only) in
 version 1.1 of their API, leaving ONLY support for JSON. [According to
 Programmable
 Web](http://blog.programmableweb.com/2011/05/25/1-in-5-apis-say-bye-xml/) 20%

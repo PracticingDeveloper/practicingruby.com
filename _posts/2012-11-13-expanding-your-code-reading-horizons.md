@@ -586,22 +586,22 @@ bubble from time to time, only good things will come of it.
 > **NOTE**: You may want to try out [4Clojure][4Clojure] if you want to hone
 > your Clojure skills at a more gradual pace than what we attempted in this
 > article. It's a quiz site similar to [RubyKoans].
- 
+
 [swarm]:       http://en.wikipedia.org/wiki/Swarm_intelligence
 [boids]:       http://en.wikipedia.org/wiki/Boids
 [aco]:         http://en.wikipedia.org/wiki/Ant_colony_optimization
 [sim]:         https://gist.github.com/1093917
 [clojure]:     http://clojure.org/
-[clojure-doc]: http://clojure.org/documentation
-[hickey]:      http://blip.tv/clojure/clojure-concurrency-819147
+[clojure-doc]: https://clojure.github.io/clojure/
+[hickey]:      https://www.youtube.com/watch?v=dGVqrGmwOAw
 [xkcd]:        http://xkcd.com
 [4Clojure]:    http://www.4clojure.com
 [RubyKoans]:   http://rubykoans.com
 
-[def]:     http://clojure.org/special_forms#Special%20Forms--%28def%20symbol%20init?%29
-[Map]: http://clojure.org/data_structures#Data%20Structures-Maps%20%28IPersistentMap%29
-[StructMap]: http://clojure.org/data_structures#Data%20Structures-StructMaps
-[Vector]: http://clojure.org/data_structures#Data%20Structures-Vectors%20%28IPersistentVector%29
+[def]:     https://clojure.org/reference/special_forms#def
+[Map]: https://clojure.org/reference/data_structures#Maps
+[StructMap]: https://clojure.org/reference/data_structures#StructMaps
+[Vector]: https://clojure.org/reference/data_structures#Vectors
 [Sequence]: http://clojure.org/sequences
 [Ref]: http://clojure.org/refs
 [->]: http://blog.fogus.me/2009/09/04/understanding-the-clojure-macro/
@@ -613,4 +613,4 @@ bubble from time to time, only good things will come of it.
 [for]: http://clojure.github.com/clojure/clojure.core-api.html#clojure.core/for
 [doall]: http://clojure.github.com/clojure/clojure.core-api.html#clojure.core/doall
 [rand-int]: http://clojure.github.com/clojure/clojure.core-api.html#clojure.core/rand-int
-[do]: http://clojure.org/special_forms#Special%20Forms--%28do%20exprs*%29
+[do]: https://clojure.org/reference/special_forms#do
