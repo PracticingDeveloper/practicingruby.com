@@ -2,7 +2,10 @@
 layout: post
 title: Ruby's method lookup path, Part 1
 date: '2010-11-09'
-categories: articles
+categories: 
+  - articles
+  - editors-picks
+  - spotlights
 author: Gregory Brown
 permalink: articles/method-lookup-1
 summary: Discover the complicated, multi-step dance that is the Ruby method lookup

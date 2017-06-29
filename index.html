@@ -3,22 +3,18 @@ layout: default
 ---
 
 <div class="home">
-  <div class="header" style="text-align: center;">
+  <div class="header" style="text-align: center; padding-top: 40px; padding-bottom: 80px;">
     <h1 style="text-align: center; font-size: 50px; font-weight: bold;">Practicing Ruby</h1>
     <h2 style="text-align: center;">Delightful lessons for the dedicated programmer</h2>
-    <img src="ruby-divider.png" style="margin-bottom: 15px;"/>
-    <big>Welcome to Practicing Ruby, an open archive of lessons that take a deep-dive into software development. Look beyond the code to solve problems, explore  ideas, and learn something new.</big>
+    <img src="ruby-divider.png" style="margin-bottom: 15px; padding-bottom: 20px; padding-top: 20px"/>
+    <big>Welcome to Practicing Ruby, a free and open source archive of lessons that take a deep-dive into software development. Our articles will help you solve problems, explore ideas, and learn useful techniques to apply in your daily work.</big>
   </div>
-
-  <br />
-  <hr style="background-color: #ddd; color: #ddd; border: none; height: 1px;" />
-  <br />
 
   <div class="categories">
     <div id="most-popular">
       {% assign posts = site.posts | where:"categories","editors-picks" %}
       <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
-        Most popular
+        Most popular lessons
         {% if posts.size > 5 %}
           <a href="/categories/most-popular" style="float: right; font-size: 16px;">View All</a>
         {% endif %}
