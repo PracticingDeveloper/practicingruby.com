@@ -1198,6 +1198,6 @@ while researching this topic:
 
 * [Easy 6502](http://skilldrick.github.io/easy6502/) by Nick Morgan
 * [Mos Technology 6502](http://en.wikipedia.org/wiki/MOS_Technology_6502) @ Wikipedia
-* [Rockwell 6502 Programmer's Manual](http://homepage.ntlworld.com/cyborgsystems/CS_Main/6502/6502.htm)  by Bluechip
+* [Rockwell 6502 Programmer's Manual](https://web.archive.org/web/20160315002735/homepage.ntlworld.com/cyborgsystems/CS_Main/6502/6502.htm)  by Bluechip
 * [NMos 6502 opcodes](http://www.6502.org/tutorials/6502opcodes.html) by John Pickens
 * [r6502](https://github.com/joelanders/r6502) by Joe Landers

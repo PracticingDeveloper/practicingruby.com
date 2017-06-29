@@ -18,7 +18,7 @@ In this article, I will walk you through some fun examples that demonstrate how 
 
 ## Setting the stage
 
-The source of my motivation for writing on this topic is the [StarLogo](http://education.mit.edu/starlogo/) programming environment and Mitchel Resnick's excellent book "Turtles, Termites, and Traffic Jams", both of which illustrate the potential for software to be used as a mind-expanding thinking tool.
+The source of my motivation for writing on this topic is the [StarLogo](http://education.mit.edu/portfolio_page/starlogo-tng/) programming environment and Mitchel Resnick's excellent book "Turtles, Termites, and Traffic Jams", both of which illustrate the potential for software to be used as a mind-expanding thinking tool.
 
 As the title of the book implies, StarLogo is an environment that facilitates simplistic modeling of scenarios that occur in the natural world. The purpose of the tool is not to create environments that closely emulate reality, but instead, to encourage exploration and discovery in simple, tightly constrained microcosms. Apart from being an intellectual curiosity, this sort of toolset provides a powerful way to intuitively experience deep concepts that range from self-organization and emergent behavior to massive parallelism.
 
