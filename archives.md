@@ -4,8 +4,6 @@ title: Archives
 permalink: /archives
 ---
 
-# Archives
-
 <div class="home">
   <ul class="post-list">
     {% for post in site.posts %}
