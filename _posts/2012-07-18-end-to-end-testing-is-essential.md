@@ -2,7 +2,7 @@
 layout: post
 title: End-to-end testing is essential
 date: '2012-07-18'
-categories: articles
+categories: testing
 author: Gregory Brown
 permalink: articles/end-to-end-testing-is-essential
 summary: Build acceptance tests that reflect application behavior, rather than implementation

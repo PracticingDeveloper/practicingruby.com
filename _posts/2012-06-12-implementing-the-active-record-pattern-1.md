@@ -2,7 +2,7 @@
 layout: post
 title: Implementing the Active Record pattern, Part 1
 date: '2012-06-12'
-categories: articles
+categories: software-design
 author: Gregory Brown
 permalink: articles/implementing-the-active-record-pattern-1
 summary: Build a basic foundation to serve as the groundwork for implementing an ActiveRecord-style

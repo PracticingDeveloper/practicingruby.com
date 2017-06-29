@@ -2,7 +2,7 @@
 layout: post
 title: Writing Configurable Applications, Part 1
 date: '2010-11-16'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/configurable-applications-1
 summary: Learn what not to do when configuring applications, then explore a simple

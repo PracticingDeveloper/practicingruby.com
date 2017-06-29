@@ -2,7 +2,7 @@
 layout: post
 title: Event loops demystified
 date: '2012-09-04'
-categories: articles
+categories: cs-concepts
 author: Magnus Holm
 permalink: articles/event-loops-demystified
 summary: Build a Node.js/EventMachine-style event loop in roughly 150 lines of Ruby

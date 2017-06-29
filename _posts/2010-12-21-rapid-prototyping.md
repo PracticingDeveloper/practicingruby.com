@@ -2,7 +2,9 @@
 layout: post
 title: Rapid Prototyping
 date: '2010-12-21'
-categories: articles
+categories:
+  - games
+  - building
 author: Gregory Brown
 permalink: articles/rapid-prototyping
 summary: Build a tiny prototype of a tetris game on the command line.

@@ -2,7 +2,7 @@
 layout: post
 title: Exploring low-level computing concepts with Ruby
 date: '2013-10-01'
-categories: articles
+categories: cs-concepts
 author: Gregory Brown
 permalink: articles/low-level-computing
 summary: Implement a minimal simulator of the classic 6502 processor using nothing

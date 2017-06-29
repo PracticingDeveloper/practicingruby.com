@@ -2,7 +2,7 @@
 layout: post
 title: Writing confident code
 date: '2012-06-05'
-categories: articles
+categories: communication
 author: Avdi Grimm
 permalink: articles/confident-ruby
 summary: Develop intention-revealing code that is confident about its responsibilities.

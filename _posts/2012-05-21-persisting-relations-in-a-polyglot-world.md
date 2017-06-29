@@ -2,7 +2,7 @@
 layout: post
 title: Persisting relations in a polyglot world
 date: '2012-05-21'
-categories: articles
+categories: cs-concepts
 author: Piotr Szotkowski
 permalink: articles/persisting-relations-in-a-polyglot-world
 summary: Explore some non-traditional persistence mechanisms and their uses.  (w.

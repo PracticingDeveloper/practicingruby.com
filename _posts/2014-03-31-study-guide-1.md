@@ -2,7 +2,7 @@
 layout: post
 title: A self guided course on streams, files, file formats, and sockets
 date: '2014-03-31'
-categories: articles
+categories: cs-concepts
 author: Gregory Brown
 permalink: articles/study-guide-1
 summary: Explore UNIX-style stream processing, binary file formats, the Racc parser

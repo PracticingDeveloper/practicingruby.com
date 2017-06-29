@@ -2,7 +2,9 @@
 layout: post
 title: Expanding your code reading horizons
 date: '2012-11-13'
-categories: articles
+categories:
+  - communication
+  - cs-concepts
 author: Gregory Brown
 permalink: articles/expanding-your-code-reading-horizons
 summary: See how much even a few dozen lines of code can tell you about a programming

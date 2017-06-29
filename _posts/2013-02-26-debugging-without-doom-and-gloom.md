@@ -2,7 +2,7 @@
 layout: post
 title: Debugging without the doom and gloom
 date: '2013-02-26'
-categories: articles
+categories: everything-else
 author: Carol Nichols
 permalink: articles/debugging-without-doom-and-gloom
 summary: Use stack traces, the Pry console, and tests to hunt bugs with confidence.

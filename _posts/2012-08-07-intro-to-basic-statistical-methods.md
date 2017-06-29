@@ -2,7 +2,7 @@
 layout: post
 title: A practical application of basic statistical methods
 date: '2012-08-07'
-categories: articles
+categories: working-with-data
 author: Jia Wu
 permalink: articles/intro-to-basic-statistical-methods
 summary: Crunch some numbers to see how Olympic medal wins relate to GDP and population.

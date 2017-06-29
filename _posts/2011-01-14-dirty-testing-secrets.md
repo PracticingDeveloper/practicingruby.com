@@ -2,7 +2,7 @@
 layout: post
 title: Dirty Little Secrets about Testing
 date: '2011-01-14'
-categories: articles
+categories: testing
 author: Gregory Brown
 permalink: articles/dirty-testing-secrets
 summary: Take a look at some dark corners of the traditional testing dogma.

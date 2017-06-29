@@ -2,7 +2,7 @@
 layout: post
 title: Duck Typing in Practice, Part 1
 date: '2010-12-28'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/duck-typing-in-practice-1
 summary: Investigate the three main ways of doing type checking in Ruby, then work

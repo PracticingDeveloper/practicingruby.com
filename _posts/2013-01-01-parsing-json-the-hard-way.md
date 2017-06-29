@@ -2,7 +2,9 @@
 layout: post
 title: Parsing JSON the hard way
 date: '2013-01-01'
-categories: articles
+categories:
+  - cs-concepts
+  - ruby-quirks
 author: Aaron Patterson
 permalink: articles/parsing-json-the-hard-way
 summary: Learn about low-level parser and compiler tools by implementing a JSON parser.

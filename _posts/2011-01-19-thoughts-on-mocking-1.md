@@ -2,7 +2,7 @@
 layout: post
 title: Thoughts on Mocking, Part 1
 date: '2011-01-19'
-categories: articles
+categories: testing
 author: Gregory Brown
 permalink: articles/thoughts-on-mocking-1
 summary: Consider how the ideas from Martin Fowler's "Mocks aren't Stubs" can be applied

@@ -2,7 +2,7 @@
 layout: post
 title: Ways to load code
 date: '2011-08-23'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/ways-to-load-code
 summary: Explore the strengths and weaknesses of the many code loading mechanisms

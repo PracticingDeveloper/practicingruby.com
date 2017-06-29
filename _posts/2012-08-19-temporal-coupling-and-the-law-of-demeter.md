@@ -2,7 +2,7 @@
 layout: post
 title: Temporal coupling and the Law of Demeter
 date: '2012-08-19'
-categories: articles
+categories: software-design
 author: Gregory Brown
 permalink: articles/temporal-coupling-and-the-law-of-demeter
 summary: See how NASA JPL's take on the Law of Demeter simplifies building robust

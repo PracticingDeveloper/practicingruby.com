@@ -2,7 +2,7 @@
 layout: post
 title: How to practice, Part 2
 date: '2011-01-28'
-categories: articles
+categories: everything-else
 author: Gregory Brown
 permalink: articles/how-to-practice-2
 summary: 'See an example of how the practice methods outlined in Issue 1.21 can be

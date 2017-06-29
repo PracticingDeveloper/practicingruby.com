@@ -2,7 +2,9 @@
 layout: post
 title: Duck Typing in Practice, Part 2
 date: '2010-12-31'
-categories: articles
+categories:
+  - open-source
+  - ruby-quirks
 author: Gregory Brown
 permalink: articles/duck-typing-in-practice-2
 summary: Examine real uses of Ruby's duck-typing capabilities in various open source

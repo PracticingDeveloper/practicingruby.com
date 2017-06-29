@@ -2,7 +2,7 @@
 layout: post
 title: Framework design and implementation, Part 2
 date: '2012-02-08'
-categories: articles
+categories: software-design
 author: Gregory Brown
 permalink: articles/framework-design-and-implementation-2
 summary: Explore some lessons learned the hard way in developing the Newman mail framework.

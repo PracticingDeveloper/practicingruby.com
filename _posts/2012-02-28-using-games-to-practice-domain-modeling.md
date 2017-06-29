@@ -2,7 +2,9 @@
 layout: post
 title: Using games to practice domain modeling
 date: '2012-02-28'
-categories: articles
+categories:
+  - games
+  - domain-modeling
 author: Gregory Brown
 permalink: articles/using-games-to-practice-domain-modeling
 summary: Learn about modeling non-trivial business logic by implementing Minecraft's

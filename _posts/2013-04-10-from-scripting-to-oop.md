@@ -2,7 +2,7 @@
 layout: post
 title: 'From adhoc script  to object-oriented program '
 date: '2013-04-10'
-categories: articles
+categories: domain-modeling
 author: Gregory Brown
 permalink: articles/from-scripting-to-oop
 summary: Gradually convert a  "throwaway" procedural program into a well-defined domain

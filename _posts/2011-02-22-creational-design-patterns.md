@@ -2,7 +2,7 @@
 layout: post
 title: Creational Design Patterns
 date: '2011-02-22'
-categories: articles
+categories: software-design
 author: Gregory Brown
 permalink: articles/creational-design-patterns
 summary: Examine a use case for each of the classic creational design patterns laid

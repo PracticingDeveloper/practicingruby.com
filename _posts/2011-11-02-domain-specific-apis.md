@@ -2,7 +2,9 @@
 layout: post
 title: Domain specific API construction
 date: '2011-11-02'
-categories: articles
+categories:
+  - domain-modeling
+  - ruby-quirks
 author: Gregory Brown
 permalink: articles/domain-specific-apis
 summary: Master classic Ruby DSL design patterns by ripping off well-known libraries

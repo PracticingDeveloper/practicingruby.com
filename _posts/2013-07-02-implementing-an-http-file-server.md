@@ -2,7 +2,9 @@
 layout: post
 title: Implementing a minimal HTTP server in Ruby
 date: '2013-07-02'
-categories: articles
+categories:
+  - building
+  - cs-concepts
 author: Luke Francl
 permalink: articles/implementing-an-http-file-server
 summary: Build just enough HTTP functionality from scratch to serve up static files.

@@ -2,7 +2,9 @@
 layout: post
 title: Tricks for working with text and files
 date: '2012-05-10'
-categories: articles
+categories:
+  - ruby-quirks
+  - working-with-data
 author: Gregory Brown
 permalink: articles/tricks-for-working-with-text-and-files
 summary: Tear apart a minimal clone of the Jekyll blog engine in search of helpful

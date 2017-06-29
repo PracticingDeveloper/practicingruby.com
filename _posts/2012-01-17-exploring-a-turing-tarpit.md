@@ -2,7 +2,7 @@
 layout: post
 title: Exploring the depths of a Turing tarpit
 date: '2012-01-17'
-categories: articles
+categories: cs-concepts
 author: Gregory Brown
 permalink: articles/exploring-a-turing-tarpit
 summary: Read the code for a simple Brainf*ck interpreter and think about how it might

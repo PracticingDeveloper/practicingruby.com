@@ -2,7 +2,9 @@
 layout: post
 title: 'Safely evaluating user-defined formulas and calculations '
 date: '2015-09-10'
-categories: articles
+categories:
+  - cs-concepts
+  - working-with-data
 author: Solomon White and Gregory Brown
 permalink: articles/formula-processing
 summary: Learn how to use Dentaku to evaluate Excel-like formulas

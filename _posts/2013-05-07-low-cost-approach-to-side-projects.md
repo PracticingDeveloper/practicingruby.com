@@ -2,7 +2,7 @@
 layout: post
 title: A low cost approach to working on side projects
 date: '2013-05-07'
-categories: articles
+categories: problem-solving
 author: Gregory Brown
 permalink: articles/low-cost-approach-to-side-projects
 summary: Save time by building a standalone feature before designing a complete product.

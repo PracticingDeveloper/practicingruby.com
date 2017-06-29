@@ -2,7 +2,9 @@
 layout: post
 title: Process spawning patterns
 date: '2012-10-02'
-categories: articles
+categories:
+  - cs-concepts
+  - ruby-quirks
 author: Jesse Storimer
 permalink: articles/process-spawning-patterns
 summary: Implement Ruby's system and backticks methods using the fork/exec pattern.

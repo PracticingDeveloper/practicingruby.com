@@ -2,7 +2,7 @@
 layout: post
 title: Lessons learned from coding in the danger zone
 date: '2012-03-13'
-categories: articles
+categories: maintenance
 author: Gregory Brown
 permalink: articles/coding-in-the-danger-zone
 summary: Establish a few survival skills for working in hostile programming environments.

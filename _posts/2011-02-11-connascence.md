@@ -2,7 +2,7 @@
 layout: post
 title: Connascence as a Software Design Metric
 date: '2011-02-11'
-categories: articles
+categories: software-design
 author: Gregory Brown
 permalink: articles/connascence
 summary: Work through code samples inspired by Jim Weirich's "Building Blocks of Modularity"

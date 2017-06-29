@@ -2,7 +2,7 @@
 layout: post
 title: Understanding the relationships between objects
 date: '2012-10-28'
-categories: articles
+categories: domain-modeling
 author: Gregory Brown
 permalink: articles/relationships-between-objects
 summary: Learn how to model dependencies, notifications, adjustments, and internal

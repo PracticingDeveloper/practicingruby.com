@@ -2,7 +2,9 @@
 layout: post
 title: An adventure in prototypes
 date: '2012-12-11'
-categories: articles
+categories:
+  - building
+  - games
 author: Avdi Grimm
 permalink: articles/adventure-in-prototypes
 summary: Build a text adventure game and a prototype-based object model, at the same

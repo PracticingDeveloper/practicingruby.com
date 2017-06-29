@@ -2,7 +2,7 @@
 layout: post
 title: Uses for Modules, Part 3
 date: '2010-12-14'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/uses-for-modules-3
 summary: See how modules can be used as namespaced function bags, and as singleton

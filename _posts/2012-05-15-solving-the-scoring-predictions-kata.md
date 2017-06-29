@@ -2,7 +2,7 @@
 layout: post
 title: Solving the "Scoring Predictions" kata
 date: '2012-05-15'
-categories: articles
+categories: problem-solving
 author: James Edward Gray II
 permalink: articles/solving-the-scoring-predictions-kata
 summary: Work through a coding puzzle and learn some fun tricks along the way. (w.

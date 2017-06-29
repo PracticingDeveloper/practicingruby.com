@@ -2,7 +2,7 @@
 layout: post
 title: Criteria for disciplined inheritance, Part 1
 date: '2012-02-15'
-categories: articles
+categories: domain-modeling
 author: Gregory Brown
 permalink: articles/disciplined-inheritance-1
 summary: See how M. Sakkinen's notion of "Disciplined Inheritance" in 1989 still applies

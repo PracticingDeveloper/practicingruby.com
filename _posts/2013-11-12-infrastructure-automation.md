@@ -2,7 +2,7 @@
 layout: post
 title: Infrastructure automation by example
 date: '2013-11-12'
-categories: articles
+categories: maintenance
 author: Mathias Lafeldt, Jordan Byron, and Gregory Brown
 permalink: articles/infrastructure-automation
 summary: Discover why infrastructure automation matters by exploring real Chef recipes.

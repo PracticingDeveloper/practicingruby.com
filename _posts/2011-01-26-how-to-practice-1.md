@@ -2,7 +2,7 @@
 layout: post
 title: How to practice, Part 1
 date: '2011-01-26'
-categories: articles
+categories: everything-else
 author: Gregory Brown
 permalink: articles/how-to-practice-1
 summary: Discover a new way to practice your coding skills by asking yourself the

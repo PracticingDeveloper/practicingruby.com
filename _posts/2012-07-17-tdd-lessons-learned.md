@@ -2,7 +2,7 @@
 layout: post
 title: Lessons learned from my TDD self-study
 date: '2012-07-17'
-categories: articles
+categories: testing
 author: Gregory Brown
 permalink: articles/tdd-lessons-learned
 summary: Revisit the reasons for Gregory's 90-day self-study on TDD, and see the results.

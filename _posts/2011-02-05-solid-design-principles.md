@@ -2,7 +2,7 @@
 layout: post
 title: SOLID Design Principles
 date: '2011-02-05'
-categories: articles
+categories: software-design
 author: Gregory Brown
 permalink: articles/solid-design-principles
 summary: Work through code samples inspired by Sandi Metz's "SOLID Object-oriented

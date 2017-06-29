@@ -2,7 +2,7 @@
 layout: post
 title: Uses for Modules, Part 1
 date: '2010-12-08'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/uses-for-modules-1
 summary: Use modules as namespaces for your libraries and applications.

@@ -2,7 +2,7 @@
 layout: post
 title: '"Unobtrusive Ruby" in Practice'
 date: '2011-10-04'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/unobtrusive-ruby-in-practice
 summary: Explore ideas from Mike Burns's "Unobtrusive Ruby" blog post via practical

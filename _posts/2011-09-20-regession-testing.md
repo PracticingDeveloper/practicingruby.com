@@ -2,7 +2,7 @@
 layout: post
 title: Thoughts on regression testing
 date: '2011-09-20'
-categories: articles
+categories: testing
 author: Gregory Brown
 permalink: articles/regession-testing
 summary: Benefit from two lessons about regression testing that were learned the hard

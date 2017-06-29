@@ -2,7 +2,7 @@
 layout: post
 title: Thoughts on Mocking, Part 2
 date: '2011-01-22'
-categories: articles
+categories: testing
 author: Gregory Brown
 permalink: articles/thoughts-on-mocking-2
 summary: Explore a few good uses of mock objects from a non-mockist's perspective.

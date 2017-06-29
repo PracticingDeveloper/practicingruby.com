@@ -2,7 +2,7 @@
 layout: post
 title: Interesting Ruby Hacker-Writers
 date: '2011-01-07'
-categories: articles
+categories: spotlights
 author: Gregory Brown
 permalink: articles/ruby-hacker-writers
 summary: Find out which Ruby hackers consistently write great content worth reading.

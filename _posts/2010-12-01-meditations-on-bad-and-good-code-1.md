@@ -2,7 +2,9 @@
 layout: post
 title: Meditations on Bad and Good Code, Part 1
 date: '2010-12-01'
-categories: articles
+categories:
+  - games
+  - maintenance
 author: Gregory Brown
 permalink: articles/meditations-on-bad-and-good-code-1
 summary: Build an ugly tic-tac-toe game by writing the entire implementation as a

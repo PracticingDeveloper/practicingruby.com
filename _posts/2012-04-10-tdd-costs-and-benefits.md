@@ -2,7 +2,7 @@
 layout: post
 title: What are the costs and benefits of TDD?
 date: '2012-04-10'
-categories: articles
+categories: testing
 author: Gregory Brown
 permalink: articles/tdd-costs-and-benefits
 summary: Think through how to evaluate the impact of test-driven development on your

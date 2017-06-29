@@ -2,7 +2,7 @@
 layout: post
 title: Ruby and the singleton pattern don't get along
 date: '2011-10-11'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/ruby-and-the-singleton-pattern-dont-get-along
 summary: Model the singleton pattern in seven different ways, without discovering

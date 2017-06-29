@@ -2,7 +2,9 @@
 layout: post
 title: Avoiding brittleness in data munging projects
 date: '2013-04-23'
-categories: articles
+categories:
+  - maintenance
+  - working-with-data
 author: Gregory Brown
 permalink: articles/avoiding-brittleness-in-data-munging
 summary: Process data and generate reports without writing unmaintainable spaghetti

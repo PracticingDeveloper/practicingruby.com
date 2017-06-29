@@ -2,7 +2,7 @@
 layout: post
 title: Ruby's method lookup path, Part 2
 date: '2010-11-11'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/method-lookup-2
 summary: Use your knowledge of Ruby's lookup path to determine where to add methods

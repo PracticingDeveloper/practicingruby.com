@@ -2,7 +2,9 @@
 layout: post
 title: Meditations on Bad and Good Code, Part 2
 date: '2010-12-03'
-categories: articles
+categories:
+  - games
+  - maintenance
 author: Gregory Brown
 permalink: articles/meditations-on-bad-and-good-code-2
 summary: Read through a cleaned up version of the ugly "Tic Tac Toe" game created

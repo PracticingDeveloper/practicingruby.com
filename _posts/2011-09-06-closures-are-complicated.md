@@ -2,7 +2,7 @@
 layout: post
 title: A closure is a double edged sword
 date: '2011-09-06'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/closures-are-complicated
 summary: Discover why the closure property can sometimes lead to hard-to-spot memory

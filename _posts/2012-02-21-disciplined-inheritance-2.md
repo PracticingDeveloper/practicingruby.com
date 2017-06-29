@@ -2,7 +2,7 @@
 layout: post
 title: Criteria for disciplined inheritance, Part 2
 date: '2012-02-21'
-categories: articles
+categories: domain-modeling
 author: Gregory Brown
 permalink: articles/disciplined-inheritance-2
 summary: Discover how Barbara Liskov's concept of "behavioral subtypes" apply to object

@@ -2,7 +2,9 @@
 layout: post
 title: Testing Private Methods
 date: '2010-11-25'
-categories: articles
+categories:
+  - ruby-quirks
+  - testing
 author: Gregory Brown
 permalink: articles/testing-private-methods
 summary: Understand why testing private methods can be a code smell.

@@ -2,7 +2,7 @@
 layout: post
 title: Building a better Turing tarpit
 date: '2012-01-25'
-categories: articles
+categories: cs-concepts
 author: Gregory Brown
 permalink: articles/spiral-staircase-of-refactoring
 summary: In this issue, we improve the design of the Brainf*ck interpreter that was

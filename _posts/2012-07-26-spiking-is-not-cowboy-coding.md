@@ -2,7 +2,7 @@
 layout: post
 title: Spiking is not cowboy coding
 date: '2012-07-26'
-categories: articles
+categories: testing
 author: Gregory Brown
 permalink: articles/spiking-is-not-cowboy-coding
 summary: Search for the boundary lines between organized chaos and wild, unstructured

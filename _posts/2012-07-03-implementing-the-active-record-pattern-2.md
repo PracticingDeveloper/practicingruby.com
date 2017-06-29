@@ -2,7 +2,7 @@
 layout: post
 title: Implementing the Active Record pattern, Part 2
 date: '2012-07-03'
-categories: articles
+categories: software-design
 author: Gregory Brown
 permalink: articles/implementing-the-active-record-pattern-2
 summary: Consider using "object-oriented mixins" to reduce inheritance-related problems

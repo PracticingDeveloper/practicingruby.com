@@ -2,7 +2,9 @@
 layout: post
 title: Learning new things step-by-step
 date: '2011-09-27'
-categories: articles
+categories:
+  - games
+  - problem-solving
 author: Gregory Brown
 permalink: articles/learning-new-things-step-by-step
 summary: Build a simple arcade game in 13 tiny steps.

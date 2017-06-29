@@ -2,7 +2,7 @@
 layout: post
 title: Uses for Modules, Part 4
 date: '2010-12-16'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/uses-for-modules-4
 summary: Explore the use of mixins for customizing individual objects.

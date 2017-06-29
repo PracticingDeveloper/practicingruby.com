@@ -2,7 +2,10 @@
 layout: post
 title: The anatomy of information in software systems
 date: '2014-09-08'
-categories: articles
+categories:
+  - problem-solving
+  - software-design
+  - working-with-data
 author: Gregory Brown
 permalink: articles/information-anatomy
 summary: Explore the tradeoffs involved in designing message formats, and the messy

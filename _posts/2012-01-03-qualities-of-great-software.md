@@ -2,7 +2,7 @@
 layout: post
 title: The qualities of great software
 date: '2012-01-03'
-categories: articles
+categories: maintenance
 author: Gregory Brown
 permalink: articles/qualities-of-great-software
 summary: See what ISO/IEC 9126 has to say about software quality, and how its metrics

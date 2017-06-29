@@ -2,7 +2,9 @@
 layout: post
 title: Building Unix-style command line applications
 date: '2011-10-18'
-categories: articles
+categories:
+  - building
+  - ruby-quirks
 author: Gregory Brown
 permalink: articles/building-unix-style-command-line-applications
 summary: Build a basic clone of the 'cat' utility while learning some Ruby idioms

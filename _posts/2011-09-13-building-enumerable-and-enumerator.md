@@ -2,7 +2,7 @@
 layout: post
 title: Building Enumerable & Enumerator in Ruby
 date: '2011-09-13'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/building-enumerable-and-enumerator
 summary: Learn about Ruby's powerful iteration tools by implementing some of its functionality

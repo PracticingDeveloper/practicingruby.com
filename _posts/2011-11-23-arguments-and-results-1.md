@@ -2,7 +2,7 @@
 layout: post
 title: Thoughts on "Arguments and Results", Part 1
 date: '2011-11-23'
-categories: articles
+categories: domain-modeling
 author: Gregory Brown
 permalink: articles/arguments-and-results-1
 summary: Work through argument objects inspired by James Noble's classic "Arguments

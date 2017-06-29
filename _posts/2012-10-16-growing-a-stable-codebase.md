@@ -2,7 +2,7 @@
 layout: post
 title: Guidelines for growing a stable codebase
 date: '2012-10-16'
-categories: articles
+categories: communication
 author: Jordan Byron and Gregory Brown
 permalink: articles/growing-a-stable-codebase
 summary: Discover the process we use for continuously improving practicingruby.com.

@@ -2,7 +2,7 @@
 layout: post
 title: Obfuscations of Christmas Past
 date: '2010-12-23'
-categories: articles
+categories: everything-else
 author: Gregory Brown
 permalink: articles/obfuscations-of-christmas-past
 summary: Tear apart an obfuscated Ruby program from Leah Neukirchen to learn

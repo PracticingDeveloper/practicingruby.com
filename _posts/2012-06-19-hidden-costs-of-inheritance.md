@@ -2,7 +2,7 @@
 layout: post
 title: The hidden costs of inheritance
 date: '2012-06-19'
-categories: articles
+categories: software-design
 author: Gregory Brown
 permalink: articles/hidden-costs-of-inheritance
 summary: Think through some problems with inheritance-based modeling and then try

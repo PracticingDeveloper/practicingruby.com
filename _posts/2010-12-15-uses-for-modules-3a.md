@@ -2,7 +2,7 @@
 layout: post
 title: Addendum to Uses For Modules, Part 3
 date: '2010-12-15'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/uses-for-modules-3a
 summary: Learn the subtle differences between "extend self", "def self.method", and

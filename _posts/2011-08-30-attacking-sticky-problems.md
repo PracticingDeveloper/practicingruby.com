@@ -2,7 +2,7 @@
 layout: post
 title: How to attack sticky problems
 date: '2011-08-30'
-categories: articles
+categories: problem-solving
 author: Gregory Brown
 permalink: articles/attacking-sticky-problems
 summary: Work through a few lessons that will help you find a starting point whenever

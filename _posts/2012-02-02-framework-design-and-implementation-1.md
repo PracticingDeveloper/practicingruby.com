@@ -2,7 +2,7 @@
 layout: post
 title: Framework design and implementation, Part 1
 date: '2012-02-02'
-categories: articles
+categories: software-design
 author: Gregory Brown
 permalink: articles/framework-design-and-implementation-1
 summary: Dig through the Newman mail framework's source code in search of useful patterns

@@ -2,7 +2,10 @@
 layout: post
 title: Responsibility-centric vs. data-centric design
 date: '2012-07-10'
-categories: articles
+categories:
+  - domain-modeling
+  - software-design
+  - working-with-data
 author: Greg Moeck
 permalink: articles/responsibility-centric-vs-data-centric-design
 summary: Work through two approaches to object modeling and examine their tradeoffs.

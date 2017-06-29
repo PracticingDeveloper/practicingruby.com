@@ -2,7 +2,10 @@
 layout: post
 title: From requirements discovery to release
 date: '2011-10-27'
-categories: articles
+categories:
+  - games
+  - problem-solving
+  - software-design
 author: Gregory Brown
 permalink: articles/from-requirements-discovery-to-release
 summary: Watch a small game project develop from the brainstorming phase to its first

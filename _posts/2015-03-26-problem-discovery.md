@@ -2,7 +2,7 @@
 layout: post
 title: Problem discovery comes before problem solving
 date: '2015-03-26'
-categories: articles
+categories: problem-solving
 author: Gregory Brown
 permalink: articles/problem-discovery
 summary: A brief story about why you should play around with problems before trying

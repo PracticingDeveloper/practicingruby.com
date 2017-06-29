@@ -2,7 +2,7 @@
 layout: post
 title: 'The Law of Demeter: Some archaeological notes'
 date: '2013-03-26'
-categories: articles
+categories: software-design
 author: David A. Black
 permalink: articles/demeter-archaeology
 summary: Explore the history of a classic design principle and how it relates to Ruby.

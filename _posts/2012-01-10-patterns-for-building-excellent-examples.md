@@ -2,7 +2,7 @@
 layout: post
 title: Patterns for building excellent examples
 date: '2012-01-10'
-categories: articles
+categories: communication
 author: Gregory Brown
 permalink: articles/patterns-for-building-excellent-examples
 summary: Learn how to write code samples that clearly communicate ideas to other programmers.

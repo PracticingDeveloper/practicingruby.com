@@ -2,7 +2,7 @@
 layout: post
 title: Structural Design Patterns
 date: '2011-02-28'
-categories: articles
+categories: software-design
 author: Gregory Brown
 permalink: articles/structural-design-patterns
 summary: Examine a use case for each of the classic structural design patterns laid

@@ -2,7 +2,7 @@
 layout: post
 title: Refactoring is not redesign
 date: '2012-07-19'
-categories: articles
+categories: testing
 author: Gregory Brown
 permalink: articles/refactoring-is-not-redesign
 summary: 'Discover how the differences between refactoring and redesign affect testing

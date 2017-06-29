@@ -2,7 +2,7 @@
 layout: post
 title: 'Code reuse in Ruby: It''s complicated!'
 date: '2013-02-12'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/code-reuse-is-complicated
 summary: "Learn the costs and benefits of the many ways that Ruby lets you reuse code.\r\n\r\n"

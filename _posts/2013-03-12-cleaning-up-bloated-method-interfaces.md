@@ -2,7 +2,7 @@
 layout: post
 title: Cleaning up bloated method interfaces
 date: '2013-03-12'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/cleaning-up-bloated-method-interfaces
 summary: Tame a complex method interface using keyword arguments and parameter objects.

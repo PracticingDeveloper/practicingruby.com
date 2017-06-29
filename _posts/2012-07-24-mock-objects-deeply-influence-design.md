@@ -2,7 +2,7 @@
 layout: post
 title: Mock objects deeply influence design
 date: '2012-07-24'
-categories: articles
+categories: testing
 author: Gregory Brown
 permalink: articles/mock-objects-deeply-influence-design
 summary: Learn the rules that you need to follow in order to use mock objects as an

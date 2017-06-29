@@ -2,7 +2,7 @@
 layout: post
 title: 'Building the rstat.us API: Choices and challenges'
 date: '2012-09-18'
-categories: articles
+categories: software-design
 author: Carol Nichols
 permalink: articles/building-the-rstatus-api
 summary: Consider the design tradeoffs between the JSON API and hypermedia API styles.

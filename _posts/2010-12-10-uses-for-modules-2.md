@@ -2,7 +2,7 @@
 layout: post
 title: Uses for Modules, Part 2
 date: '2010-12-10'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/uses-for-modules-2
 summary: Use mixins as an alternative to multiple inheritance to augment class definitions.

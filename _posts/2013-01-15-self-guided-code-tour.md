@@ -2,7 +2,9 @@
 layout: post
 title: A self-guided tour of an interesting codebase
 date: '2013-01-15'
-categories: articles
+categories:
+  - communication
+  - cs-concepts
 author: Gregory Brown
 permalink: articles/self-guided-code-tour
 summary: Practice your code reading skills by walking through a small GUI client to

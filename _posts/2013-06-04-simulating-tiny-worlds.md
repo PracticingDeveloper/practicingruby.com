@@ -2,7 +2,10 @@
 layout: post
 title: Simulating tiny worlds for fun and profit
 date: '2013-06-04'
-categories: articles
+categories:
+  - building
+  - games
+  - problem-solving
 author: Gregory Brown
 permalink: articles/simulating-tiny-worlds
 summary: Practice exploratory programming by modeling forest fires, rabbit populations,

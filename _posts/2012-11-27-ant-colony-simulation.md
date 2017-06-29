@@ -2,7 +2,10 @@
 layout: post
 title: Simulating the emergent behavior of ant colonies
 date: '2012-11-27'
-categories: articles
+categories:
+  - building
+  - games
+  - working-with-data
 author: Gregory Brown
 permalink: articles/ant-colony-simulation
 summary: Explore how simple rules for individuals can yield complex group behavior

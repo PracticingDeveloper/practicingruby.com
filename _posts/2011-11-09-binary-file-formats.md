@@ -2,7 +2,7 @@
 layout: post
 title: Working with binary file formats
 date: '2011-11-09'
-categories: articles
+categories: cs-concepts
 author: Gregory Brown
 permalink: articles/binary-file-formats
 summary: Read and write bitmap files using only a few dozen lines of Ruby code.

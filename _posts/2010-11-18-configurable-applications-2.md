@@ -2,7 +2,7 @@
 layout: post
 title: Writing Configurable Applications, Part 2
 date: '2010-11-18'
-categories: articles
+categories: ruby-quirks
 author: Gregory Brown
 permalink: articles/configurable-applications-2
 summary: Build dynamic Ruby-based configuration objects.
