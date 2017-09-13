@@ -69,7 +69,7 @@ this in mind: they work best if you don't panic!
 > Editor's Note: *Don't Panic* is the motivating
 > force behind several of the maintenance policies for practicingruby.com. For
 > more on this topic, see Lessons 4 and 5 from [Issue
-> 5.6](https://practicingruby.com/articles/91)
+> 5.6](http://practicingruby.com/articles/growing-a-stable-codebase)
 
 ## Read stack traces
 
@@ -147,7 +147,7 @@ somewhere.
 This kind of workflow is especially useful when control flow gets complicated,
 such as when working with events or threads. For example, suppose we wanted to
 get a closer look at the behavior of [the actor model](https://github.com/elm-city-craftworks/practicing-ruby-examples/blob/master/v6/003/lib/actors.rb)
-from the Dining Philosopher's problem from [Issue 6.3](https://practicingruby.com/articles/100). 
+from the Dining Philosopher's problem from [Issue 6.3](http://practicingruby.com/articles/gentle-intro-to-actor-based-concurrency). 
 Here's how we would inspect what's happening in the `Waiter#request_to_eat`
 method:
 

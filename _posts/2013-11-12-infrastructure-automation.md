@@ -674,7 +674,7 @@ automation or Chef, too.
 
 Thanks for making it all the way to the end of this article, and happy automating!
 
-[puppet]: http://projects.puppetlabs.com/projects/puppet
+[puppet]: https://docs.puppet.com/puppet/
 [chef]: http://www.opscode.com/chef/
 [pr-cookbook]: https://github.com/elm-city-craftworks/practicing-ruby-cookbook/tree/1.0.8
 [pr-cookbook-attributes]: https://github.com/elm-city-craftworks/practicing-ruby-cookbook/blob/1.0.8/attributes/default.rb

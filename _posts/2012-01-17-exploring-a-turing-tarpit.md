@@ -13,7 +13,7 @@ issue_number: '3.3'
 > NOTE: This article describes an interactive challenge that was done in
 > realtime at the time it was published. You can still make use of it
 > by starting from the initial version of the code, but if you'd
-> rather skip to the end results, be sure to read [Issue 3.4](https://practicingruby.com/articles/spiral-staircase-of-refactoring).
+> rather skip to the end results, be sure to read [Issue 3.4](http://practicingruby.com/articles/spiral-staircase-of-refactoring).
 
 A programming language that is endlessly flexible but difficult to use because
 of its lack of support for common operations is known as a [Turing
@@ -68,7 +68,7 @@ follows:
 * If you want to add documentation patches, those are welcome too!
 * Feel free to work on this with friends and colleagues, even if they aren't Practicing Ruby subscribers.
 
-In [Issue 3.4](https://practicingruby.com/articles/spiral-staircase-of-refactoring), I will
+In [Issue 3.4](http://practicingruby.com/articles/spiral-staircase-of-refactoring), I will
 go over the improvements we made to this project as a group, and discuss why
 they're worthwhile. Because I know there are several things that need
 improvement in this code that are pretty general in nature, I'm reasonably sure

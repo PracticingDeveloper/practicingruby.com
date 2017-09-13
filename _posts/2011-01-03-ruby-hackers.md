@@ -13,7 +13,7 @@ In this article, I've listed five people worth knowing about if you're involved 
 
 ### Wayne Seguin ([@wayneeseguin](http://twitter.com/wayneeseguin))
 
-Wayne gave us [RVM](http://rvm.beginrescueend.com), the Ruby enVironment Manager. This tool quickly evolved from a bunch of crude shell script hacks to something that makes working with multiple Ruby versions and implementations a breeze. A tool which simply allowed manually switching between versions and implementations of Ruby would be useful on its own, but the thing that makes RVM special are all the shiny extras that come with it.
+Wayne gave us [RVM](https://rvm.io/), the Ruby Version Manager. This tool quickly evolved from a bunch of crude shell script hacks to something that makes working with multiple Ruby versions and implementations a breeze. A tool which simply allowed manually switching between versions and implementations of Ruby would be useful on its own, but the thing that makes RVM special are all the shiny extras that come with it.
 
 In addition to basic version switching, RVM provides gemsets which are sandboxes for your gem installation environment. This makes it possible for each of your projects to have its own gemset, eliminating concerns about different projects having dependencies that clash with one another. While this is a problem that can often be solved by version locking, having an extra layer of protection and organization is great.
 
@@ -45,7 +45,7 @@ As you can imagine, building a testing framework to test Ruby itself is a harder
 
 RubySpec itself is really impressive. If you haven't looked through it before, I strongly encourage that you do so. It provides comprehensive unit tests for a huge amount of Ruby's behavior, covering each feature in minute detail. I guarantee you that if you spend a little time reading through the specs, you'll find an edge case about some Ruby feature that you didn't know about, no matter how solid your understanding of Ruby is.
 
-<strike>While we haven't officially announced the details, Brian and I will be working together to run Ruby Mendicant University's first Free Software Clinic. This will be a chance for some of our students to work with me as we contribute something interesting that should make RubySpec even more useful than it already is. More information will come about this topic soon.</strike>
+~~While we haven't officially announced the details, Brian and I will be working together to run Ruby Mendicant University's first Free Software Clinic. This will be a chance for some of our students to work with me as we contribute something interesting that should make RubySpec even more useful than it already is. More information will come about this topic soon.~~
 
 In addition to his work on Rubinius and RubySpec, Brian happens to be an incredible teacher. While most of my interactions with him have been over IRC, he is capable of explaining complex and deep computer science topics in a way that makes them feel natural and manageable. I finally had a chance to see him give a talk in person at RubyConf 2010, and by watching [this video](http://confreaks.net/videos/454-rubyconf2010-poisoning-rubinius-the-_why-and-how), I think you'll get a sense of what I mean.
 

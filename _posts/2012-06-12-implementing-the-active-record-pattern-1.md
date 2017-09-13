@@ -206,7 +206,7 @@ appreciate your magical tools; the latter helps you master them.
 To help you dig deeper, I will guide you through the code that handles each
 of these responsibilities in `BrokenRecord`, explaining how it all works along
 the way. We will start by exploring some low level constructs that help
-simplify the implementation of Active Record objects, and then in [part 2](http://practicingruby.com/articles/63) 
+simplify the implementation of Active Record objects, and then in [part 2](http://practicingruby.com/articles/implementing-the-active-record-pattern-2) 
 we will look at how the whole system comes together.
 
 ### Abstracting away the database
@@ -478,7 +478,7 @@ context dependent, and that makes them a bit tricky to generalize.
 The objects described in this article may seem a bit austere,
 but they are easy to reason about once you gain some familiarity with them. In
 the [second part of this article (Issue
-4.10)](http://practicingruby.com/articles/63), you will be able to see these
+4.10)](http://practicingruby.com/articles/implementing-the-active-record-pattern-2), you will be able to see these
 objects in the context which they are actually used, which will help you
 understand them further.
 

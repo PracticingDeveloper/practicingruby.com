@@ -32,7 +32,7 @@ I, [2012-03-10T12:46:57.274896 #9841]  INFO -- RESPONSE:
 :bcc=>nil, :subject=>"pong", :reply_to=>nil}
 ```
 
-Because Newman currently only understands how to filter messages based on their TO and SUBJECT fields, the standard log information is fairly helpful for basic application debugging needs. However, when dealing with complex problems, it is nice to be able to see [the raw contents of the messages](https://raw.github.com/gist/01fbab481a21f4d43bbf/0778e1a0ae887e6423bce985298e3f8d60eb37a0/gistfile1.txt). Rather than choosing one or the other, Newman handles both log formats by outputting them at different log levels:
+Because Newman currently only understands how to filter messages based on their TO and SUBJECT fields, the standard log information is fairly helpful for basic application debugging needs. However, when dealing with complex problems, it is nice to be able to see [the raw contents of the messages](https://gist.githubusercontent.com/practicingruby/01fbab481a21f4d43bbf/raw/c0df16c518eed541025c3e8f022d20610a5b2f08/gistfile1.txt). Rather than choosing one or the other, Newman handles both log formats by outputting them at different log levels:
 
 ```ruby
 module Newman

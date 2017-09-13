@@ -405,7 +405,7 @@ if something goes wrong with the request.
 * Make the web root directory and port configurable.
 * Add support for POST requests. You could implement CGI by executing
 a script when it matches the path, or implement 
-the [Rack spec](http://rack.rubyforge.org/doc/SPEC.html) to
+the [Rack spec](https://github.com/rack/rack/blob/master/SPEC) to
 let the server serve Rack apps with `call`.
 * Reimplement the request loop using [GServer](http://www.ruby-doc.org/stdlib-2.0/libdoc/gserver/rdoc/GServer.html)
 (Ruby's generic threaded server) to handle multiple connections.
@@ -418,6 +418,6 @@ Happy hacking!
 Mathias Lafeldt for reviewing this article and providing feedback 
 before we published it.*
 
-> NOTE: If you'd like to learn more about this topic, consider doing the Practicing Ruby self-guided course on [Streams, Files, and Sockets](https://practicingruby.com/articles/study-guide-1?u=dc2ab0f9bb). You've already completed one of its reading exercises by working through this article!
+> NOTE: If you'd like to learn more about this topic, consider doing the Practicing Ruby self-guided course on [Streams, Files, and Sockets](http://practicingruby.com/articles/study-guide-1). You've already completed one of its reading exercises by working through this article!
 
-> SEE ALSO: A [similar HTTP server](https://github.com/emilyhorsman/practicing-ruby-examples/blob/v7_002python/v7/002python27/http_server.py) written in Python, contributed by [Emily Horsman](http://emilyhorsman.com/).
+> SEE ALSO: A [similar HTTP server](https://github.com/emilyhorsman/practicing-ruby-examples/blob/v7_002python/v7/002python27/http_server.py) written in Python, contributed by [Emily Horsman](https://github.com/emilyhorsman).

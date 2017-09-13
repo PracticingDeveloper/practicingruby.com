@@ -32,7 +32,7 @@ a fresh look at my use of TDD and how it effects my work. For a period
 of 90 days, I challenged myself to practice formal TDD as often as 
 possible, and to learn as much about 
 it as I could during that time. While the [original plans for my self
-study](http://practicingruby.com/articles/28) were much more
+study](http://practicingruby.com/articles/tdd-costs-and-benefits) were much more
 rigorous than what I ended up doing, I did maintain a fairly
 disciplined TDD workflow throughout the three month period, and that
 taught me a few lessons worth sharing.
@@ -41,10 +41,10 @@ To make it easier for us to discuss what I've learned, I've decided to
 break the lessons out into individual mini-articles, each with their own comments
 thread. Please follow the links below to read them:
 
-* [LESSON 1: End-to-end testing is essential](http://practicingruby.com/articles/66)
-* [LESSON 2: Refactoring is not redesign](http://practicingruby.com/articles/67)
-* [LESSON 3: Mock objects deeply influence design](http://practicingruby.com/articles/68)
-* [LESSON 4: Spiking is not cowboy coding](http://practicingruby.com/articles/69)
+* [LESSON 1: End-to-end testing is essential](http://practicingruby.com/articles/end-to-end-testing-is-essential)
+* [LESSON 2: Refactoring is not redesign](http://practicingruby.com/articles/refactoring-is-not-redesign)
+* [LESSON 3: Mock objects deeply influence design](http://practicingruby.com/articles/mock-objects-deeply-influence-design)
+* [LESSON 4: Spiking is not cowboy coding](http://practicingruby.com/articles/spiking-is-not-cowboy-coding)
 
 If you feel there are other lessons that you have learned from your own work
 with TDD, or you have general questions about how my self-study went, feel free

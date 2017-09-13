@@ -9,7 +9,7 @@ summary: Find out which Ruby hackers consistently write great content worth read
 issue_number: '1.17'
 ---
 
-In the [last issue](http://practicingruby.com/articles/45) we covered five folks who are working on really interesting projects. In this issue, I'd like to pay some attention to five other Ruby hackers who have caught my attention through their excellent technical writing. As a technical author myself, I am particularly moved by folks who educate and inform our community through more than just code, but through written words as well.
+In the [last issue](http://practicingruby.com/articles/ruby-hackers) we covered five folks who are working on really interesting projects. In this issue, I'd like to pay some attention to five other Ruby hackers who have caught my attention through their excellent technical writing. As a technical author myself, I am particularly moved by folks who educate and inform our community through more than just code, but through written words as well.
 
 Similar to Issue #16's list, this lineup is in no particular order, is far too short to do the community justice, and is purely subjective in nature. None of these folks knew I was going to write about them and my recommendations are completely unsolicited.
 
@@ -33,19 +33,19 @@ Similar to Magnus, I admire Jeff for breaking out of the standard 'blogging temp
 
 ### MenTaLguY ([@MenTaLguY](http://twitter.com/#!/MenTaLguY))
 
-I may be showing my long, flowing Ruby beard by recommending MenTaLguY on a list of bloggers who impressed me in 2010, since the bulk of the materials of his that interested me were published in 2005-2006. But two articles posted in 2010 really caught my eye, and are worth recognition on their own: [Atomic Operations in Ruby](http://moonbase.rydia.net/mental/blog/programming/atomic-operations-in-ruby.html) and [The Biggest Mistake Everyone Makes With Closures](http://moonbase.rydia.net/mental/blog/programming/the-biggest-mistake-everyone-makes-with-closures.html).
+I may be showing my long, flowing Ruby beard by recommending MenTaLguY on a list of bloggers who impressed me in 2010, since the bulk of the materials of his that interested me were published in 2005-2006. But two articles posted in 2010 really caught my eye, and are worth recognition on their own: [Atomic Operations in Ruby](https://web.archive.org/web/20160304023427/http://moonbase.rydia.net/mental/blog/programming/atomic-operations-in-ruby.html) and [The Biggest Mistake Everyone Makes With Closures](https://web.archive.org/web/20161105080832/http://moonbase.rydia.net/mental/blog/programming/the-biggest-mistake-everyone-makes-with-closures.html).
 
 These two articles are guaranteed to expose edge cases that will surprise all but the most diligent Rubyists, and are representative of the two things MenTaLguY has historically been known for: concurrency and functional programming.
 
-His blog is written in the old fashioned 'everything in one pot' style, and due to a mixture of non-technical and technical content, can be very challenging to dig through. For this reason, I've gone way back to his 2006 and 2007 writing and pulled a few articles worth checking out, which may intice you to dig even deeper.
+His blog is written in the old fashioned 'everything in one pot' style, and due to a mixture of non-technical and technical content, can be very challenging to dig through. For this reason, I've gone way back to his 2006 and 2007 writing and pulled a few articles worth checking out, which may entice you to dig even deeper.
 
-* [Simple Lazy Streams](http://moonbase.rydia.net/mental/blog/programming/simple-lazy-streams.html) 
-* [Currying in Ruby](http://moonbase.rydia.net/mental/blog/programming/currying-in-ruby.html) 
-* [Monads in Ruby](http://moonbase.rydia.net/mental/writings/programming/monads-in-ruby/)
-* [Concise Memoization](http://moonbase.rydia.net/mental/blog/programming/concise-memoization.html)
-* [Eavesdropping on Expressions](http://moonbase.rydia.net/mental/blog/programming/eavesdropping-on-expressions.html) 
-* [Ruby Symbols Explained](http://moonbase.rydia.net/mental/blog/programming/ruby-symbols-explained.html)
-* [Concurrency Five Ways](http://moonbase.rydia.net/mental/blog/programming/concurrency-five-ways.html)
+* [Simple Lazy Streams](https://web.archive.org/web/20161105081110/http://moonbase.rydia.net:80/mental/blog/programming/simple-lazy-streams.html) 
+* [Currying in Ruby](https://web.archive.org/web/20161105080813/http://moonbase.rydia.net:80/mental/blog/programming/currying-in-ruby.html) 
+* [Monads in Ruby](https://web.archive.org/web/20161105081421/http://moonbase.rydia.net:80/mental/writings/programming/monads-in-ruby/)
+* [Concise Memoization](https://web.archive.org/web/20161105080750/http://moonbase.rydia.net:80/mental/blog/programming/concise-memoization.html)
+* [Eavesdropping on Expressions](https://web.archive.org/web/20161105081056/http://moonbase.rydia.net:80/mental/blog/programming/eavesdropping-on-expressions.html) 
+* [Ruby Symbols Explained](https://web.archive.org/web/20160330181745/http://moonbase.rydia.net/mental/blog/programming/ruby-symbols-explained.html)
+* [Concurrency Five Ways](https://web.archive.org/web/20161105080800/http://moonbase.rydia.net:80/mental/blog/programming/concurrency-five-ways.html)
 
 The reason I've included MenTaLguY in this lineup is because I feel like he is a representation of an unapologetically deeply technical person that we are seeing less and less of in a more commercialized ecosystem that tends to value shiny tools and productivity tips over deep knowledge and theory. While the new world isn't a bad one because we all can find jobs in it, I remember a different community that leaned more towards MenTaLguY's direction as recent as five years ago.
 

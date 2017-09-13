@@ -13,7 +13,7 @@ issue_number: '4.6'
 *This article is written by Piotr Szotkowski. Greg invited Piotr to contribute
 to Practicing Ruby after seeing his RubyConf 2011 talk _Persisting
 Relations Across Time and Space_
-([slides](http://persistence-rubyconf-2011.heroku.com),
+([slides](http://talks.chastell.net/rubyconf-2011),
 [video](http://confreaks.net/videos/657)). This is not a one-to-one text
 version of that talk; Piotr has instead chosen to share some thoughts on the topics of
 [polyglot persistence](http://architects.dzone.com/articles/polyglot-persistence-future)
@@ -192,7 +192,7 @@ database of email
 signatures](https://github.com/chastell/dotfiles/blob/aee1d31618e2e4ea88186eda163f29ebd72702d1/.local/share/signore/signatures.yml)
 consists of 4,000 entries and works fast enough.
 
-> **NOTE:** If you’re eager to try YAML as a storage backend, check out [YAML Record](https://github.com/nico-taing/yaml_record) and [YAML Model](http://www.darkarts.co.za/yaml-model).
+> **NOTE:** If you’re eager to try YAML as a storage backend, check out [YAML Record](https://github.com/nicotaing/yaml_record) and [YAML Model](https://web.archive.org/web/20140727052610/http://www.darkarts.co.za/yaml-model).
 
 ### Sweet relations: how do they work?
 
@@ -237,8 +237,7 @@ example, retrieving all of the comments by a given person or getting the list of
 most recent comments means scanning through the whole `posts` collection.
 
 Although some document databases employ implicit, foreign-key-like references
-(e.g., MongoDB’s DBRefs, which are two-key documents of the form `{ $ref:
-<collection>, $id: <object_id> }`), dereferencing relations is usually a bigger
+(e.g., MongoDB’s DBRefs, which are two-key documents of the form `{ $ref: <collection>, $id: <object_id> }`), dereferencing relations is usually a bigger
 problem (due to the lack of standard approaches like SQL `JOIN` queries) and is
 often done on the client side, even if it’s greatly simplified by tools like
 [MongoHydrator](https://github.com/gregspurrier/mongo_hydrator).
@@ -308,7 +307,7 @@ between objects is to persist the objects not in a way that requires explicit
 mapping, but by using an object database.
 
 In the past, there were a few approaches to solving this problem in Ruby—
-notable contestants being [Madeleine](http://madeleine.rubyforge.org),
+notable contestants being [Madeleine](https://github.com/andrzejkrzywda/madeleine),
 [ODB](http://zeropluszero.com/software/odb/), and
 [HybridDB](https://github.com/pauliephonic/hybriddb); unfortunately, all of
 these seem to be no longer maintained (although some birds at the wroc\_love.rb
@@ -426,5 +425,5 @@ If this topic sounds intriguing, you might be
 interested in another of my talks, which was given at wroc\_love.rb this year (with a
 highly revised version scheduled for the Scottish Ruby Conference in Edinburgh):
 _Decoupling Persistence (Like There’s Some Tomorrow)_
-([slides](http://decoupling-wrocloverb-2012.heroku.com),
+([slides](http://talks.chastell.net/src-2012),
 [video](https://www.youtube.com/watch?v=w7Eol9N3jGI)).

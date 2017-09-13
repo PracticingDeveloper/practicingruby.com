@@ -550,7 +550,7 @@ class ArticlesController < ApplicationController
 end
 ```
 
-This is clearly not a portrait of healthy code! In fact, it looks suspiciously similiar to the code samples that "lost the plot" in Avdi Grimm's contributed article on [confident coding](https://practicingruby.com/articles/confident-ruby). That said, it's probably more fair to say that there wasn't much of a well defined plot when this code was written in the first place, and my attempts to modify it only muddied things further. 
+This is clearly not a portrait of healthy code! In fact, it looks suspiciously similiar to the code samples that "lost the plot" in Avdi Grimm's contributed article on [confident coding](http://practicingruby.com/articles/confident-ruby). That said, it's probably more fair to say that there wasn't much of a well defined plot when this code was written in the first place, and my attempts to modify it only muddied things further. 
 
 It was hard for me to determine whether or not I should attempt to refactor this code right away or wait until later. From a purely technical perspective, the answer was obvious that this code needed to be cleaned up. But looking at it from another angle, I wanted to make sure that the external behavior of the system was what I actually wanted before I invested more time into optimizing its implementation. I didn't have insight at this point in time to answer that question, so I decided to leave the code messy for the time being until I had a chance to see how well the new sharing mechanism performed in production. 
 

@@ -207,7 +207,7 @@ to adopt is reflected in the handy-dandy flow chart shown below:
 
 <div align="center">
 <img
-src="http://upload.wikimedia.org/wikipedia/en/9/9c/Test-driven_development.PNG"
+src="https://web.archive.org/web/20140806004301/https://upload.wikimedia.org/wikipedia/en/9/9c/Test-driven_development.PNG"
 title="Image Credit: Excirial on Wikipedia CC-SA" >
 </div>
 

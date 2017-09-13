@@ -15,7 +15,7 @@ articles to keep them disconnected from a particular point in time, but
 in this case I intentionally left them in because the post is written
 in a sort of "diary" style. It was originally posted in January 2011.
 
-In the [previous issue](http://practicingruby.com/articles/50), I provided a
+In the [previous issue](http://practicingruby.com/articles/how-to-practice-1), I provided a
 series of questions and instructions that outlined the way I practice. While
 some may have been expecting code katas or other indirect exercises, my style is
 more geared towards learning on the job. You start by figuring out what's
@@ -28,7 +28,7 @@ project or explore a new area that I'm not that familiar with. As luck would
 have it, I actually have a new project I need to start, and so today I'll give
 you the chance to metaphorically look over my shoulder as I work through this
 exercise myself. If you haven't read [Issue
-#21](http://practicingruby.com/articles/50), now is a good time to do that, so
+#21](http://practicingruby.com/articles/how-to-practice-1), now is a good time to do that, so
 that the rest of this article makes sense.
 
 ### Step 1: Find out what's important 
@@ -381,7 +381,7 @@ until it too, becomes too small.
 
 This is how I practice. I hope hearing about it has been useful to you.
 
-<b>UPDATE 2011.09.09</b>: <i> The [PuzzleNode website](http://puzzlenode.com)
+<b>UPDATE 2011.09.09</b>: <i> The [PuzzleNode website](http://www.puzzlenode.com/)
 was successfully launched on time, and has been used to conduct three entrance
 exams for Mendicant University already. The puzzles there are language agnostic,
 and may be fun to try out even if you aren't planning to apply to MU. But I'd be

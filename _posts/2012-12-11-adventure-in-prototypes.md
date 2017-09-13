@@ -34,10 +34,10 @@ Ruby comes from the class-based school of OO language design. But it's
 flexible enough that with a little cleverness, we can experiment with
 prototype-style coding. In this article that's just what we'll do.
 
-[self]: http://en.wikipedia.org/wiki/Self_(programming_language
+[self]: https://en.wikipedia.org/wiki/Self_(programming_language)
 [io]: http://en.wikipedia.org/wiki/Io_(programming_language)
 [rogue]: http://rubyrogues.com/
-[tapas]: http://devblog.avdi.org/rubytapas/
+[tapas]: https://www.rubytapas.com/
 [virtuous]: http://devblog.avdi.org/
 
 ## Getting started

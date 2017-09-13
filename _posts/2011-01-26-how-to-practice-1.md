@@ -88,7 +88,7 @@ your goals. But Freakonomics thinks he's wrong, and so do I.
 Every single project that I've been successful on, I've described in public
 before I even broke ground. The [original Ruby Mendicant
 project](http://www.oreillynet.com/ruby/blog/2008/03/id_love_to_quit_my_job_sort_of.html)
-that brought us [Prawn](http://github.com/sandal/prawn), and my current work at
+that brought us [Prawn](https://github.com/prawnpdf/prawn), and my current work at
 [Mendicant University](http://university.rubymendicant.com) are just two
 examples that I can offer some anecdotal evidence for.
 

@@ -218,6 +218,6 @@ avoid some of the most common mistakes people make, but the rest is up to you!
 If you want to learn more about method-level interface design, James Noble wrote
 a great paper on the topic called [Arguments and
 Results](http://www.laputan.org/pub/patterns/noble/noble.pdf). I strongly
-recommend reading his work, as well as [Issue 2.14](https://practicingruby.com/articles/shared/vpxpovppchww) 
-and [Issue 2.15](https://practicingruby.com/articles/shared/mupuergickjz) of
+recommend reading his work, as well as [Issue 2.14](http://practicingruby.com/articles/arguments-and-results-1) 
+and [Issue 2.15](http://practicingruby.com/articles/arguments-and-results-2) of
 Practicing Ruby, which cover the same topic with some Ruby-specific examples.

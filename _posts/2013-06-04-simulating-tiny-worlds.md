@@ -18,7 +18,7 @@ In this article, I will walk you through some fun examples that demonstrate how 
 
 ## Setting the stage
 
-The source of my motivation for writing on this topic is the [StarLogo](http://education.mit.edu/starlogo/) programming environment and Mitchel Resnick's excellent book "Turtles, Termites, and Traffic Jams", both of which illustrate the potential for software to be used as a mind-expanding thinking tool.
+The source of my motivation for writing on this topic is the [StarLogo](http://education.mit.edu/portfolio_page/starlogo-tng/) programming environment and Mitchel Resnick's excellent book "Turtles, Termites, and Traffic Jams", both of which illustrate the potential for software to be used as a mind-expanding thinking tool.
 
 As the title of the book implies, StarLogo is an environment that facilitates simplistic modeling of scenarios that occur in the natural world. The purpose of the tool is not to create environments that closely emulate reality, but instead, to encourage exploration and discovery in simple, tightly constrained microcosms. Apart from being an intellectual curiosity, this sort of toolset provides a powerful way to intuitively experience deep concepts that range from self-organization and emergent behavior to massive parallelism.
 
@@ -166,7 +166,7 @@ Because it's the live interactions in this system that are complex and not its r
 
 As you may have already guessed, StarLogo's data model doesn't just give you creatures and patches, but it also supports interactions between the two. Because both the creatures and patches can encapsulate arbitrarily complex data, and because StarLogo provides a solid API for various kinds of common tasks, the richness of behavior that can be expressed through these interactions is mind boggling.
 
-The full StarLogo environment can tackle problems like ant foraging behavior with ease, a problem that I labored with for weeks and spent two issues of Practicing Ruby on ([Issue 5.8](https://practicingruby.com/articles/92) and [Issue 5.9](https://practicingruby.com/articles/93)). However, the features I've ported from StarLogo into the Terrarium project are somewhat limited, so we'll tackle a more basic scenario that will still give you a sense of how creatures and patches can interact with one another.
+The full StarLogo environment can tackle problems like ant foraging behavior with ease, a problem that I labored with for weeks and spent two issues of Practicing Ruby on ([Issue 5.8](http://practicingruby.com/articles/expanding-your-code-reading-horizons) and [Issue 5.9](http://practicingruby.com/articles/ant-colony-simulation). However, the features I've ported from StarLogo into the Terrarium project are somewhat limited, so we'll tackle a more basic scenario that will still give you a sense of how creatures and patches can interact with one another.
 
 We'll now take a stab at implementing a simple ecosystem in which hungry rabbits wander around doing what rabbits tend to do: eating, procreating, and dying. This is the sort of predator/prey modeling problem that you might find on a school math test, but we'll approach it informally rather than brushing up on our differential equations.
 

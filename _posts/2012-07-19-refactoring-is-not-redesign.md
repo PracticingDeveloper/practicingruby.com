@@ -10,8 +10,8 @@ summary: 'Discover how the differences between refactoring and redesign affect t
 issue_number: 4.12.2
 ---
 
-> **NOTE**: This is one of [four lessons learned](http://practicingruby.com/articles/65) 
-from my [90 day self-study on test-driven development](http://practicingruby.com/articles/28). 
+> **NOTE**: This is one of [four lessons learned](http://practicingruby.com/articles/tdd-lessons-learned) 
+from my [90 day self-study on test-driven development](http://practicingruby.com/articles/tdd-costs-and-benefits). 
 If this topic interests you,  be sure to check out the other lessons! 
 
 To maintain a productive TDD workflow, you need understand the difference

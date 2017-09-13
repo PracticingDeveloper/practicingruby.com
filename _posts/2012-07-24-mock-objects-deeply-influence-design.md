@@ -11,11 +11,11 @@ issue_number: 4.12.3
 ---
 
 > **NOTE:** This is one of [four lessons
-> learned](http://practicingruby.com/articles/65) from my 90 day [self-study on
-> test-driven development](http://practicingruby.com/articles/28). 
+> learned](http://practicingruby.com/articles/tdd-lessons-learned) from my 90 day [self-study on
+> test-driven development](http://practicingruby.com/articles/tdd-costs-and-benefits). 
 > If this topic interests you, be sure to check out the other lessons!
 
-Before this study, I knew that I [rarely used mock objects](http://practicingruby.com/articles/49) 
+Before this study, I knew that I [rarely used mock objects](http://practicingruby.com/articles/thoughts-on-mocking-2) 
 in my tests, but I didn't clearly understand why that was the case. When asked to explain my 
 preferences, I typically would offer some vague argument about keeping things
 simple, and then go on to complain about test brittleness. Because I knew many
@@ -60,7 +60,7 @@ will be maximized and their drawbacks minimized. The interesting thing is that
 while several of these heuristics are meant to improve the testability of code,
 nearly as many have a direct influence on software design in general. Taken
 together, the following four points strongly favor [responsibility-centric
-design](http://practicingruby.com/articles/64):
+design](http://practicingruby.com/articles/responsibility-centric-vs-data-centric-design):
 
 * Don't use getters.
 * Only mock your immediate neighbors.

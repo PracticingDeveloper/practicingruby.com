@@ -10,7 +10,7 @@ summary: Consider how the ideas from Martin Fowler's "Mocks aren't Stubs" can be
 issue_number: '1.19'
 ---
 
-When I originally published my [small rant on testing](http://practicingruby.com/articles/47), it generated a spirited discussion about a number of different topics. It even lead [Bryan Liles](http://twitter.com/bryanl) to post a great set of [testing guidelines](https://gist.github.com/785610) to balance out my unfocused rant. But the topic that overshadowed almost everything else was that of best practices regarding mock objects. In this two part article, we'll try to shine some light on that topic, because it is clearly still a point of confusion and occasionally even controversy within our community.
+When I originally published my [small rant on testing](http://practicingruby.com/articles/dirty-testing-secrets), it generated a spirited discussion about a number of different topics. It even lead [Bryan Liles](http://twitter.com/bryanl) to post a great set of [testing guidelines](https://gist.github.com/785610) to balance out my unfocused rant. But the topic that overshadowed almost everything else was that of best practices regarding mock objects. In this two part article, we'll try to shine some light on that topic, because it is clearly still a point of confusion and occasionally even controversy within our community.
 
 In Issue #20, I will go over some examples of when I use mock objects and when I don't, and try to come up with some guidelines for building test suites that do their job without becoming too brittle. But before we can really discuss practices, we need to establish a baseline level of theory and background knowledge, which is what this post is all about.
 

@@ -9,7 +9,7 @@ summary: Build dynamic Ruby-based configuration objects.
 issue_number: '1.4'
 ---
 
-In [Issue #3](http://practicingruby.com/articles/31), we looked at the downsides
+In [Issue #3](http://practicingruby.com/articles/configurable-applications-1), we looked at the downsides
 of mixing configuration code with application code. We discussed how storing
 configuration data in YAML files can solve many of those issues, but not
 all of them. In this article, we will explore the limitations of the YAML 

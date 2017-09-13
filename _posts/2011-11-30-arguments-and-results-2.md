@@ -14,7 +14,7 @@ Back in 1997, James Noble published a paper called [Arguments and Results](http:
 
 <u>Arguments and Results</u> is written in such a way that it is natural to split the patterns it describes into two separate groups: patterns about method arguments and patterns about the results returned by methods. I've decided to split this Practicing Ruby article in the same manner in order to make it easier for me to write and easier for you to read. 
 
-In [Issue 2.14](http://practicingruby.com/articles/14) I outlined various kinds of arguments objects that can be used to simplify the messages being sent within a system. In this issue, I will show how results objects can provide similar flexibility on the response side of things.
+In [Issue 2.14](http://practicingruby.com/articles/arguments-and-results-1) I outlined various kinds of arguments objects that can be used to simplify the messages being sent within a system. In this issue, I will show how results objects can provide similar flexibility on the response side of things.
 
 ### Results objects
 
@@ -221,7 +221,7 @@ class LazyObject < BasicObject
 end
 ```
 
-Another option would be to use [lazy.rb](http://moonbase.rydia.net/software/lazy.rb/), which provides similar functionality via `Lazy::Promise` objects that get instantiated via the `Lazy.promise` method:
+Another option would be to use [lazy.rb](https://github.com/mental/lazy), which provides similar functionality via `Lazy::Promise` objects that get instantiated via the `Lazy.promise` method:
 
 ```ruby
 require "lazy"
@@ -360,7 +360,7 @@ While implementing a generic future object from scratch would not be difficult f
 
 The most important thing to keep in mind is that thread scheduling in standard Ruby is affected by a global interpreter lock (GIL) which makes it so that most computations end up blocking the execution of other threads. Alternative implementations such as JRuby and Rubinius remove this lock, but in standard Ruby this basically means that threads are mostly useful for backgrounding operations such as file and network I/O. This is because unlike most computations, I/O operations will give other threads a chance to run while waiting on their data to become available. Because lazy.rb's implementation is thread based, future objects inherit the same set of restrictions. The other thing to be aware of is that Ruby does not explicitly join all of its threads once the main execution thread completes. This means that if I did not explicitly call `downloader.finish_all_downloads` in the previous example, the threads spun up by my future objects would be terminated if the main thread finished up before the downloads were completed. This may be obvious to anyone with a background in concurrency, but I scratched by head for a bit because of this issue.
 
-Other than those issues, future objects pretty much allow you to solve some basic concurrency problems without knowing a whole lot about how to work with low level concurrency primitives. While the example I've shown here is a bit dull, I can imagine this technique might come in handy for things like sending emails or doing some time intensive computations that are part of an interactive reporting system. Both of these are problems I've had to solve before using tools like [Resque](https://github.com/defunkt/resque), but simple future objects might prove to be a lightweight 
+Other than those issues, future objects pretty much allow you to solve some basic concurrency problems without knowing a whole lot about how to work with low level concurrency primitives. While the example I've shown here is a bit dull, I can imagine this technique might come in handy for things like sending emails or doing some time intensive computations that are part of an interactive reporting system. Both of these are problems I've had to solve before using tools like [Resque](https://github.com/resque/resque), but simple future objects might prove to be a lightweight 
 alternative. I'd be curious to hear from our readers who have some concurrency experience whether that seems like a good idea or not, and also whether you have ideas for other potential applications of future objects.
 
 ## Reflections
