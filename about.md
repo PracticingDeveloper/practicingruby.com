@@ -29,5 +29,6 @@ Support from readers like you make this possible!
 <p>
 Thanks to a <a href="https://www.kickstarter.com/projects/828998531/practicing-ruby-contributors-fund">Kickstarter campaign</a> we ran in June 2015, Practicing Ruby is able to offer a modest honorarium of $500 for all guest collaborators.</p>
 
-<p>If you're interested in contributing to Practicing Ruby, send a brief email about your idea to <a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a>. You do not need to be an experienced technical writer to participate! Collaborations typically consist of about three to five meetings one hour with Gregory, and a few hours of solo research work to prepare notes and code samples. 
-</p>
+<p>If you're interested in contributing to Practicing Ruby, send a brief email about your idea to <a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a>.<p>
+
+<p>You do not need to be an experienced technical writer to participate! Collaborations typically consist of about five meetings with Gregory (60-90 mins each), and a few hours of solo research and development work to prepare notes and code samples.</p>
