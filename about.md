@@ -1,40 +1,33 @@
 ---
 layout: page
-title: About
+title: About Practicing Ruby
 permalink: /about
 ---
 
-<a href="http://tinyletter.com/programming-beyond-practices">
-<img src="/pbp-cover.jpg" width="200px" style="float: right; padding-left: 40px; padding-bottom: 20px;"/>
-</a>
+<p>This project was started by <a href="https://practicingdeveloper.com">Gregory Brown</a> in 2010, and is meant to help software developers everywhere broaden their horizons and see their work in a new light.</p><p>Although it went on (unplanned) hiatus for a couple years while while Gregory wrestled with "the rest of life" ... a renewed effort began in October 2017 to bring the project back to life.
 
-<div style="text-align: justify; width: 500px;">
-<p>
-If you enjoy Practicing Ruby and want to support my work, please sign up
-for the free <a href="http://tinyletter.com/programming-beyond-practices">Programming Beyond Practices newsletter</a>.</p>
+<br>
+<hr>
+<br>
 
-<p>
-I am currently working on a book for O'Reilly by the same name, and its newsletter
-is where I've been sharing ideas, notes, and sample chapters.
-If you like what I'm posting there, please forward the emails along to others,
-and buy the book when it's ready for purchase.
-</p>
-
-<p>
-I plan to use my royalties from this book to fund my own time working on Practicing Ruby,
-with the goal of doing a dozen collaborations with thoughtful Ruby community
-members in the near future. I spend anywhere from 5-10 work days on each collaboration,
-so this is a very labor-intensive process for me.
-</p>
-
-<p>
-Thanks to a <a href="https://www.kickstarter.com/projects/828998531/practicing-ruby-contributors-fund">Kickstarter campaign</a> we ran in June 2015, funding has already been secured to pay a $500 honorarium to
-each collaborator that contributes to Practicing Ruby.
-</p>
-
-<p>
-Practicing Ruby is independent, open access, and will never run advertisements.
+<p style="text-align: center;">
+<strong>Practicing Ruby is proudly independent, open source, and will never run advertisements.
 Support from readers like you make this possible!
+</strong>
 </p>
 
-</div>
+<p style="text-align: center;">
+<a href="https://www.patreon.com/bePatron?u=837706" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+</p>
+
+<br>
+<hr>
+<br>
+
+<h3>Want your own lessons to be featured here?</h3>
+
+<p>
+Thanks to a <a href="https://www.kickstarter.com/projects/828998531/practicing-ruby-contributors-fund">Kickstarter campaign</a> we ran in June 2015, Practicing Ruby is able to offer a modest honorarium of $500 for all guest collaborators.</p>
+
+<p>If you're interested in contributing to Practicing Ruby, send a brief email about your idea to <a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a>. You do not need to be an experienced technical writer to participate! Collaborations typically consist of about three to five meetings one hour with Gregory, and a few hours of solo research work to prepare notes and code samples. 
+</p>
