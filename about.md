@@ -31,4 +31,4 @@ Thanks to a <a href="https://www.kickstarter.com/projects/828998531/practicing-r
 
 <p>If you're interested in contributing to Practicing Ruby, send a brief email about your idea to <a href="mailto:gregory@practicingdeveloper.com">gregory@practicingdeveloper.com</a>.<p>
 
-<p>You do not need to be an experienced technical writer to participate! Collaborations typically consist of about five meetings with Gregory (60-90 mins each), and a few hours of solo research and development work to prepare notes and code samples.</p>
+<p>You do not need to be an experienced technical writer to participate! Collaborations typically consist of about five meetings with Gregory (60-90 mins each), and a few hours of solo research and development work to prepare notes and code samples over the span of a few weeks.</p>
