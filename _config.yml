@@ -13,8 +13,6 @@ description: > # this means to ignore newlines until "baseurl:"
   Ruby developers.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://practicingruby.com" # the base hostname & protocol for your site
-twitter_username: practicingdev
-github_username:  practicingdeveloper
 
 # Build settings
 markdown: kramdown
