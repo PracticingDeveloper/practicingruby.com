@@ -11,7 +11,7 @@ permalink: /about
 <br>
 
 <p style="text-align: center;">
-<strong>Practicing Ruby is proudly independent, open source, and will never run advertisements.
+<strong>Practicing Ruby is proudly independent, open source, and will never run advertisements.<br/>
 Support from readers like you make this possible!
 </strong>
 </p>
